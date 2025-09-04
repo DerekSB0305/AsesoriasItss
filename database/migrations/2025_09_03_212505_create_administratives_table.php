@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('last_name_father', 50); # Apellido paterno
             $table->string('last_name_mother', 50); # Apellido materno
             $table->string('position', 50); # Puesto
-            $table->unsignedBigInteger('department_id'); # ID del departamento
+            $table->foreignId('department_id')->constrained('departments')->onDelete('cascade'); # ID del departamento
             $table->timestamps();
         });
     }

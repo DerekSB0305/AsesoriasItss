@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name', 100); # Nombre de la materia
             $table->integer('credits'); # Créditos de la materia
-            $table->unsignedBigInteger('career_id'); # ID de la carrera
+            $table->foreignId('career_id')->constrained('careers')->onDelete('cascade'); # ID de la carrera
             $table->timestamps();
         });
     }

@@ -17,10 +17,10 @@ return new class extends Migration
             $table->string('last_name_mother', 50); // Apellido materno    
             $table->string('first_name', 50); // Nombre(s)
             $table->integer('semester'); // Semestre
-            $table->unsignedBigInteger('career_id'); // ID de la carrera
+            $table->foreignId('career_id')->constrained('careers')->onDelete('cascade'); // ID de la carrera
             $table->string('gender', 10); // Género
             $table->integer('age'); // Edad
-            $table->unsignedBigInteger('teacher_id'); // ID del tutor
+            $table->foreignId('teacher_id')->constrained('teachers')->onDelete('cascade'); // ID del tutor
             $table->timestamps();
         });
     }

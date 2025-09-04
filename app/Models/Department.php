@@ -9,4 +9,11 @@ class Department extends Model
 {
     /** @use HasFactory<\Database\Factories\DepartmentFactory> */
     use HasFactory;
+
+    protected $fillable = ['name', 'type', 'location'];
+
+    public function administratives()
+    {
+        return $this->hasMany(Administrative::class);
+    }
 }

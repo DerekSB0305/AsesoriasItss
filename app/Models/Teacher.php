@@ -9,4 +9,23 @@ class Teacher extends Model
 {
     /** @use HasFactory<\Database\Factories\TeacherFactory> */
     use HasFactory;
+
+    protected $fillable = ['first_name', 'last_name_father', 'last_name_mother', 'career_id', 'study_degree', 'tutor'];
+
+    public function career()
+    {
+        return $this->belongsTo(Career::class);
+    }
+
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
+
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class, 'teacher_subjects')
+                    ->withPivot('career_id')
+                    ->withTimestamps();
+    }
 }

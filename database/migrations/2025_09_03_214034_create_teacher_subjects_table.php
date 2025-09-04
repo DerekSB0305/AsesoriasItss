@@ -13,10 +13,13 @@ return new class extends Migration
     {
         Schema::create('teacher_subjects', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('teacher_id'); # ID del profesor
-            $table->unsignedBigInteger('subject_id'); # ID de la materia
-            $table->unsignedBigInteger('career_id'); # ID de la carrera
+            $table->foreignId('teacher_id')->constrained('teachers')->onDelete('cascade'); # ID del profesor
+            $table->foreignId('subject_id')->constrained('subjects')->onDelete('cascade'); # ID de la materia
+            $table->foreignId('career_id')->constrained('careers')->onDelete('cascade'); # ID de la carrera
             $table->timestamps();
+
+            #Evitar duplicados
+            $table->unique(['teacher_id', 'subject_id', 'career_id']);
         });
     }
 

@@ -9,4 +9,21 @@ class TeacherSubject extends Model
 {
     /** @use HasFactory<\Database\Factories\TeacherSubjectFactory> */
     use HasFactory;
+
+    protected $fillable = ['teacher_id', 'subject_id', 'career_id'];
+
+    public function teacher()
+    {
+        return $this->belongsTo(Teacher::class);
+    }
+
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class);
+    }
+
+    public function career()
+    {
+        return $this->belongsTo(Career::class);
+    }
 }
