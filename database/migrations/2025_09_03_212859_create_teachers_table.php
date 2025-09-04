@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('teachers', function (Blueprint $table) {
             $table->id();
+            $table->string('first_name', 50); # Nombre(s)
+            $table->string('last_name_father', 50); # Apellido paterno
+            $table->string('last_name_mother', 50); # Apellido materno
+            $table->unsignedBigInteger('career_id'); # ID de la carrera
+            $table->string('study_degree', 50); # Grado de estudio
+            $table->boolean('tutor')->default(false); # Indica si es tutor
             $table->timestamps();
         });
     }

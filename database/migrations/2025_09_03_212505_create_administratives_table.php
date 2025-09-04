@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('administratives', function (Blueprint $table) {
             $table->id();
+            $table->string('first_name', 50); # Nombre(s)
+            $table->string('last_name_father', 50); # Apellido paterno
+            $table->string('last_name_mother', 50); # Apellido materno
+            $table->string('position', 50); # Puesto
+            $table->unsignedBigInteger('department_id'); # ID del departamento
             $table->timestamps();
         });
     }

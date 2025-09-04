@@ -12,7 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('students', function (Blueprint $table) {
-            $table->id();
+            $table->string('enrollment', 8)->primary(); // Matrícula
+            $table->string('last_name_father', 50); // Apellido paterno
+            $table->string('last_name_mother', 50); // Apellido materno    
+            $table->string('first_name', 50); // Nombre(s)
+            $table->integer('semester'); // Semestre
+            $table->unsignedBigInteger('career_id'); // ID de la carrera
+            $table->string('gender', 10); // Género
+            $table->integer('age'); // Edad
+            $table->unsignedBigInteger('teacher_id'); // ID del tutor
             $table->timestamps();
         });
     }

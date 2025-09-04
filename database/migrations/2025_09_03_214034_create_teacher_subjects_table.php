@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('teacher_subjects', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('teacher_id'); # ID del profesor
+            $table->unsignedBigInteger('subject_id'); # ID de la materia
+            $table->unsignedBigInteger('career_id'); # ID de la carrera
             $table->timestamps();
         });
     }

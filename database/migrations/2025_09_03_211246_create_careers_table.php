@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('careers', function (Blueprint $table) {
             $table->id();
+            $table->string('name', 100); # Nombre de la carrera
+            $table->string('study_plan', 100); # Plan de estudios
             $table->timestamps();
         });
     }

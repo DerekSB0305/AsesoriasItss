@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('subjects', function (Blueprint $table) {
             $table->id();
+            $table->string('name', 100); # Nombre de la materia
+            $table->integer('credits'); # Créditos de la materia
+            $table->unsignedBigInteger('career_id'); # ID de la carrera
             $table->timestamps();
         });
     }
