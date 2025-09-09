@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Administrative;
+use App\Models\Department;
 use Illuminate\Http\Request;
 
 class AdministrativeController extends Controller
@@ -12,7 +13,8 @@ class AdministrativeController extends Controller
      */
     public function index()
     {
-        //
+       $administratives = Administrative::with('department')->get();
+        return view('administratives.index', compact('administratives'));
     }
 
     /**
@@ -20,7 +22,8 @@ class AdministrativeController extends Controller
      */
     public function create()
     {
-        //
+        $departments = Department::all();
+        return view('administratives.create', compact('departments'));
     }
 
     /**
@@ -28,7 +31,17 @@ class AdministrativeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:50',
+            'last_name_father' => 'required|string|max:50',
+            'last_name_mother' => 'required|string|max:50',
+            'position' => 'required|string|max:50',
+            'department_id' => 'required|exists:departments,id',
+        ]);
+
+        Administrative::create($validated);
+
+        return redirect()->route('administratives.index')->with('success', 'Administrativo creado exitosamente.');
     }
 
     /**
@@ -44,7 +57,8 @@ class AdministrativeController extends Controller
      */
     public function edit(Administrative $administrative)
     {
-        //
+        $departments = Department::all();
+        return view('administratives.edit', compact('administrative', 'departments'));
     }
 
     /**
@@ -52,7 +66,17 @@ class AdministrativeController extends Controller
      */
     public function update(Request $request, Administrative $administrative)
     {
-        //
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:50',
+            'last_name_father' => 'required|string|max:50',
+            'last_name_mother' => 'required|string|max:50',
+            'position' => 'required|string|max:50',
+            'department_id' => 'required|exists:departments,id',
+        ]);
+
+        $administrative->update($validated);
+
+        return redirect()->route('administratives.index')->with('success', 'Administrativo actualizado exitosamente.');
     }
 
     /**
@@ -60,6 +84,7 @@ class AdministrativeController extends Controller
      */
     public function destroy(Administrative $administrative)
     {
-        //
+        $administrative->delete();
+        return redirect()->route('administratives.index')->with('success', 'Administrativo eliminado exitosamente.');
     }
 }

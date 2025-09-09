@@ -11,7 +11,6 @@
     <table>
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Nombre</th>
                 <th>Tipo</th>
                 <th>Ubicación</th>
@@ -19,9 +18,9 @@
             </tr>
         </thead>
         <tbody>
+            <a href="{{ route('departments.create') }}">Crear nuevo departamento</a>
             @foreach ($departments as $department)
                 <tr>
-                    <td>{{ $department->id }}</td>
                     <td>{{ $department->name }}</td>
                     <td>{{ $department->type }}</td>
                     <td>{{ $department->location }}</td>

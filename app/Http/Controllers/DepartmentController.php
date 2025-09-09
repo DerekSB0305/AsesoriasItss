@@ -54,7 +54,7 @@ class DepartmentController extends Controller
      */
     public function edit(Department $department)
     {
-        //
+        return view('departments.edit', compact('department'));
     }
 
     /**
@@ -62,7 +62,15 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, Department $department)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:50',
+            'type' => 'required|string|max:50',
+            'location' => 'required|string|max:50',
+        ]);
+
+        $department->update($validated);
+        return redirect()->route('departments.index')->with('success', 'Departamento actualizado correctamente.');
+        
     }
 
     /**
@@ -70,6 +78,7 @@ class DepartmentController extends Controller
      */
     public function destroy(Department $department)
     {
-        //
+        $department->delete();
+        return redirect()->route('departments.index')->with('success', 'Departamento eliminado correctamente.');
     }
 }
