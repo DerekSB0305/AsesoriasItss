@@ -19,3 +19,6 @@ Route::middleware('auth')->group(function () {
 
 Route::resource('departments', \App\Http\Controllers\DepartmentController::class)->middleware('auth', 'verified');
 require __DIR__.'/auth.php';
+
+Route::resource('teachers', \App\Http\Controllers\TeacherController::class)->middleware('auth', 'verified');
+require __DIR__.'/auth.php';

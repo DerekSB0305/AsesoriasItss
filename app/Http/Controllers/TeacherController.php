@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Career;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,8 @@ class TeacherController extends Controller
      */
     public function index()
     {
-        //
+        $teachers = Teacher::with('career')->get(); // 👈 esto devuelve una colección
+    return view('teachers.index', compact('teachers'));
     }
 
     /**
@@ -20,7 +22,8 @@ class TeacherController extends Controller
      */
     public function create()
     {
-        //
+         $careers = Career::all(); // Traemos las carreras para el select
+        return view('teachers.create', compact('careers'));
     }
 
     /**
@@ -28,7 +31,17 @@ class TeacherController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:50',
+            'last_name_father' => 'required|string|max:50',
+            'last_name_mother' => 'required|string|max:50',
+            'career_id' => 'required|exists:careers,id',
+            'study_degree' => 'required|string|max:50',
+            'tutor' => 'sometimes|boolean',
+        ]);
+
+        \App\Models\Teacher::create($validated);
+        return redirect()->route('teachers.index')->with('success', 'Profesor creado correctamente.');
     }
 
     /**
@@ -36,7 +49,7 @@ class TeacherController extends Controller
      */
     public function show(Teacher $teacher)
     {
-        //
+        return view('teachers.show', compact('teacher'));
     }
 
     /**
@@ -44,7 +57,8 @@ class TeacherController extends Controller
      */
     public function edit(Teacher $teacher)
     {
-        //
+        $Careers = \App\Models\Career::all();
+        return view('teachers.edit', compact('teacher', 'Careers'));
     }
 
     /**
@@ -52,7 +66,17 @@ class TeacherController extends Controller
      */
     public function update(Request $request, Teacher $teacher)
     {
-        //
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:50',
+            'last_name_father' => 'required|string|max:50',
+            'last_name_mother' => 'required|string|max:50',
+            'career_id' => 'required|exists:careers,id',
+            'study_degree' => 'required|string|max:50',
+            'tutor' => 'sometimes|boolean',
+        ]);
+
+        $teacher->update($validated);
+        return redirect()->route('teachers.index')->with('success', 'Profesor actualizado correctamente.');
     }
 
     /**
@@ -60,6 +84,7 @@ class TeacherController extends Controller
      */
     public function destroy(Teacher $teacher)
     {
-        //
+        $teacher->delete();
+        return redirect()->route('teachers.index')->with('success', 'Profesor eliminado correctamente.');
     }
 }
