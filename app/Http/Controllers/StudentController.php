@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Career;
 use App\Models\Student;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -12,7 +14,8 @@ class StudentController extends Controller
      */
     public function index()
     {
-        //
+        $students = Student::with(['career', 'teacher'])->get();
+        return view('students.index', compact('students'));
     }
 
     /**
@@ -20,7 +23,9 @@ class StudentController extends Controller
      */
     public function create()
     {
-        //
+        $careers = Career::all();
+        $teachers = Teacher::all();
+        return view('students.create', compact('careers', 'teachers'));
     }
 
     /**
@@ -28,7 +33,22 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+         
+      $validated = $request->validate([
+            'enrollment' => 'required|string|max:8|unique:students,enrollment',
+            'last_name_father' => 'required|string|max:50',
+            'last_name_mother' => 'required|string|max:50',
+            'first_name' => 'required|string|max:50',
+            'semester' => 'required|integer|min:1|max:12',
+            'career_id' => 'required|exists:careers,id',
+            'gender' => 'required|string|max:10',
+            'age' => 'required|integer|min:15|max:100',
+            'teacher_id' => 'required|exists:teachers,id',
+        ]);
+
+        \App\Models\Student::create($validated);
+        return redirect()->route('students.index')
+                         ->with('success', 'Estudiante registrado correctamente.');
     }
 
     /**
@@ -36,7 +56,8 @@ class StudentController extends Controller
      */
     public function show(Student $student)
     {
-        //
+        $student->load(['career', 'teacher']);
+        return view('students.show', compact('student'));
     }
 
     /**
@@ -44,7 +65,9 @@ class StudentController extends Controller
      */
     public function edit(Student $student)
     {
-        //
+        $careers = Career::all();
+        $teachers = Teacher::all();
+        return view('students.edit', compact('student', 'careers', 'teachers'));
     }
 
     /**
@@ -52,7 +75,20 @@ class StudentController extends Controller
      */
     public function update(Request $request, Student $student)
     {
-        //
+        $request->validate([
+            'last_name_father' => 'required|string|max:50',
+            'last_name_mother' => 'required|string|max:50',
+            'first_name' => 'required|string|max:50',
+            'semester' => 'required|integer|min:1|max:12',
+            'career_id' => 'required|exists:careers,id',
+            'gender' => 'required|string|max:10',
+            'age' => 'required|integer|min:15|max:100',
+            'teacher_id' => 'nullable|exists:teachers,id',
+        ]);
+        $student->update($request->all());
+
+        return redirect()->route('students.index')
+                         ->with('success', 'Estudiante actualizado correctamente.');
     }
 
     /**
@@ -60,6 +96,9 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
-        //
+         $student->delete();
+
+        return redirect()->route('students.index')
+                         ->with('success', 'Estudiante eliminado correctamente.');
     }
 }

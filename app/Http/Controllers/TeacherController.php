@@ -13,7 +13,7 @@ class TeacherController extends Controller
      */
     public function index()
     {
-        $teachers = Teacher::with('career')->get(); // 👈 esto devuelve una colección
+        $teachers = Teacher::with('career')->get(); 
     return view('teachers.index', compact('teachers'));
     }
 
@@ -41,7 +41,8 @@ class TeacherController extends Controller
         ]);
 
         \App\Models\Teacher::create($validated);
-        return redirect()->route('teachers.index')->with('success', 'Profesor creado correctamente.');
+        return redirect()->route('teachers.index')
+        ->with('success', 'Profesor creado correctamente.');
     }
 
     /**
