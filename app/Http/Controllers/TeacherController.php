@@ -58,8 +58,8 @@ class TeacherController extends Controller
      */
     public function edit(Teacher $teacher)
     {
-        $Careers = \App\Models\Career::all();
-        return view('teachers.edit', compact('teacher', 'Careers'));
+        $careers = Career::all();
+        return view('teachers.edit', compact('teacher', 'careers'));
     }
 
     /**
