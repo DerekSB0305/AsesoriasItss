@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Career;
 use App\Models\Subject;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,8 @@ class SubjectController extends Controller
      */
     public function index()
     {
-        //
+        $subjects = Subject::with('career')->get();
+        return view('subjects.index', compact('subjects'));
     }
 
     /**
@@ -20,7 +22,8 @@ class SubjectController extends Controller
      */
     public function create()
     {
-        //
+        $careers = Career::all();
+        return view('subjects.create', compact('careers'));
     }
 
     /**
@@ -28,7 +31,15 @@ class SubjectController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'credits' => 'required|integer|min:1|max:10',
+            'career_id' => 'required|exists:careers,id',
+        ]);
+
+        Subject::create($request->all());
+        return redirect()->route('subjects.index')
+                         ->with('success', 'Materia registrada correctamente.');
     }
 
     /**
@@ -44,7 +55,8 @@ class SubjectController extends Controller
      */
     public function edit(Subject $subject)
     {
-        //
+        $careers = Career::all();
+        return view('subjects.edit', compact('subject', 'careers'));
     }
 
     /**
@@ -52,7 +64,15 @@ class SubjectController extends Controller
      */
     public function update(Request $request, Subject $subject)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'credits' => 'required|integer|min:1|max:10',
+            'career_id' => 'required|exists:careers,id',
+        ]);
+
+        $subject->update($request->all());
+        return redirect()->route('subjects.index')
+                         ->with('success', 'Materia actualizada correctamente.');
     }
 
     /**
@@ -60,6 +80,8 @@ class SubjectController extends Controller
      */
     public function destroy(Subject $subject)
     {
-        //
+        $subject->delete();
+        return redirect()->route('subjects.index')
+                         ->with('success', 'Materia eliminada correctamente.');
     }
 }
