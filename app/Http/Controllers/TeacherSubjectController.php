@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Career;
+use App\Models\Subject;
+use App\Models\Teacher;
 use App\Models\TeacherSubject;
 use Illuminate\Http\Request;
 
@@ -12,7 +15,8 @@ class TeacherSubjectController extends Controller
      */
     public function index()
     {
-        //
+        $teacherSubjects = TeacherSubject::with(['teacher', 'subject', 'career'])->get();
+        return view('teacher_subjects.index', compact('teacherSubjects'));
     }
 
     /**
@@ -20,7 +24,10 @@ class TeacherSubjectController extends Controller
      */
     public function create()
     {
-        //
+        $teachers = Teacher::all();
+        $subjects = Subject::all();
+        $careers = Career::all();
+        return view('teacher_subjects.create', compact('teachers', 'subjects', 'careers'));
     }
 
     /**
@@ -28,7 +35,15 @@ class TeacherSubjectController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'teacher_id' => 'required|exists:teachers,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'career_id' => 'required|exists:careers,id',
+        ]);
+
+        TeacherSubject::create($request->all());
+        return redirect()->route('teacher_subjects.index')
+                         ->with('success', 'Asignación registrada correctamente.');
     }
 
     /**
@@ -44,7 +59,10 @@ class TeacherSubjectController extends Controller
      */
     public function edit(TeacherSubject $teacherSubject)
     {
-        //
+        $teachers = Teacher::all();
+        $subjects = Subject::all();
+        $careers = Career::all();
+        return view('teacher_subjects.edit', compact('teacherSubject', 'teachers', 'subjects', 'careers'));
     }
 
     /**
@@ -52,7 +70,15 @@ class TeacherSubjectController extends Controller
      */
     public function update(Request $request, TeacherSubject $teacherSubject)
     {
-        //
+        $request->validate([
+            'teacher_id' => 'required|exists:teachers,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'career_id' => 'required|exists:careers,id',
+        ]);
+
+        $teacherSubject->update($request->all());
+        return redirect()->route('teacher_subjects.index')
+                         ->with('success', 'Asignación actualizada correctamente.');
     }
 
     /**
@@ -60,6 +86,8 @@ class TeacherSubjectController extends Controller
      */
     public function destroy(TeacherSubject $teacherSubject)
     {
-        //
+        $teacherSubject->delete();
+        return redirect()->route('teacher_subjects.index')
+                         ->with('success', 'Asignación eliminada correctamente.');
     }
 }

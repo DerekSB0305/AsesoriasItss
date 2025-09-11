@@ -31,3 +31,6 @@ require __DIR__.'/auth.php';
 
 Route::resource('subjects', \App\Http\Controllers\SubjectController::class)->middleware('auth', 'verified');
 require __DIR__.'/auth.php';
+
+Route::resource('teacher_subjects', \App\Http\Controllers\TeacherSubjectController::class)->middleware('auth', 'verified');
+require __DIR__.'/auth.php';
