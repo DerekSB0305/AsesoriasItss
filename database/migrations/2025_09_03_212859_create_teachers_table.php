@@ -12,13 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('teachers', function (Blueprint $table) {
-            $table->id();
+            $table->string('teacher_user', 50)->primary(); # ID del profesor
             $table->string('first_name', 50); # Nombre(s)
             $table->string('last_name_father', 50); # Apellido paterno
             $table->string('last_name_mother', 50); # Apellido materno
             $table->foreignId('career_id')->constrained('careers')->onDelete('cascade'); # ID de la carrera
             $table->string('study_degree', 50); # Grado de estudio
-            $table->boolean('tutor')->default(false); # Indica si es tutorG
+            $table->boolean('tutor')->default(false); # Indica si es tutor
+            $table->boolean('basic sciences')->default(false); # Indica si tiene horas de ciencias básicas
+            $table->string('report')->nullable(); # Reporte
             $table->timestamps();
         });
     }
