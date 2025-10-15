@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('career_id')->constrained('careers')->onDelete('cascade'); // ID de la carrera
             $table->string('gender', 10); // Género
             $table->integer('age'); // Edad
-            $table->foreignId('teacher_id')->constrained('teachers')->onDelete('cascade'); // ID del tutor
+            $table->foreignId('teacher_user')->constrained('teachers')->onDelete('cascade'); // ID del tutor
             $table->timestamps();
         });
     }

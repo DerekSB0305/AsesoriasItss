@@ -11,15 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('teacher_subjects', function (Blueprint $table) {
+        Schema::create('consultings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('teacher_user')->constrained('teachers')->onDelete('cascade'); # ID del profesor
+            $table->foreignId('enrollment')->constrained('students')->onDelete('cascade'); # Matreícula del alumno
             $table->foreignId('subject_id')->constrained('subjects')->onDelete('cascade'); # ID de la materia
-            $table->foreignId('career_id')->constrained('careers')->onDelete('cascade'); # ID de la carrera
+            $table->dateTime('consulting_date'); # Fecha y hora de la asesoría
+            $table->string('classroom', 10); # Aula
+            $table->string('building', 10); # Edificio
+            $table->string('assignment_sheet')->nullable(); # Hoja de asignación
             $table->timestamps();
-
-            #Evitar duplicados
-            $table->unique(['teacher_id', 'subject_id', 'career_id']);
         });
     }
 
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('teacher_subjects');
+        Schema::dropIfExists('consultings');
     }
 };
