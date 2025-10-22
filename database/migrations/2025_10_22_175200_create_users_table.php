@@ -15,8 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('user', 50)->unique();
             $table->string('password');
-            $table->string('rol', 20)->nullable(); // Alumno, profesor, Administrador
-            $table->rememberToken();
+            $table->foreignId('role_id')->constrained('roles')->onDelete('cascade');
             $table->timestamps();
         });
     }

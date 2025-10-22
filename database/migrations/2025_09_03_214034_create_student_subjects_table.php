@@ -13,8 +13,11 @@ return new class extends Migration
     {
         Schema::create('student_subjects', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('enrollment')->constrained('students')->onDelete('cascade'); # Matreícula del alumno
-            $table->foreignId('subject_id')->constrained('subjects')->onDelete('cascade'); # ID de la materia
+            $table->string('enrollment', 8);
+            $table->unsignedBigInteger('subject_id');
+
+            $table->foreign('enrollment')->references('enrollment')->on('students')->onDelete('cascade');
+            $table->foreign('subject_id')->references('subject_id')->on('subjects')->onDelete('cascade');
             $table->timestamps();
 
             #Evitar duplicados

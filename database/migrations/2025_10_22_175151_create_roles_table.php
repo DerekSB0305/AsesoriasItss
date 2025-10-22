@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('careers', function (Blueprint $table) {
-            $table->id('career_id');
-            $table->string('name', 50); # Nombre de la carrera
-            $table->string('study_plan', 13); # Plan de estudios
-            $table->string('period', 10)->nullable(); # Periodo
+        Schema::create('roles', function (Blueprint $table) {
+            $table->id();
+            $table->string('role_type', 20); // Tipo de rol (e.g., admin, teacher, student)
             $table->timestamps();
         });
     }
@@ -25,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('careers');
+        Schema::dropIfExists('roles');
     }
 };

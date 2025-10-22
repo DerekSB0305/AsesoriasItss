@@ -13,13 +13,17 @@ return new class extends Migration
     {
         Schema::create('teacher_subjects', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('teacher_user')->constrained('teachers')->onDelete('cascade'); # ID del profesor
-            $table->foreignId('subject_id')->constrained('subjects')->onDelete('cascade'); # ID de la materia
-            $table->foreignId('career_id')->constrained('careers')->onDelete('cascade'); # ID de la carrera
+            $table->string('teacher_user', 50);
+            $table->unsignedBigInteger('subject_id');
+            $table->unsignedBigInteger('career_id');
+
+            $table->foreign('teacher_user')->references('teacher_user')->on('teachers')->onDelete('cascade');
+            $table->foreign('subject_id')->references('subject_id')->on('subjects')->onDelete('cascade');
+            $table->foreign('career_id')->references('career_id')->on('careers')->onDelete('cascade');
             $table->timestamps();
 
             #Evitar duplicados
-            $table->unique(['teacher_id', 'subject_id', 'career_id']);
+            $table->unique(['teacher_user', 'subject_id', 'career_id']);
         });
     }
 
