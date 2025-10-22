@@ -10,10 +10,11 @@ class Administrative extends Model
     /** @use HasFactory<\Database\Factories\AdministrativeFactory> */
     use HasFactory;
 
-    protected $fillable = ['first_name', 'last_name_father', 'last_name_mother', 'position', 'department_id'];
-
-    public function department()
-    {
-        return $this->belongsTo(Department::class);
-    }
+    protected $primaryKey = 'administrative_user';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $fillable = [
+        'administrative_user', 'name', 'last_name_f', 'last_name_m',
+        'position', 'canalization_file'
+    ];
 }

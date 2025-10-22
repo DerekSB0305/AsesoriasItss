@@ -10,22 +10,35 @@ class Teacher extends Model
     /** @use HasFactory<\Database\Factories\TeacherFactory> */
     use HasFactory;
 
-    protected $fillable = ['first_name', 'last_name_father', 'last_name_mother', 'career_id', 'study_degree', 'tutor'];
+    protected $primaryKey = 'teacher_user';
+    public $incrementing = false;
+    protected $keyType = 'string';
+    protected $fillable = [
+        'teacher_user', 'name', 'last_name_f', 'last_name_m',
+        'career_id', 'degree', 'tutor', 'science_department', 'report'
+    ];
 
+    // Un profesor pertenece a una carrera
     public function career()
     {
-        return $this->belongsTo(Career::class);
+        return $this->belongsTo(Career::class, 'career_id', 'career_id');
     }
 
-    public function students()
-    {
-        return $this->hasMany(Student::class);
-    }
-
+    // Relación con materias (N:M)
     public function subjects()
     {
-        return $this->belongsToMany(Subject::class, 'teacher_subjects')
-                    ->withPivot('career_id')
-                    ->withTimestamps();
+        return $this->belongsToMany(Subject::class, 'teacher_subjects', 'teacher_user', 'subject_id');
+    }
+
+    // Relación con alumnos (1:N)
+    public function students()
+    {
+        return $this->hasMany(Student::class, 'teacher_user', 'teacher_user');
+    }
+
+    // Relación con asesorías
+    public function advisories()
+    {
+        return $this->hasMany(Advisories::class, 'teacher_user', 'teacher_user');
     }
 }

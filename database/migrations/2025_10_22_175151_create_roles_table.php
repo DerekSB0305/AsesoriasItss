@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('departments', function (Blueprint $table) {
+        Schema::create('roles', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 50); # Nombre del departamento
-            $table->string('type', 50); # Tipo de departamento
-            $table->string('location', 50); # Ubicación del departamento
+            $table->string('role_type', 20); // Tipo de rol (e.g., admin, teacher, student)
             $table->timestamps();
         });
     }
@@ -25,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('departments');
+        Schema::dropIfExists('roles');
     }
 };

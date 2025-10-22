@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('administratives', function (Blueprint $table) {
-            $table->string('admin_user', 50)->primary(); # ID del administrativo
-            $table->string('first_name', 50); # Nombre(s)
-            $table->string('last_name_father', 50); # Apellido paterno
-            $table->string('last_name_mother', 50); # Apellido materno
-            $table->string('position', 50); # Puesto
-            $table->string('channeling_sheet')->nullable(); # Hoja canalizadora
+            $table->string('administrative_user', 50)->primary();
+            $table->string('name', 40);
+            $table->string('last_name_f', 50);
+            $table->string('last_name_m', 50);
+            $table->string('position', 50);
+            $table->string('canalization_file', 45)->nullable();
             $table->timestamps();
         });
     }

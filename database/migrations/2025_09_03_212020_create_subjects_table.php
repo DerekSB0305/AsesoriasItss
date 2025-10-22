@@ -12,10 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('subjects', function (Blueprint $table) {
-            $table->id();
-            $table->string('name', 100); # Nombre de la materia
-            $table->integer('credits'); # Créditos de la materia
-            $table->foreignId('career_id')->constrained('careers')->onDelete('cascade'); # ID de la carrera
+            $table->id('subject_id');
+            $table->string('name', 50); # Nombre de la materia
+            $table->unsignedBigInteger('career_id');
+            $table->string('period', 10)->nullable();
+
+            $table->foreign('career_id')->references('career_id')->on('careers')->onDelete('cascade');
             $table->timestamps();
         });
     }

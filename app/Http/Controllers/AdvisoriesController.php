@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Consulting;
+use App\Models\Advisories;
 use Illuminate\Http\Request;
 
-class ConsultingController extends Controller
+class AdvisoriesController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class ConsultingController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Consulting $consulting)
+    public function show(Advisories $advisories)
     {
         //
     }
@@ -42,7 +42,7 @@ class ConsultingController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Consulting $consulting)
+    public function edit(Advisories $advisories)
     {
         //
     }
@@ -50,7 +50,7 @@ class ConsultingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Consulting $consulting)
+    public function update(Request $request, Advisories $advisories)
     {
         //
     }
@@ -58,7 +58,7 @@ class ConsultingController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Consulting $consulting)
+    public function destroy(Advisories $advisories)
     {
         //
     }
