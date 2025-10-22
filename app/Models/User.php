@@ -17,11 +17,8 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+        protected $primaryKey = 'user_id';
+        protected $fillable = ['username', 'password', 'role_id'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -48,6 +45,6 @@ class User extends Authenticatable
 
     public function role()
     {
-         return $this->belongsTo(Role::class); 
+         return $this->belongsTo(Role::class, 'role_id', 'id');
     }
 }
