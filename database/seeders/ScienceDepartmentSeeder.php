@@ -16,7 +16,7 @@ class ScienceDepartmentSeeder extends Seeder
     public function run(): void
     { {
             $admin = Administrative::create([
-                'administrative_user' => 'Ciencias Basicas',
+                'administrative_user' => 'AlvaroEmir',
                 'name' => 'Alvaro',
                 'last_name_f' => 'Martinez',
                 'last_name_m' => 'Aguilar',
