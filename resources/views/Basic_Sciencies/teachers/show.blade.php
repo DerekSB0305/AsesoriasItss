@@ -16,6 +16,6 @@
     <p><strong>Tutor:</strong> {{ $teacher->tutor ? 'Sí' : 'No' }}</p>
     <p><strong>Carrera:</strong> {{ $teacher->career->name ?? 'Sin carrera' }}</p>
 
-    <a href="{{ route('teachers.index') }}">Volver a la lista</a>
+    <a href="{{ route('basic_sciences.teachers.index') }}">Volver a la lista</a>
 </body>
 </html>

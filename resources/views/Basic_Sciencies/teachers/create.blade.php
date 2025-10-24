@@ -8,7 +8,7 @@
 <body>
     <h1>Agregar Maestro</h1>
 
-    <form action="{{ route('teachers.store') }}" method="POST">
+    <form action="{{ route('basic_sciences.teachers.store') }}" method="POST">
         @csrf
         <label>Nombre(s):</label>
         <input type="text" name="first_name" required><br><br>

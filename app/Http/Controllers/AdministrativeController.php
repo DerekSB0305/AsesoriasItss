@@ -22,7 +22,7 @@ class AdministrativeController extends Controller
      */
     public function create()
     {
-        $departments = Department::all();
+       
         return view('administratives.create', compact('departments'));
     }
 
@@ -57,7 +57,7 @@ class AdministrativeController extends Controller
      */
     public function edit(Administrative $administrative)
     {
-        $departments = Department::all();
+        // $departments = Department::all();
         return view('administratives.edit', compact('administrative', 'departments'));
     }
 

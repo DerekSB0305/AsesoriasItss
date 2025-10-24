@@ -8,7 +8,7 @@
 <body>
     <h1>Lista de Maestros</h1>
 
-    <a href="{{ route('teachers.create') }}">Agregar Maestro</a>
+    <a href="{{ route('basic_sciences.teachers.create') }}">Agregar Maestro</a>
 
     <table border="1" cellpadding="5" cellspacing="0">
         <thead>
@@ -34,17 +34,18 @@
                     <td>{{ $teacher->tutor ? 'Sí' : 'No' }}</td>
                     <td>{{ $teacher->career->name ?? 'Sin carrera' }}</td>
                     <td>
-                        <a href="{{ route('teachers.edit', $teacher) }}">Editar</a> |
-                        <form action="{{ route('teachers.destroy', $teacher) }}" method="POST" style="display:inline;">
+                        <a href="{{ route('basic_sciences.teachers.edit', $teacher) }}">Editar</a> |
+                        <form action="{{ route('basic_sciences.teachers.destroy', $teacher) }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')
                             <button type="submit">Eliminar</button>
                         </form> |
-                        <a href="{{ route('teachers.show', $teacher) }}">Ver</a>
+                        <a href="{{ route('basic_sciences.teachers.show', $teacher) }}">Ver</a>
                     </td>
                 </tr>
             @endforeach
         </tbody>
     </table>
+    
 </body>
 </html>

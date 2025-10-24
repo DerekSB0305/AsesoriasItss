@@ -16,17 +16,17 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
-Route::resource('departments', \App\Http\Controllers\DepartmentController::class)->middleware('auth', 'verified');
+Route::resource('/administratives', \App\Http\Controllers\AdministrativeController::class)->middleware('auth', 'verified');
 require __DIR__.'/auth.php';
 
-Route::resource('teachers', \App\Http\Controllers\TeacherController::class)->middleware('auth', 'verified');
-require __DIR__.'/auth.php';
+Route::prefix('basic_sciences')->name('basic_sciences.')->middleware(['auth','verified'])->group(function(){
+    Route::resource('teachers', \App\Http\Controllers\TeacherController::class);
+});
 
 Route::resource('administratives', \App\Http\Controllers\AdministrativeController::class)->middleware('auth', 'verified');
 require __DIR__.'/auth.php';
 
-Route::resource('students', \App\Http\Controllers\StudentController::class)->middleware('auth', 'verified');
+Route::resource('/students', \App\Http\Controllers\StudentController::class)->middleware('auth', 'verified');
 require __DIR__.'/auth.php';
 
 Route::resource('subjects', \App\Http\Controllers\SubjectController::class)->middleware('auth', 'verified');

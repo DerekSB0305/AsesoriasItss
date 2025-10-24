@@ -8,7 +8,7 @@
 <body>
     <h1>Editar Maestro</h1>
 
-    <form action="{{ route('teachers.update', $teacher) }}" method="POST">
+    <form action="{{ route('basic_sciences.teachers.update', $teacher) }}" method="POST">
         @csrf
         @method('PUT')
 
