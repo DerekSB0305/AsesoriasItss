@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Advisory_details;
+use App\Models\Student;
+use App\Models\Subject;
 use Illuminate\Http\Request;
 
 class AdvisoryDetailsController extends Controller
@@ -20,7 +22,10 @@ class AdvisoryDetailsController extends Controller
      */
     public function create()
     {
-        //
+        $students = Student::all();
+        $subjects = Subject::all();
+
+        return view('basic_sciences.advisory_details.create', compact('students', 'subjects'));
     }
 
     /**
@@ -28,7 +33,16 @@ class AdvisoryDetailsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+         $validated = $request->validate([
+            'student_enrollment' => 'required|exists:students,enrollment',
+            'subject_id' => 'required|exists:subjects,id',
+            'status' => 'required|string|max:15',
+            'observations' => 'nullable|string|max:100',
+        ]);
+
+        $detail = Advisory_details::create($validated);
+
+        return redirect()->route('basic_sciences.advisories.create', ['detail.id' => $detail->id]);
     }
 
     /**

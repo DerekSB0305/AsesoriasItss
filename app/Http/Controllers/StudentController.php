@@ -15,7 +15,7 @@ class StudentController extends Controller
     public function index()
     {
         $students = Student::with(['career', 'teacher'])->get();
-        return view('students.index', compact('students'));
+        return view('basic_sciences.students.index', compact('students'));
     }
 
     /**
@@ -25,7 +25,7 @@ class StudentController extends Controller
     {
         $careers = Career::all();
         $teachers = Teacher::all();
-        return view('students.create', compact('careers', 'teachers'));
+        return view('basic_sciences.students.create', compact('careers', 'teachers'));
     }
 
     /**
@@ -47,7 +47,7 @@ class StudentController extends Controller
         ]);
 
         \App\Models\Student::create($validated);
-        return redirect()->route('students.index')
+        return redirect()->route('basic_sciences.students.index')
                          ->with('success', 'Estudiante registrado correctamente.');
     }
 
@@ -57,7 +57,7 @@ class StudentController extends Controller
     public function show(Student $student)
     {
         $student->load(['career', 'teacher']);
-        return view('students.show', compact('student'));
+        return view('basic_sciences.students.show', compact('student'));
     }
 
     /**
@@ -67,7 +67,7 @@ class StudentController extends Controller
     {
         $careers = Career::all();
         $teachers = Teacher::all();
-        return view('students.edit', compact('student', 'careers', 'teachers'));
+        return view('basic_sciences.students.edit', compact('student', 'careers', 'teachers'));
     }
 
     /**
@@ -87,7 +87,7 @@ class StudentController extends Controller
         ]);
         $student->update($request->all());
 
-        return redirect()->route('students.index')
+        return redirect()->route('basic_sciences.students.index')
                          ->with('success', 'Estudiante actualizado correctamente.');
     }
 
@@ -98,7 +98,7 @@ class StudentController extends Controller
     {
          $student->delete();
 
-        return redirect()->route('students.index')
+        return redirect()->route('basic_sciences.students.index')
                          ->with('success', 'Estudiante eliminado correctamente.');
     }
 }

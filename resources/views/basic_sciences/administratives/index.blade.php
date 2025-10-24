@@ -9,16 +9,16 @@
 <body>
     <h1>Lista de Administrativos</h1>
                 <td colspan="4">
-                    <a href="{{ route('administratives.create') }}">Crear nuevo administrativo</a>
+                    <a href="{{ route('basic_sciences.administratives.create') }}">Crear nuevo administrativo</a>
                 </td>
     <table border="1">
         <thead>
             <tr>
+                <th>usuario</th>
                 <th>Nombre</th>
                 <th>Apellido Paterno</th>
                 <th>Apellido Materno</th>
                 <th>Puesto</th>
-                <th>Departamento</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -28,14 +28,14 @@
             </tr>
             @foreach ($administratives as $administrative)
                 <tr>
-                    <td>{{ $administrative->first_name }}</td>
-                    <td>{{ $administrative->last_name_father }}</td>
-                    <td>{{ $administrative->last_name_mother }}</td>
+                    <td>{{ $administrative->administrative_user }}</td>
+                    <td>{{ $administrative->name }}</td>
+                    <td>{{ $administrative->last_name_f }}</td>
+                    <td>{{ $administrative->last_name_m }}</td>
                     <td>{{ $administrative->position }}</td>
-                    <td>{{ $administrative->department->name ?? 'N/A' }}</td>
                     <td>
-                        <a href="{{ route('administratives.edit', $administrative) }}">Editar</a>
-                        <form action="{{ route('administratives.destroy', $administrative) }}" method="POST" style="display:inline;">
+                        <a href="{{ route('basic_sciences.administratives.edit', $administrative) }}">Editar</a>
+                        <form action="{{ route('basic_sciences.administratives.destroy', $administrative) }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')
                             <button type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar este administrativo?')">Eliminar</button>

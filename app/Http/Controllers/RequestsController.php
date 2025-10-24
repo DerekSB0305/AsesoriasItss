@@ -12,7 +12,8 @@ class RequestsController extends Controller
      */
     public function index()
     {
-        //
+        $requests = Requests::all();
+        return view('basic_sciences.requests.index', compact('requests'));
     }
 
     /**

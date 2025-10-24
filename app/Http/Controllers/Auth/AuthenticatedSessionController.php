@@ -54,7 +54,7 @@ class AuthenticatedSessionController extends Controller
         switch (strtolower(trim($role))) {
             case 'ciencias básicas':
             case 'ciencias basicas':
-                return redirect()->route('basic_sciences.teachers.index');
+                return redirect()->route('basic_sciences.index');
 
             case 'jefatura':
                 return redirect()->route('jefatura.dashboard');

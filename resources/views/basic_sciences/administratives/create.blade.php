@@ -8,7 +8,7 @@
 </head>
 <body>
     <h1>Crear nuevo administrativo</h1>
-    <form action="{{ route('administratives.store') }}" method="POST">
+    <form action="{{ route('basic_sciences.administratives.store') }}" method="POST">
         @csrf
         <div>
             <label for="first_name">Nombre:</label>
@@ -30,19 +30,7 @@
             <input type="text" id="position" name="position" value="{{ old('position') }}" required>
             @error ("position") <p style="color: red;">{{ $message }}</p> @enderror
         </div>
-        <div>
-            <label for="department_id">Departamento:</label>
-            <select id="department_id" name="department_id" required>
-                <option value="">Seleccione un departamento</option>
-                    @foreach ($departments as $department)
-                    <option value="{{ $department->id }}" {{ old('department_id') == $department->id ? 'selected' : '' }}>
-                    {{ $department->name }}
-                 </option>
-                    @endforeach
-            </select>
-@error ("department_id") <p style="color: red;">{{ $message }}</p> @enderror
-
-        </div>
+        
         <button type="submit">Crear</button>
     </form>
 </body>

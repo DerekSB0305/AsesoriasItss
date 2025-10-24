@@ -14,13 +14,13 @@ class TeacherController extends Controller
     public function index()
 {
     $teachers = Teacher::with('career')->get(); 
-    return view('basic_sciencies.teachers.index', compact('teachers'));
+    return view('basic_sciences.teachers.index', compact('teachers'));
 }
 
 public function create()
 {
     $careers = Career::all();
-    return view('basic_sciencies.teachers.create', compact('careers'));
+    return view('basic_sciences.teachers.create', compact('careers'));
 }
 
 public function store(Request $request)
@@ -42,13 +42,13 @@ public function store(Request $request)
 
 public function show(Teacher $teacher)
 {
-    return view('basic_sciencies.teachers.show', compact('teacher'));
+    return view('basic_sciences.teachers.show', compact('teacher'));
 }
 
 public function edit(Teacher $teacher)
 {
     $careers = Career::all();
-    return view('basic_sciencies.teachers.edit', compact('teacher', 'careers'));
+    return view('basic_sciences.teachers.edit', compact('teacher', 'careers'));
 }
 
 public function update(Request $request, Teacher $teacher)

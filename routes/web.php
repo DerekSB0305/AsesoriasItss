@@ -20,11 +20,18 @@ Route::resource('/administratives', \App\Http\Controllers\AdministrativeControll
 require __DIR__.'/auth.php';
 
 Route::prefix('basic_sciences')->name('basic_sciences.')->middleware(['auth','verified'])->group(function(){
-    Route::resource('teachers', \App\Http\Controllers\TeacherController::class);
-});
+    Route::get('/', function () {
+        return view('basic_sciences.index');
+    })->name('index');
 
-Route::resource('administratives', \App\Http\Controllers\AdministrativeController::class)->middleware('auth', 'verified');
-require __DIR__.'/auth.php';
+    //Crud
+    Route::resource('teachers', \App\Http\Controllers\TeacherController::class);
+    Route::resource('students', \App\Http\Controllers\StudentController::class);
+    Route::resource('administratives', \App\Http\Controllers\AdministrativeController::class);
+    Route::resource('requests', \App\Http\Controllers\RequestsController::class);
+    Route::resource('advisory_details', \App\Http\Controllers\AdvisoryDetailsController::class);
+    Route::resource('advisories', \App\Http\Controllers\AdvisoriesController::class);
+});
 
 Route::resource('/students', \App\Http\Controllers\StudentController::class)->middleware('auth', 'verified');
 require __DIR__.'/auth.php';
