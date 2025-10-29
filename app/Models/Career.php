@@ -9,9 +9,12 @@ class Career extends Model
 {
     /** @use HasFactory<\Database\Factories\CareerFactory> */
     use HasFactory;
-
+    protected $table = 'careers';
     protected $primaryKey = 'career_id';
-    protected $fillable = ['name', 'study_plan', 'period'];
+    public $incrementing = true;
+    public $timestamps = false;
+
+    protected $fillable = ['name', 'plan_study', 'period'];
 
     // Relación con materias
     public function subjects()

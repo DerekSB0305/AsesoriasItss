@@ -10,17 +10,21 @@
 
     <form action="{{ route('basic_sciences.teachers.store') }}" method="POST">
         @csrf
+
+        <label>Usuario:</label>
+        <input type="text" name="teacher_user" required><br><br>
+
         <label>Nombre(s):</label>
-        <input type="text" name="first_name" required><br><br>
+        <input type="text" name="name" required><br><br>
 
         <label>Apellido Paterno:</label>
-        <input type="text" name="last_name_father" required><br><br>
+        <input type="text" name="last_name_f" required><br><br>
 
         <label>Apellido Materno:</label>
-        <input type="text" name="last_name_mother" required><br><br>
+        <input type="text" name="last_name_m" required><br><br>
 
         <label>Grado de Estudios:</label>
-        <input type="text" name="study_degree" required><br><br>
+        <input type="text" name="degree" required><br><br>
 
         <label>¿Es Tutor?</label>
         <select name="tutor">
@@ -28,10 +32,17 @@
             <option value="1">Sí</option>
         </select><br><br>
 
-        <label>Carrera:</label>
-        <select name="career_id" required>
-            @foreach ($careers as $career)
-                <option value="{{ $career->id }}">{{ $career->name }}</option>
+        <label>¿Tiene horas de ciencias basicas?:</label>
+        <select name="science_department">
+            <option value="0">No</option>
+            <option value="1">Sí</option>
+        </select><br><br>
+
+       <label for="career_id">Carrera:</label>
+        <select name="career_id" id="career_id" required>
+            <option value="">Selecciona una carrera</option>
+             @foreach ($careers as $career)
+             <option value="{{ $career->career_id }}">{{ $career->name }}</option>
             @endforeach
         </select><br><br>
 

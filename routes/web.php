@@ -31,6 +31,7 @@ Route::prefix('basic_sciences')->name('basic_sciences.')->middleware(['auth','ve
     Route::resource('requests', \App\Http\Controllers\RequestsController::class);
     Route::resource('advisory_details', \App\Http\Controllers\AdvisoryDetailsController::class);
     Route::resource('advisories', \App\Http\Controllers\AdvisoriesController::class);
+    Route::resource('users', \App\Http\Controllers\UserController::class);
 });
 
 Route::resource('/students', \App\Http\Controllers\StudentController::class)->middleware('auth', 'verified');

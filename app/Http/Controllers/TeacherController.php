@@ -19,19 +19,23 @@ class TeacherController extends Controller
 
 public function create()
 {
+    
     $careers = Career::all();
     return view('basic_sciences.teachers.create', compact('careers'));
 }
 
 public function store(Request $request)
 {
+
     $validated = $request->validate([
-        'first_name' => 'required|string|max:50',
-        'last_name_father' => 'required|string|max:50',
-        'last_name_mother' => 'required|string|max:50',
-        'career_id' => 'required|exists:careers,id',
-        'study_degree' => 'required|string|max:50',
+        'teacher_user' => 'required|string|max:50|unique:teachers,teacher_user',
+        'name' => 'required|string|max:50',
+        'last_name_f' => 'required|string|max:50',
+        'last_name_m' => 'required|string|max:50',
+        'career_id' => 'required|exists:careers,career_id',
+        'degree' => 'required|string|max:50',
         'tutor' => 'sometimes|boolean',
+        'science_department' => 'sometimes|boolean',
     ]);
 
     Teacher::create($validated);
@@ -54,12 +58,14 @@ public function edit(Teacher $teacher)
 public function update(Request $request, Teacher $teacher)
 {
     $validated = $request->validate([
-        'first_name' => 'required|string|max:50',
-        'last_name_father' => 'required|string|max:50',
-        'last_name_mother' => 'required|string|max:50',
-        'career_id' => 'required|exists:careers,id',
-        'study_degree' => 'required|string|max:50',
+        'teacher_user' => 'required|string|max:50|unique:teachers,teacher_user,',
+        'name' => 'required|string|max:50',
+        'last_name_f' => 'required|string|max:50',
+        'last_name_m' => 'required|string|max:50',
+        'career_id' => 'required|exists:careers,career_id',
+        'degree' => 'required|string|max:50',
         'tutor' => 'sometimes|boolean',
+        'science_department' => 'sometimes|boolean',
     ]);
 
     $teacher->update($validated);

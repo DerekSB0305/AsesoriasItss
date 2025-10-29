@@ -13,6 +13,7 @@
     <a href="{{ route('basic_sciences.students.index') }}">ver Estudiantes</a>
     <a href="{{ route ('basic_sciences.requests.index') }}">Ver Solicitudes</a>
     <a href="{{ route ('basic_sciences.advisories.index') }}">Gestionar asesorias</a>
+    <a href="{{ route ('basic_sciences.users.index') }}">Ver Usuarios</a>
     
 </body>
 </html>

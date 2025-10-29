@@ -13,26 +13,30 @@
     <table border="1" cellpadding="5" cellspacing="0">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>Usuario</th>
                 <th>Nombre(s)</th>
                 <th>Apellido Paterno</th>
                 <th>Apellido Materno</th>
                 <th>Grado de Estudios</th>
                 <th>Tutor</th>
+                <th>Ciencias Basicas</th>
                 <th>Carrera</th>
+                <th>Reporte</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($teachers as $teacher)
                 <tr>
-                    <td>{{ $teacher->id }}</td>
-                    <td>{{ $teacher->first_name }}</td>
-                    <td>{{ $teacher->last_name_father }}</td>
-                    <td>{{ $teacher->last_name_mother }}</td>
-                    <td>{{ $teacher->study_degree }}</td>
+                    <td>{{ $teacher->teacher_user }}</td>
+                    <td>{{ $teacher->name }}</td>
+                    <td>{{ $teacher->last_name_f }}</td>
+                    <td>{{ $teacher->last_name_m }}</td>
+                    <td>{{ $teacher->degree }}</td>
                     <td>{{ $teacher->tutor ? 'Sí' : 'No' }}</td>
+                    <td>{{ $teacher->science_department ? 'Sí' : 'No' }}</td>
                     <td>{{ $teacher->career->name ?? 'Sin carrera' }}</td>
+                    <td>{{ $teacher->report }}</td>
                     <td>
                         <a href="{{ route('basic_sciences.teachers.edit', $teacher) }}">Editar</a> |
                         <form action="{{ route('basic_sciences.teachers.destroy', $teacher) }}" method="POST" style="display:inline;">
