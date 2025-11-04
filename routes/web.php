@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -10,6 +11,8 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -32,6 +35,26 @@ Route::prefix('basic_sciences')->name('basic_sciences.')->middleware(['auth','ve
     Route::resource('advisory_details', \App\Http\Controllers\AdvisoryDetailsController::class);
     Route::resource('advisories', \App\Http\Controllers\AdvisoriesController::class);
     Route::resource('users', \App\Http\Controllers\UserController::class);
+});
+
+// Rutas Maestro
+    Route::prefix('teachers')->name('teachers.')->middleware(['auth','verified'])->group(function () {
+
+    // Inicio Maestro
+    Route::get('/', [\App\Http\Controllers\TeacherController::class, 'indexTeacher'])->name('index');
+
+    // sobrescribir INDEX del resource
+    Route::get('students', [\App\Http\Controllers\StudentController::class, 'indexTeacher'])
+            ->name('students.index');
+
+    // ahora sí el resource pero SIN index
+    Route::resource('students', \App\Http\Controllers\StudentController::class)
+            ->except(['index'])
+            ->names('students');
+
+    // Solicitudes del maestro
+    Route::resource('requests', \App\Http\Controllers\RequestsController::class)
+        ->names('requests');
 });
 
 Route::resource('/students', \App\Http\Controllers\StudentController::class)->middleware('auth', 'verified');

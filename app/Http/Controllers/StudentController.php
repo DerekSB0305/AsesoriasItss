@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Career;
+use App\Models\Role;
 use App\Models\Student;
 use App\Models\Teacher;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
 {
@@ -18,14 +22,22 @@ class StudentController extends Controller
         return view('basic_sciences.students.index', compact('students'));
     }
 
+    public function indexTeacher()
+    {
+        $teacher_user = Auth::user()->user;
+
+        $students = Student::where('teacher_user', $teacher_user)->get();
+
+        return view('teachers.students.index', compact('students'));
+    }
+
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-        $careers = Career::all();
-        $teachers = Teacher::all();
-        return view('basic_sciences.students.create', compact('careers', 'teachers'));
+            $careers = Career::all();
+    return view('teachers.students.create', compact('careers'));
     }
 
     /**
@@ -33,22 +45,38 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-         
-      $validated = $request->validate([
-            'enrollment' => 'required|string|max:8|unique:students,enrollment',
-            'last_name_father' => 'required|string|max:50',
-            'last_name_mother' => 'required|string|max:50',
-            'first_name' => 'required|string|max:50',
-            'semester' => 'required|integer|min:1|max:12',
-            'career_id' => 'required|exists:careers,id',
-            'gender' => 'required|string|max:10',
-            'age' => 'required|integer|min:15|max:100',
-            'teacher_id' => 'required|exists:teachers,id',
-        ]);
+       $validated = $request->validate([
+        'enrollment' => 'required|string|max:8|unique:students,enrollment',
+        'last_name_f' => 'required|string|max:50',
+        'last_name_m' => 'required|string|max:50',
+        'name' => 'required|string|max:40',
+        'semester' => 'required|integer',
+        'career_id' => 'required|exists:careers,career_id',
+        'gender' => 'required|string|max:10',
+        'age' => 'required|integer',
+    ]);
 
-        \App\Models\Student::create($validated);
-        return redirect()->route('basic_sciences.students.index')
-                         ->with('success', 'Estudiante registrado correctamente.');
+    $teacherUser = Auth::user()->user; // usuario del maestro logueado
+
+    // guardar alumno
+    $student = Student::create([
+        ...$validated,
+        'teacher_user' => $teacherUser,
+    ]);
+
+    // CREAR USUARIO AUTOMATICO PARA EL ALUMNO
+    $defaultPassword = strtolower($validated['enrollment']); // contraseña = matrícula
+
+    $roleAlumno = Role::where('role_type', 'Alumno')->first(); // <-- aquí usamos el rol exacto
+
+    User::create([
+        'user' => $validated['enrollment'],            // el usuario será la matrícula
+        'password' => bcrypt($defaultPassword),        // contraseña encriptada
+        'role_id' => $roleAlumno->id,                  // rol alumno
+    ]);
+
+    return redirect()->route('teachers.students.index')
+        ->with('success','Alumno registrado correctamente.');
     }
 
     /**
@@ -56,8 +84,7 @@ class StudentController extends Controller
      */
     public function show(Student $student)
     {
-        $student->load(['career', 'teacher']);
-        return view('basic_sciences.students.show', compact('student'));
+      
     }
 
     /**
@@ -65,9 +92,7 @@ class StudentController extends Controller
      */
     public function edit(Student $student)
     {
-        $careers = Career::all();
-        $teachers = Teacher::all();
-        return view('basic_sciences.students.edit', compact('student', 'careers', 'teachers'));
+
     }
 
     /**
@@ -75,20 +100,7 @@ class StudentController extends Controller
      */
     public function update(Request $request, Student $student)
     {
-        $request->validate([
-            'last_name_father' => 'required|string|max:50',
-            'last_name_mother' => 'required|string|max:50',
-            'first_name' => 'required|string|max:50',
-            'semester' => 'required|integer|min:1|max:12',
-            'career_id' => 'required|exists:careers,id',
-            'gender' => 'required|string|max:10',
-            'age' => 'required|integer|min:15|max:100',
-            'teacher_id' => 'nullable|exists:teachers,id',
-        ]);
-        $student->update($request->all());
-
-        return redirect()->route('basic_sciences.students.index')
-                         ->with('success', 'Estudiante actualizado correctamente.');
+     
     }
 
     /**
@@ -96,9 +108,6 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
-         $student->delete();
-
-        return redirect()->route('basic_sciences.students.index')
-                         ->with('success', 'Estudiante eliminado correctamente.');
+  
     }
 }

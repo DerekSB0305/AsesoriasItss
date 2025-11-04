@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Advisories;
 use App\Models\Career;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TeacherController extends Controller
 {
@@ -79,4 +81,13 @@ public function destroy(Teacher $teacher)
     return redirect()->route('basic_sciences.teachers.index')
         ->with('success', 'Profesor eliminado correctamente.');
 }
+
+// Modulo Maestro
+    public function indexTeacher()
+    {
+            $teacher = Auth::user()->user; // o el modelo teacher
+    $advisories = Advisories::where('teacher_user', $teacher)->get();
+
+    return view('teachers.index', compact('advisories'));
+    }
 }

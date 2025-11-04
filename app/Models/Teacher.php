@@ -41,4 +41,10 @@ class Teacher extends Model
     {
         return $this->hasMany(Advisories::class, 'teacher_user', 'teacher_user');
     }
+
+    public function userRelation()
+    {
+        return $this->belongsTo(User::class, 'teacher_user', 'user');
+    }
+
 }
