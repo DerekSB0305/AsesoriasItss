@@ -37,7 +37,7 @@ Route::prefix('basic_sciences')->name('basic_sciences.')->middleware(['auth','ve
     Route::resource('users', \App\Http\Controllers\UserController::class);
 });
 
-// Rutas Maestro
+    // Rutas Maestro //
     Route::prefix('teachers')->name('teachers.')->middleware(['auth','verified'])->group(function () {
 
     // Inicio Maestro
@@ -53,8 +53,17 @@ Route::prefix('basic_sciences')->name('basic_sciences.')->middleware(['auth','ve
             ->names('students');
 
     // Solicitudes del maestro
+        // Solicitudes del maestro
+
+    // sobreescribir INDEX del resource
+    Route::get('requests', [\App\Http\Controllers\RequestsController::class, 'indexTeacher'])
+        ->name('requests.index');
+
+    // ya después el resource pero sin index
     Route::resource('requests', \App\Http\Controllers\RequestsController::class)
+        ->except(['index'])
         ->names('requests');
+
 });
 
 Route::resource('/students', \App\Http\Controllers\StudentController::class)->middleware('auth', 'verified');

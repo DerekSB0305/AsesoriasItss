@@ -7,7 +7,8 @@
 </head>
 <body>
 
-    <h1>Bienvenido Maestro</h1>
+    <h2>Bienvenido Maestro: {{ Auth::user()->teacher->name }} {{ Auth::user()->teacher->last_name_f }} {{ Auth::user()->teacher->last_name_m }}</h2>
+
 
     <h3>Acciones:</h3>
     <ul>

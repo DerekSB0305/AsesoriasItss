@@ -12,7 +12,7 @@ class Requests extends Model
 
     protected $primaryKey = 'request_id';
     protected $fillable = [
-        'enrollment', 'teacher_user', 'subject_id', 'canalization_file'
+        'enrollment', 'teacher_user', 'subject_id', 'reason', 'canalization_file'
     ];
 
     public function student()

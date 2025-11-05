@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('enrollment', 8);
             $table->string('teacher_user', 50);
             $table->unsignedBigInteger('subject_id');
-            $table->string('canalization_file', 45)->nullable();
+            $table->string('reason', 100);
+            $table->string('canalization_file')->nullable();
 
             $table->foreign('enrollment')->references('enrollment')->on('students')->onDelete('cascade');
             $table->foreign('teacher_user')->references('teacher_user')->on('teachers')->onDelete('cascade');
