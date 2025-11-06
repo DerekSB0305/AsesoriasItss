@@ -7,7 +7,8 @@
 </head>
 <body>
     <h1>Lista de Maestros</h1>
-
+<a href="{{ route('basic_sciences.index') }}">🔙 Volver al inicio</a>
+<br>
     <a href="{{ route('basic_sciences.teachers.create') }}">Agregar Maestro</a>
 
     <table border="1" cellpadding="5" cellspacing="0">

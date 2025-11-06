@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Gestión de Usuarios</title>
     @vite('resources/css/app.css')
+    <a href="{{ route('basic_sciences.index') }}">🔙 Volver al inicio</a>
 </head>
 <body class="bg-gray-100 p-8">
     <div class="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow">

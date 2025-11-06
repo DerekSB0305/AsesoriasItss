@@ -10,20 +10,26 @@ class TeacherSubject extends Model
     /** @use HasFactory<\Database\Factories\TeacherSubjectFactory> */
     use HasFactory;
 
-    protected $fillable = ['teacher_id', 'subject_id', 'career_id'];
+      protected $primaryKey = 'teacher_subject_id';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
-    public function teacher()
+    protected $fillable = ['teacher_user','subject_id','career_id'];
+
+     public function getRouteKeyName()
     {
-        return $this->belongsTo(Teacher::class);
+        return 'teacher_subject_id';
     }
 
-    public function subject()
-    {
-        return $this->belongsTo(Subject::class);
+    public function teacher() {
+        return $this->belongsTo(Teacher::class, 'teacher_user','teacher_user');
     }
 
-    public function career()
-    {
-        return $this->belongsTo(Career::class);
+    public function subject(){
+        return $this->belongsTo(Subject::class,'subject_id','subject_id');
+    }
+
+    public function career(){
+        return $this->belongsTo(Career::class,'career_id','career_id');
     }
 }
