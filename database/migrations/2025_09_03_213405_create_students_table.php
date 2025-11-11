@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('last_name_m', 50);
             $table->string('name', 40);
             $table->integer('semester');
+            $table->string('group', 5);
             $table->unsignedBigInteger('career_id');
             $table->string('gender', 10);
             $table->integer('age');

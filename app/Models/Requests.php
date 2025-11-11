@@ -29,4 +29,9 @@ class Requests extends Model
     {
         return $this->belongsTo(Subject::class, 'subject_id', 'subject_id');
     }
+
+    public function advisoryDetails()
+    {
+        return $this->hasMany(Advisory_details::class, 'request_id', 'request_id');
+    }
 }

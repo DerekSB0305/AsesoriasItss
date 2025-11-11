@@ -16,20 +16,18 @@ class TeacherSubject extends Model
 
     protected $fillable = ['teacher_user','subject_id','career_id'];
 
-     public function getRouteKeyName()
+    public function teacher()
     {
-        return 'teacher_subject_id';
+        return $this->belongsTo(Teacher::class);
     }
 
-    public function teacher() {
-        return $this->belongsTo(Teacher::class, 'teacher_user','teacher_user');
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class);
     }
 
-    public function subject(){
-        return $this->belongsTo(Subject::class,'subject_id','subject_id');
-    }
-
-    public function career(){
-        return $this->belongsTo(Career::class,'career_id','career_id');
+    public function career()
+    {
+        return $this->belongsTo(Career::class);
     }
 }

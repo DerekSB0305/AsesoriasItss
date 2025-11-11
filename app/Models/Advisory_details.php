@@ -11,12 +11,11 @@ class Advisory_details extends Model
     use HasFactory;
 
     protected $primaryKey = 'advisory_detail_id';
-    protected $fillable = ['enrollment', 'status', 'observations'];
+    protected $fillable = ['request_id', 'status', 'observations'];
 
-    // Pertenece a un alumno
-    public function student()
+    public function request()
     {
-        return $this->belongsTo(Student::class, 'enrollment', 'enrollment');
+        return $this->belongsTo(Requests::class, 'request_id', 'request_id');
     }
 
     // Relación con asesorías
