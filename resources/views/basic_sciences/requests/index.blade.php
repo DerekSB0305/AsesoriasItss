@@ -25,16 +25,34 @@
                 <th>Accion</th>
             </tr>
         </thead>
-        <tbody>
-            @foreach ($requests as $request)
-                <tr>
-                    <td>{{ $request->enrollment }}</td>
-                    <td>{{ $request->subject }}</td>
-                    <td>{{ $request->request_date }}</td>
-                    <td>{{ $request->status }}</td>
-                </tr>
-            @endforeach
-        </tbody>
+       <tbody>
+    @foreach ($requests as $request)
+        <tr>
+            <td>{{ $request->student->enrollment }}</td>
+            <td>{{ $request->student->name }}</td>
+            <td>{{ $request->student->last_name_f }}</td>
+            <td>{{ $request->student->last_name_m }}</td>
+            <td>{{ $request->student->career->name ?? 'N/A' }}</td>
+            <td>{{ $request->student->semester }}</td>
+            <td>{{ $request->student->group ?? 'N/A' }}</td>
+            <td>{{ $request->reason }}</td>
+            <td>{{ $request->subject->name }}</td> {{-- o si tienes otro campo diferente --}}
+            <td>{{ $request->teacher->name ?? 'N/A' }}</td>
+
+            <td>
+                @if($request->canalization_file)
+                    <a href="{{ asset('storage/' . $request->canalization_file) }}" target="_blank">Ver Hoja</a>
+                @else
+                    No disponible
+                @endif
+            </td>
+            <td>
+                {{-- <a href="{{ route('teachers.advisories.create', $request->request_id) }}"class="bg-blue-600 text-white px-3 py-1 rounded">Crear asesoría</a> --}}
+            </td>
+        </tr>
+    @endforeach
+</tbody>
+
     </table>
 </body>
 </html>

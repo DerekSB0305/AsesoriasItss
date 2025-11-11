@@ -9,7 +9,8 @@
 <body>
     <h1>Bienvenido</h1>
     <a href="{{ route('basic_sciences.administratives.index') }}">Gestionar Administrativos</a>
-    <a href="{{ route('basic_sciences.teachers.index') }}">Gestionar Maestros</a>
+    <a href="{{ route('basic_sciences.teachers.index') }}">Crear Maestros</a>
+    <a href="{{ route ('basic_sciences.teacher_subjects.index') }}">Asignar Materias a Maestros</a>
     <a href="{{ route('basic_sciences.students.index') }}">ver Estudiantes</a>
     <a href="{{ route ('basic_sciences.requests.index') }}">Ver Solicitudes</a>
     <a href="{{ route ('basic_sciences.advisories.index') }}">Gestionar asesorias</a>

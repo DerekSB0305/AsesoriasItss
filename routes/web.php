@@ -35,6 +35,7 @@ Route::prefix('basic_sciences')->name('basic_sciences.')->middleware(['auth','ve
     Route::resource('advisory_details', \App\Http\Controllers\AdvisoryDetailsController::class);
     Route::resource('advisories', \App\Http\Controllers\AdvisoriesController::class);
     Route::resource('users', \App\Http\Controllers\UserController::class);
+    Route::resource('teacher_subjects', \App\Http\Controllers\TeacherSubjectController::class);
 });
 
     // Rutas Maestro //

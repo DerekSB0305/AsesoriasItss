@@ -18,16 +18,6 @@
             </div>
 
             <div>
-                <label class="block mb-1 font-medium">Contraseña</label>
-                <input type="password" name="password" class="w-full border rounded p-2" required>
-            </div>
-
-            <div>
-                <label class="block mb-1 font-medium">Confirmar contraseña</label>
-                <input type="password" name="password_confirmation" class="w-full border rounded p-2" required>
-            </div>
-
-            <div>
                 <label class="block mb-1 font-medium">Rol</label>
                 <select name="role_id" class="w-full border rounded p-2" required>
                     <option value="">Seleccione un rol</option>

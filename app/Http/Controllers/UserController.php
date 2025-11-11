@@ -32,20 +32,21 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-          $request->validate([
-            'user' => 'required|string|max:50|unique:users,user',
-            'password' => 'required|string|min:8|confirmed',
-            'role_id' => 'required|exists:roles,id',
-        ]);
+        $request->validate([
+        'user' => 'required|string|unique:users,user',
+        'role_id' => 'required|integer|exists:roles,id',
+        
+    ]);
 
-        User::create([
-            'user' => $request->user,
-            'password' => Hash::make($request->password),
-            'role_id' => $request->role_id,
-        ]);
+    User::create([
+        'user'     => $request->user,
+        'role_id'  => $request->role_id,
+        // Usa el usuario como contraseña provisional 
+        'password' => Hash::make($request->user), 
+    ]);
 
-        return redirect()->route('basic_sciences.users.index')
-            ->with('success', 'Usuario creado correctamente.');
+    return redirect()->route('basic_sciences.users.index')
+        ->with('success', 'Usuario creado correctamente.');
     }
 
     /**

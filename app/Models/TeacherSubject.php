@@ -10,7 +10,11 @@ class TeacherSubject extends Model
     /** @use HasFactory<\Database\Factories\TeacherSubjectFactory> */
     use HasFactory;
 
-    protected $fillable = ['teacher_id', 'subject_id', 'career_id'];
+      protected $primaryKey = 'teacher_subject_id';
+    public $incrementing = true;
+    protected $keyType = 'int';
+
+    protected $fillable = ['teacher_user','subject_id','career_id'];
 
     public function teacher()
     {

@@ -16,7 +16,7 @@ class TeacherSubjectController extends Controller
     public function index()
     {
         $teacherSubjects = TeacherSubject::with(['teacher', 'subject', 'career'])->get();
-        return view('teacher_subjects.index', compact('teacherSubjects'));
+        return view('basic_sciences.teacher_subjects.index', compact('teacherSubjects'));
     }
 
     /**
@@ -27,7 +27,7 @@ class TeacherSubjectController extends Controller
         $teachers = Teacher::all();
         $subjects = Subject::all();
         $careers = Career::all();
-        return view('teacher_subjects.create', compact('teachers', 'subjects', 'careers'));
+        return view('basic_sciences.teacher_subjects.create', compact('teachers', 'subjects', 'careers'));
     }
 
     /**
@@ -35,15 +35,41 @@ class TeacherSubjectController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'teacher_id' => 'required|exists:teachers,id',
-            'subject_id' => 'required|exists:subjects,id',
-            'career_id' => 'required|exists:careers,id',
-        ]);
+          $request->validate([
+        'teacher_user' => 'required|string|exists:teachers,teacher_user',
+        'subjects'     => 'required|array', // subjects[subject_id][career_id]
+    ]);
 
-        TeacherSubject::create($request->all());
-        return redirect()->route('teacher_subjects.index')
-                         ->with('success', 'Asignación registrada correctamente.');
+    $duplicados = 0;
+
+    foreach($request->subjects as $data){
+        if(!isset($data['subject_id']) || !isset($data['career_id'])){
+            continue; // si no marcaron la materia, skip
+        }
+
+        $exists = TeacherSubject::where('teacher_user', $request->teacher_user)
+            ->where('subject_id', $data['subject_id'])
+            ->where('career_id', $data['career_id'])
+            ->exists();
+
+        if($exists){
+            $duplicados++;
+            continue;
+        }
+
+        TeacherSubject::create([
+            'teacher_user' => $request->teacher_user,
+            'subject_id'   => $data['subject_id'],
+            'career_id'    => $data['career_id'],
+        ]);
+    }
+
+    $msg = $duplicados > 0
+        ? "Algunas materias ya estaban asignadas"
+        : "Materias asignadas correctamente";
+
+    return redirect()->route('basic_sciences.teacher_subjects.index')
+        ->with('success',$msg);
     }
 
     /**
@@ -57,28 +83,39 @@ class TeacherSubjectController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(TeacherSubject $teacherSubject)
+    public function edit(TeacherSubject $teacher_subject)
     {
-        $teachers = Teacher::all();
-        $subjects = Subject::all();
-        $careers = Career::all();
-        return view('teacher_subjects.edit', compact('teacherSubject', 'teachers', 'subjects', 'careers'));
+       $teachers = Teacher::all();
+    $subjects = Subject::all();
+    $careers  = Career::all();
+
+    return view('basic_sciences.teacher_subjects.edit', [
+        'teacherSubject' => $teacher_subject,
+        'teachers' => $teachers,
+        'subjects' => $subjects,
+        'careers' => $careers,
+    ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, TeacherSubject $teacherSubject)
+    public function update(Request $request, $teacher_subject_id)
     {
-        $request->validate([
-            'teacher_id' => 'required|exists:teachers,id',
-            'subject_id' => 'required|exists:subjects,id',
-            'career_id' => 'required|exists:careers,id',
-        ]);
+         $request->validate([
+        'subject_id' => 'required|integer|exists:subjects,subject_id',
+        'career_id'  => 'required|integer|exists:careers,career_id',
+    ]);
 
-        $teacherSubject->update($request->all());
-        return redirect()->route('teacher_subjects.index')
-                         ->with('success', 'Asignación actualizada correctamente.');
+    $record = TeacherSubject::where('teacher_subject_id',$teacher_subject_id)->firstOrFail();
+
+    $record->update([
+        'subject_id' => $request->subject_id,
+        'career_id'  => $request->career_id,
+    ]);
+
+    return redirect()->route('basic_sciences.teacher_subjects.index')
+        ->with('success','Asignación actualizada correctamente');
     }
 
     /**
@@ -87,7 +124,7 @@ class TeacherSubjectController extends Controller
     public function destroy(TeacherSubject $teacherSubject)
     {
         $teacherSubject->delete();
-        return redirect()->route('teacher_subjects.index')
+        return redirect()->route('basic_sciences.teacher_subjects.index')
                          ->with('success', 'Asignación eliminada correctamente.');
     }
 }
