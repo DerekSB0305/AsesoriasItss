@@ -13,17 +13,17 @@ return new class extends Migration
     {
         Schema::create('advisories', function (Blueprint $table) {
             $table->id('advisory_id');
-            $table->string('teacher_user', 50);
+            $table->unsignedBigInteger('teacher_subject_id');
             $table->unsignedBigInteger('advisory_detail_id');
-            $table->unsignedBigInteger('subject_id');
+            // $table->unsignedBigInteger('subject_id');
             $table->dateTime('schedule');
             $table->string('classroom', 10)->nullable();
             $table->string('building', 10)->nullable();
             $table->string('assignment_file', 45)->nullable();
 
-            $table->foreign('teacher_user')->references('teacher_user')->on('teachers')->onDelete('cascade');
+            $table->foreign('teacher_subject_id')->references('teacher_subject_id')->on('teacher_subjects')->onDelete('cascade');
             $table->foreign('advisory_detail_id')->references('advisory_detail_id')->on('advisory_details')->onDelete('cascade');
-            $table->foreign('subject_id')->references('subject_id')->on('subjects')->onDelete('cascade');
+            // $table->foreign('subject_id')->references('subject_id')->on('subjects')->onDelete('cascade');
             $table->timestamps();
         });
     }

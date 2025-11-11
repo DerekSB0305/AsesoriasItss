@@ -14,16 +14,21 @@ class TeacherSubject extends Model
 
     public function teacher()
     {
-        return $this->belongsTo(Teacher::class);
+        return $this->belongsTo(Teacher::class, 'teacher_user', 'teacher_user');
     }
 
     public function subject()
     {
-        return $this->belongsTo(Subject::class);
+        return $this->belongsTo(Subject::class, 'subject_id', 'subject_id');
     }
 
     public function career()
     {
-        return $this->belongsTo(Career::class);
+        return $this->belongsTo(Career::class, 'career_id', 'career_id');
+    }
+
+    public function advisories()
+    {
+        return $this->hasMany(Advisories::class, 'teacher_subject_id', 'teacher_subject_id');
     }
 }
