@@ -85,9 +85,9 @@ public function destroy(Teacher $teacher)
 // Modulo Maestro
     public function indexTeacher()
     {
-            $teacher = Auth::user()->user; // o el modelo teacher
-    $advisories = Advisories::where('teacher_user', $teacher)->get();
+            // Maestro logueado
+    $teacher = Auth::user()->teacher;
 
-    return view('teachers.index', compact('advisories'));
+    return view('teachers.index', compact('teacher'));
     }
 }

@@ -23,6 +23,7 @@
             <th>Matrícula</th>
             <th>Nombre</th>
             <th>Semestre</th>
+            <th>Grupo</th>
             <th>Género</th>
             <th>Edad</th>
             <th>Carrera</th>
@@ -35,6 +36,7 @@
                 <td>{{ $student->enrollment }}</td>
                 <td>{{ $student->last_name_f }} {{ $student->last_name_m }} {{ $student->name }}</td>
                 <td>{{ $student->semester }}</td>
+                <td>{{ $student->group }}</td>
                 <td>{{ $student->gender }}</td>
                 <td>{{ $student->age }}</td>
                 <td>{{ $student->career?->name ?? '---' }}</td>

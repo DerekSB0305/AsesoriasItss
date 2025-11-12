@@ -37,11 +37,14 @@
     <label>Semestre: </label>
     <input type="number" name="semester" value="{{ old('semester') }}" required><br><br>
 
+    <label>Grupo: </label>
+    <input type="text" name="group" value="{{ old('group') }}" required><br><br>
+
     <label>Género: </label>
     <select name="gender" required>
         <option value="">Seleccione uno</option>
-        <option value="Hombre" {{ old('gender')=='Hombre' ? 'selected':'' }}>Hombre</option>
-        <option value="Mujer" {{ old('gender')=='Mujer' ? 'selected':'' }}>Mujer</option>
+        <option value="Masculino" {{ old('gender')=='Masculino' ? 'selected':'' }}>Masculino</option>
+        <option value="Femenino" {{ old('gender')=='Femenino' ? 'selected':'' }}>Femenino</option>
     </select><br><br>
 
     <label>Edad: </label>

@@ -51,6 +51,7 @@ class StudentController extends Controller
         'last_name_m' => 'required|string|max:50',
         'name' => 'required|string|max:40',
         'semester' => 'required|integer',
+        'group' => 'required|string|max:5',
         'career_id' => 'required|exists:careers,career_id',
         'gender' => 'required|string|max:10',
         'age' => 'required|integer',
