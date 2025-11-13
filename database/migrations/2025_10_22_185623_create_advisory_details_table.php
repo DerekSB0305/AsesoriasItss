@@ -13,11 +13,8 @@ return new class extends Migration
     {
         Schema::create('advisory_details', function (Blueprint $table) {
             $table->id('advisory_detail_id');
-            $table->unsignedBigInteger('request_id');
             $table->string('status', 9)->default('Pending');
             $table->string('observations', 100)->nullable();
-
-            $table->foreign('request_id')->references('request_id')->on('requests')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\AdvisoriesController;
+use App\Http\Controllers\AdvisoryDetailsController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ProfileController;
+use App\Models\Advisories;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -32,12 +35,14 @@ Route::prefix('basic_sciences')->name('basic_sciences.')->middleware(['auth','ve
     Route::resource('students', \App\Http\Controllers\StudentController::class);
     Route::resource('administratives', \App\Http\Controllers\AdministrativeController::class);
     Route::resource('requests', \App\Http\Controllers\RequestsController::class);
-    Route::resource('advisory_details', \App\Http\Controllers\AdvisoryDetailsController::class);
-    Route::resource('advisories', \App\Http\Controllers\AdvisoriesController::class);
     Route::resource('users', \App\Http\Controllers\UserController::class);
     Route::resource('teacher_subjects', \App\Http\Controllers\TeacherSubjectController::class);
-    Route::get('/advisory_details/students/{subject_id}', 
-        [App\Http\Controllers\AdvisoryDetailsController::class, 'getStudentsBySubject']
+    Route::resource('advisory_details', AdvisoryDetailsController::class);
+    Route::resource('advisories', AdvisoriesController::class);
+
+    // Ruta AJAX para cargar alumnos por materia
+    Route::get('/advisory_details/students/{subject_id}',
+        [AdvisoryDetailsController::class, 'getStudentsBySubject']
     )->name('advisory_details.getStudents');
     
 });

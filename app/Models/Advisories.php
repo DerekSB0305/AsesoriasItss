@@ -7,48 +7,66 @@ use Illuminate\Database\Eloquent\Model;
 
 class Advisories extends Model
 {
-    /** @use HasFactory<\Database\Factories\AdvisoriesFactory> */
     use HasFactory;
 
-     protected $primaryKey = 'advisory_id';
+    protected $primaryKey = 'advisory_id';
+
     protected $fillable = [
-        'teacher_subject_id', 'advisory_detail_id',
-        'schedule', 'classroom', 'building', 'assignment_file'
+        'teacher_subject_id',
+        'advisory_detail_id',
+        'schedule',
+        'classroom',
+        'building',
+        'assignment_file'
     ];
 
+    // maestro con ASIGNACIÓN
     public function teacherSubject()
     {
-        return $this->belongsTo(TeacherSubject::class, 'teacher_subject_id', 'teacher_subject_id');
+        return $this->belongsTo(
+            TeacherSubject::class,
+            'teacher_subject_id',
+            'teacher_subject_id'
+        );
+    }
+
+    public function detail()
+    {
+        return $this->belongsTo(
+            Advisory_details::class,
+            'advisory_detail_id',
+            'advisory_detail_id'
+        );
     }
 
     public function advisoryDetail()
     {
-        return $this->belongsTo(Advisory_details::class, 'advisory_detail_id', 'advisory_detail_id');
+        return $this->detail();
     }
 
-    //  A través de teacherSubject se puede obtener el maestro
+    // Maestro directo
     public function teacher()
     {
         return $this->hasOneThrough(
             Teacher::class,
             TeacherSubject::class,
-            'teacher_subject_id',   // FK en teacher_subjects
-            'teacher_user',         // FK en teachers
-            'teacher_subject_id',   // FK local en advisories
-            'teacher_user'          // FK local en teacher_subjects
+            'teacher_subject_id',
+            'teacher_user',
+            'teacher_subject_id',
+            'teacher_user'
         );
     }
 
-    // 🔹 A través del detalle se puede acceder al alumno y materia
+    // Alumno mediante request_id
     public function student()
     {
         return $this->hasOneThrough(
             Student::class,
             Requests::class,
-            'request_id',    // FK en requests
-            'enrollment',    // FK en students
-            'advisory_detail_id', // FK local en advisories -> detail
-            'enrollment'     // FK local en requests
+            'request_id',
+            'enrollment',
+            'advisory_detail_id',
+            'enrollment'
         );
     }
 }

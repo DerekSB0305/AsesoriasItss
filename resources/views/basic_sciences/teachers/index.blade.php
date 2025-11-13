@@ -45,7 +45,6 @@
                             @method('DELETE')
                             <button type="submit">Eliminar</button>
                         </form> |
-                        <a href="{{ route('basic_sciences.teachers.show', $teacher) }}">Ver</a>
                     </td>
                 </tr>
             @endforeach

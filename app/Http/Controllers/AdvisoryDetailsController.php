@@ -13,7 +13,9 @@ class AdvisoryDetailsController extends Controller
      */
     public function index()
     {
-        //
+         $details = Advisory_details::with('students')->get();
+
+        return view('basic_sciences.advisory_details.index', compact('details'));
     }
 
     /**
@@ -21,13 +23,12 @@ class AdvisoryDetailsController extends Controller
      */
     public function create()
     {
-           $subjects = Requests::with('subject')
+           // Traer materias que han sido solicitadas (desde requests)
+        $subjects = Requests::with('subject')
             ->select('subject_id')
             ->distinct()
             ->get()
-            ->map(function ($req) {
-                return $req->subject;
-            })
+            ->map(fn($r) => $r->subject)
             ->filter();
 
         return view('basic_sciences.advisory_details.create', compact('subjects'));
@@ -35,25 +36,17 @@ class AdvisoryDetailsController extends Controller
 
  public function getStudentsBySubject(int $subject_id)
     {
-        // Trae las solicitudes de esa materia junto con el alumno
-        $requests = Requests::with('student')
-            ->where('subject_id', $subject_id)
-            ->get();
-
-        if ($requests->isEmpty()) {
-            return response()->json([
-                'error' => 'No hay solicitudes registradas para esta materia.'
-            ], 404);
-        }
-
-        $students = $requests->map(function ($req) {
-            $student = $req->student;
-            return [
-                'request_id' => $req->request_id,
-                'enrollment' => $student->enrollment ?? '',
-                'name' => "{$student->name} {$student->last_name_f} {$student->last_name_m}",
-            ];
-        });
+        $students = Requests::where('subject_id', $subject_id)
+            ->with('student')
+            ->get()
+            ->map(function ($req) {
+                return [
+                    'request_id' => $req->request_id,
+                    'enrollment' => $req->student->enrollment,
+                    'name'       => $req->student->name,
+                    'last_name_f'=> $req->student->last_name_f,
+                ];
+            });
 
         return response()->json($students);
     }
@@ -65,23 +58,28 @@ class AdvisoryDetailsController extends Controller
     {
        
        $request->validate([
-        'subject_id' => 'required|integer|exists:subjects,subject_id',
-        'request_id' => 'required|array',
-        'request_id.*' => 'integer|exists:requests,request_id',
-        'observations' => 'nullable|string|max:255',
-    ]);
+            'subject_id'   => 'required|integer|exists:subjects,subject_id',
+            'request_id'   => 'required|array', // array de request_id seleccionados
+            'observations' => 'nullable|string|max:255',
+        ]);
 
-    foreach ($request->request_id as $reqId) {
-        Advisory_details::create([
-            'request_id' => $reqId,
-            'status' => 'Pending',
+        // Crear detalle asesoría
+        $detail = Advisory_details::create([
+            'status'       => 'Pending',
             'observations' => $request->observations,
         ]);
-    }
 
-    return redirect()
-        ->route('basic_sciences.advisories.create')
-        ->with('success', 'Detalles registrados, continúe con la asesoría.');
+         foreach ($request->request_id as $reqId) {
+            $req = Requests::find($reqId);
+
+            if ($req && $req->student) {
+                $detail->students()->attach($req->student->enrollment);
+            }
+        }
+
+         return redirect()->route('basic_sciences.advisories.create', [
+            'detail_id' => $detail->advisory_detail_id
+        ])->with('success', 'Detalle creado, ahora completa la asesoría.');
     }
 
     /**
@@ -95,7 +93,8 @@ class AdvisoryDetailsController extends Controller
      */
     public function show(Advisory_details $advisory_details)
     {
-        //
+         $advisory_details->load('students');
+        return view('basic_sciences.advisory_details.show', compact('advisory_details'));
     }
 
     /**
@@ -119,6 +118,9 @@ class AdvisoryDetailsController extends Controller
      */
     public function destroy(Advisory_details $advisory_details)
     {
-        //
+         $advisory_details->delete();
+
+        return redirect()->route('basic_sciences.advisory_details.index')
+            ->with('success', 'Detalle eliminado correctamente.');
     }
 }

@@ -11,16 +11,23 @@ class Advisory_details extends Model
     use HasFactory;
 
     protected $primaryKey = 'advisory_detail_id';
-    protected $fillable = ['request_id', 'status', 'observations'];
-
-    public function request()
-    {
-        return $this->belongsTo(Requests::class, 'request_id', 'request_id');
-    }
+    protected $fillable = ['status', 'observations'];
 
     // Relación con asesorías
     public function advisories()
     {
         return $this->hasMany(Advisories::class, 'advisory_detail_id', 'advisory_detail_id');
+    }
+
+    public function students()
+    {
+        return $this->belongsToMany(
+            Student::class,
+            'advisory_detail_student',   // tabla pivot
+            'advisory_detail_id',        // FK en pivot
+            'enrollment',                // FK a students
+            'advisory_detail_id',        // PK advisory_details
+            'enrollment'                 // PK/FK students
+        );
     }
 }

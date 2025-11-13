@@ -2,53 +2,65 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asesorías Registradas</title>
-    @vite('resources/css/app.css')
+    <title>Listado de Asesorías</title>
 </head>
-<body class="bg-gray-100 p-8">
-    <h1 class="text-2xl font-bold mb-6 text-gray-800">Asesorías Registradas</h1>
+<body>
+<h1>Listado de Asesorías</h1>
 
-    <a href="{{ route('basic_sciences.advisory_details.create') }}" 
-       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-       Nueva Asesoría
-    </a>
+@if(session('success'))
+    <p style="color:green">{{ session('success') }}</p>
+@endif
 
-    <table class="min-w-full bg-white shadow-md mt-6 rounded-lg overflow-hidden">
-        <thead class="bg-gray-200 text-gray-700">
-            <tr>
-                <th class="py-2 px-4 text-left">Profesor</th>
-                <th class="py-2 px-4 text-left">Alumno</th>
-                <th class="py-2 px-4 text-left">Materia</th>
-                <th class="py-2 px-4 text-left">Horario</th>
-                <th class="py-2 px-4 text-left">Aula</th>
-                <th class="py-2 px-4 text-left">Estado</th>
-                <th class="py-2 px-4 text-center">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($advisories as $advisory)
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="py-2 px-4">{{ $advisory->teacher->first_name ?? 'N/A' }}</td>
-                    <td class="py-2 px-4">{{ $advisory->detail->student->first_name ?? 'N/A' }}</td>
-                    <td class="py-2 px-4">{{ $advisory->subject->name ?? 'N/A' }}</td>
-                    <td class="py-2 px-4">{{ $advisory->schedule }}</td>
-                    <td class="py-2 px-4">{{ $advisory->classroom }}</td>
-                    <td class="py-2 px-4">{{ $advisory->detail->status }}</td>
-                    <td class="py-2 px-4 text-center">
-                        <form action="{{ route('basic_sciences.advisories.destroy', $advisory->id) }}" method="POST" onsubmit="return confirm('¿Eliminar esta asesoría?');">
-                            @csrf
-                            @method('DELETE')
-                            <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="7" class="text-center py-4 text-gray-500">No hay asesorías registradas.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+<table border="1" cellpadding="5">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Maestro</th>
+            <th>Materia</th>
+            <th>Carrera</th>
+            <th>Fecha / Hora</th>
+            <th>Alumnos</th>
+            <th>Archivo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach($advisories as $adv)
+        <tr>
+            <td>{{ $adv->advisory_id }}</td>
+            <td>{{ $adv->teacherSubject->teacher->name ?? 'N/A' }}</td>
+            <td>{{ $adv->teacherSubject->subject->name ?? 'N/A' }}</td>
+            <td>{{ $adv->teacherSubject->career->name ?? 'N/A' }}</td>
+            <td>{{ $adv->schedule }}</td>
+            <td>
+                @if($adv->detail && $adv->detail->students->count())
+                    <ul>
+                        @foreach($adv->detail->students as $stu)
+                            <li>{{ $stu->enrollment }} - {{ $stu->name }}</li>
+                        @endforeach
+                    </ul>
+                @else
+                    Sin alumnos
+                @endif
+            </td>
+            <td>
+                @if($adv->assignment_file)
+                    <a href="{{ asset('storage/'.$adv->assignment_file) }}" target="_blank">Ver archivo</a>
+                @else
+                    N/A
+                @endif
+            </td>
+            <td>
+                <form action="{{ route('basic_sciences.advisories.destroy', $adv) }}" method="POST"
+                      onsubmit="return confirm('¿Eliminar asesoría?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+    @endforeach
+    </tbody>
+</table>
 </body>
 </html>

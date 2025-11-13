@@ -14,7 +14,7 @@ class AdvisoriesController extends Controller
      */
     public function index()
     {
-        $advisories = Advisories::with(['teacher', 'subject', 'detail.student'])->get();
+         $advisories = Advisories::with(['detail.students', 'teacherSubject.teacher', 'teacherSubject.subject'])->get();
 
         return view('basic_sciences.advisories.index', compact('advisories'));
     }
@@ -24,15 +24,17 @@ class AdvisoriesController extends Controller
      */
     public function create(Request $request)
     {
-        $detail_id = $request->detail_id;
+        $detailId = $request->detail_id;
 
-        // Cargar detalle
-        $detail = Advisory_details::with('request.student', 'request.subject')->findOrFail($detail_id);
+        if (!$detailId) {
+            return redirect()->route('basic_sciences.advisory_details.create')
+                ->with('error', 'Primero crea un detalle de asesoría.');
+        }
 
-        // Cargar maestros que pueden dar esta materia
-        $teacherSubjects = TeacherSubject::with('teacher')
-            ->where('subject_id', $detail->request->subject_id)
-            ->get();
+        $detail = Advisory_details::with('students')->findOrFail($detailId);
+
+        // Todas las combinaciones maestro-materia-carrera
+        $teacherSubjects = TeacherSubject::with(['teacher', 'subject', 'career'])->get();
 
         return view('basic_sciences.advisories.create', compact('detail', 'teacherSubjects'));
     }
@@ -42,31 +44,38 @@ class AdvisoriesController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'teacher_subject_id' => 'required|exists:teacher_subjects,teacher_subject_id',
+          $request->validate([
             'advisory_detail_id' => 'required|exists:advisory_details,advisory_detail_id',
-            'schedule' => 'required|date',
-            'classroom' => 'nullable|string|max:10',
-            'building' => 'nullable|string|max:10',
-            'assignment_file' => 'nullable|file|mimes:pdf,jpg,png,docx|max:2048',
+            'teacher_subject_id' => 'required|exists:teacher_subjects,teacher_subject_id',
+            'schedule'           => 'required|date',
+            'classroom'          => 'nullable|string|max:10',
+            'building'           => 'nullable|string|max:10',
+            'assignment_file'    => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:4096',
         ]);
 
-        $filePath = null;
+         $path = null;
         if ($request->hasFile('assignment_file')) {
-            $filePath = $request->file('assignment_file')->store('assignments', 'public');
+            $path = $request->file('assignment_file')->store('assignments', 'public');
         }
 
-        Advisories::create([
-            'teacher_subject_id' => $request->teacher_subject_id,
+         $advisory = Advisories::create([
             'advisory_detail_id' => $request->advisory_detail_id,
-            'schedule' => $request->schedule,
-            'classroom' => $request->classroom,
-            'building' => $request->building,
-            'assignment_file' => $filePath
+            'teacher_subject_id' => $request->teacher_subject_id,
+            'schedule'           => $request->schedule,
+            'classroom'          => $request->classroom,
+            'building'           => $request->building,
+            'assignment_file'    => $path,
         ]);
 
+        // Opcional: actualizar estado del detalle
+        $detail = Advisory_details::find($request->advisory_detail_id);
+        if ($detail) {
+            $detail->status = 'Approved';
+            $detail->save();
+        }
 
-        return redirect()->route('basic_sciences.index')->with('success', 'Asesoría registrada correctamente.');
+        return redirect()->route('basic_sciences.advisories.index')
+            ->with('success', 'Asesoría creada correctamente.');
     }
 
     /**
@@ -74,7 +83,8 @@ class AdvisoriesController extends Controller
      */
     public function show(Advisories $advisories)
     {
-        //
+         $advisories->load('detail.students', 'teacherSubject.teacher', 'teacherSubject.subject');
+        return view('basic_sciences.advisories.show', compact('advisories'));
     }
 
     /**
@@ -98,13 +108,7 @@ class AdvisoriesController extends Controller
      */
     public function destroy(Advisories $advisories)
     {
-        $advisory = Advisories::findOrFail($advisories->id);
-
-        if ($advisory->detail) {
-            $advisory->detail->delete();
-        }
-
-        $advisory->delete();
+       $advisories->delete();
 
         return redirect()->route('basic_sciences.advisories.index')
             ->with('success', 'Asesoría eliminada correctamente.');
