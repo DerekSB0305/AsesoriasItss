@@ -36,6 +36,10 @@ Route::prefix('basic_sciences')->name('basic_sciences.')->middleware(['auth','ve
     Route::resource('advisories', \App\Http\Controllers\AdvisoriesController::class);
     Route::resource('users', \App\Http\Controllers\UserController::class);
     Route::resource('teacher_subjects', \App\Http\Controllers\TeacherSubjectController::class);
+    Route::get('/advisory_details/students/{subject_id}', 
+        [App\Http\Controllers\AdvisoryDetailsController::class, 'getStudentsBySubject']
+    )->name('advisory_details.getStudents');
+    
 });
 
     // Rutas Maestro //

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->dateTime('schedule');
             $table->string('classroom', 10)->nullable();
             $table->string('building', 10)->nullable();
-            $table->string('assignment_file', 45)->nullable();
+            $table->string('assignment_file')->nullable();
 
             $table->foreign('teacher_subject_id')->references('teacher_subject_id')->on('teacher_subjects')->onDelete('cascade');
             $table->foreign('advisory_detail_id')->references('advisory_detail_id')->on('advisory_details')->onDelete('cascade');

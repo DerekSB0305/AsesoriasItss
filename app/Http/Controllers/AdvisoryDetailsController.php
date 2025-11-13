@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Advisory_details;
-use App\Models\Student;
-use App\Models\Subject;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request; 
+use App\Models\Requests;
+use App\Models\Advisory_details; 
 
 class AdvisoryDetailsController extends Controller
 {
@@ -22,29 +21,75 @@ class AdvisoryDetailsController extends Controller
      */
     public function create()
     {
-        $students = Student::all();
-        $subjects = Subject::all();
+           $subjects = Requests::with('subject')
+            ->select('subject_id')
+            ->distinct()
+            ->get()
+            ->map(function ($req) {
+                return $req->subject;
+            })
+            ->filter();
 
-        return view('basic_sciences.advisory_details.create', compact('students', 'subjects'));
+        return view('basic_sciences.advisory_details.create', compact('subjects'));
+    }
+
+ public function getStudentsBySubject(int $subject_id)
+    {
+        // Trae las solicitudes de esa materia junto con el alumno
+        $requests = Requests::with('student')
+            ->where('subject_id', $subject_id)
+            ->get();
+
+        if ($requests->isEmpty()) {
+            return response()->json([
+                'error' => 'No hay solicitudes registradas para esta materia.'
+            ], 404);
+        }
+
+        $students = $requests->map(function ($req) {
+            $student = $req->student;
+            return [
+                'request_id' => $req->request_id,
+                'enrollment' => $student->enrollment ?? '',
+                'name' => "{$student->name} {$student->last_name_f} {$student->last_name_m}",
+            ];
+        });
+
+        return response()->json($students);
+    }
+    /**
+     * Crea uno o varios advisory_details a partir de los request_id seleccionados.
+     * Tras crear, redirige a crear la Asesoría usando el primer detalle.
+     */
+    public function store(Request $request)
+    {
+       
+       $request->validate([
+        'subject_id' => 'required|integer|exists:subjects,subject_id',
+        'request_id' => 'required|array',
+        'request_id.*' => 'integer|exists:requests,request_id',
+        'observations' => 'nullable|string|max:255',
+    ]);
+
+    foreach ($request->request_id as $reqId) {
+        Advisory_details::create([
+            'request_id' => $reqId,
+            'status' => 'Pending',
+            'observations' => $request->observations,
+        ]);
+    }
+
+    return redirect()
+        ->route('basic_sciences.advisories.create')
+        ->with('success', 'Detalles registrados, continúe con la asesoría.');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-         $validated = $request->validate([
-            'student_enrollment' => 'required|exists:students,enrollment',
-            'subject_id' => 'required|exists:subjects,id',
-            'status' => 'required|string|max:15',
-            'observations' => 'nullable|string|max:100',
-        ]);
 
-        $detail = Advisory_details::create($validated);
-
-        return redirect()->route('basic_sciences.advisories.create', ['detail.id' => $detail->id]);
-    }
-
+    // Traer a los alumnos por materia
+  
     /**
      * Display the specified resource.
      */
