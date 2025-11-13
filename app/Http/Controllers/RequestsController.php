@@ -49,34 +49,41 @@ class RequestsController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'enrollment'        => ['required','string','exists:students,enrollment'],
-            'subject_id'        => ['required','integer','exists:subjects,subject_id'], // ajusta columna si es otra
-            'reason'            => ['nullable','string','max:500'],
-            'canalization_file' => ['nullable','file','mimes:pdf,jpg,jpeg,png','max:2048'],
-        ]);
+            $request->validate([
+        'enrollments'   => ['required', 'array'],
+        'enrollments.*' => ['string', 'exists:students,enrollment'],
 
-        $teacher = Auth::user()->teacher; // maestro logueado
-        if (!$teacher) {
-            abort(403, 'Solo los docentes pueden crear solicitudes.');
-        }
+        'subject_id'    => ['required', 'integer', 'exists:subjects,subject_id'],
 
-        $path = null;
-        if ($request->hasFile('canalization_file')) {
-            // guarda en storage/app/public/canalizations
-            $path = $request->file('canalization_file')->store('canalizations', 'public');
-        }
+        'reason'        => ['nullable', 'string', 'max:500'],
+        'canalization_file' => ['nullable','file','mimes:pdf,jpg,jpeg,png','max:2048'],
+    ]);
 
+    $teacher = Auth::user()->teacher;
+    if (!$teacher) {
+        abort(403, "Solo los docentes pueden crear solicitudes.");
+    }
+
+    // Guardar archivo una sola vez (opcional)
+    $path = null;
+    if ($request->hasFile('canalization_file')) {
+        $path = $request->file('canalization_file')->store('canalizations', 'public');
+    }
+
+    // Crear una solicitud por alumno
+    foreach ($request->enrollments as $enrollment) {
         Requests::create([
-            'enrollment'        => $request->enrollment,
-            'teacher_user'      => $teacher->teacher_user,
-            'subject_id'        => $request->subject_id,
-            'reason'            => $request->reason,
-            'canalization_file' => $path,   // guarda la ruta relativa (public disk)
+            'enrollment' => $enrollment,
+            'teacher_user' => $teacher->teacher_user,
+            'subject_id' => $request->subject_id,
+            'reason' => $request->reason,
+            'canalization_file' => $path,
         ]);
+    }
 
-        return redirect()->route('teachers.requests.index')
-            ->with('success', 'Solicitud enviada correctamente.');
+    return redirect()
+        ->route('teachers.requests.index')
+        ->with('success', 'Solicitudes enviadas correctamente.');
     }
 
     /**

@@ -13,17 +13,18 @@
         @csrf
 
         <div style="margin-bottom:15px;">
-            <label><strong>Alumno:</strong></label><br>
-            <select name="enrollment" required style="width:100%; padding:6px;">
-                @foreach($students as $s)
-                    <option value="{{ $s->enrollment }}">
-                        {{ $s->enrollment }} — {{ $s->name }} {{ $s->last_name_f }}
-                    </option>
-                @endforeach
-            </select>
-            @error('enrollment')
-                <small style="color:red">{{ $message }}</small>
-            @enderror
+                <label>Alumnos:</label>
+    <select name="enrollments[]" multiple size="6" class="w-full border rounded p-2" required>
+        @foreach($students as $s)
+            <option value="{{ $s->enrollment }}">
+                {{ $s->enrollment }} — {{ $s->name }} {{ $s->last_name_f }}
+            </option>
+        @endforeach
+    </select>
+    <p style="color: blue; font-weight: bold;">
+        * Mantén presionado CTRL para seleccionar varios alumnos
+    </p>
+
         </div>
 
         <div style="margin-bottom:15px;">

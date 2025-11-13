@@ -22,7 +22,6 @@
                     <th>Materia</th>
                     <th>Motivo</th>
                     <th>Archivo</th>
-                    <th>Fecha</th>
                 </tr>
             </thead>
             <tbody>
@@ -49,8 +48,6 @@
                                 No adjunto
                             @endif
                         </td>
-
-                        <td>{{ $r->created_at->format('d/m/Y H:i') }}</td>
                     </tr>
                 @endforeach
 
