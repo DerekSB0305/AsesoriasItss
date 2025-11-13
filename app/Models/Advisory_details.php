@@ -19,6 +19,16 @@ class Advisory_details extends Model
         return $this->hasMany(Advisories::class, 'advisory_detail_id', 'advisory_detail_id');
     }
 
+
+    public function getSubjectAttribute()
+    {
+        return $this->advisories
+            ->first()
+            ?->teacherSubject
+            ?->subject;
+    }
+
+
     public function students()
     {
         return $this->belongsToMany(

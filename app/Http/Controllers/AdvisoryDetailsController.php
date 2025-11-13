@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Advisories;
 use Illuminate\Http\Request; 
 use App\Models\Requests;
 use App\Models\Advisory_details; 
@@ -11,11 +12,24 @@ class AdvisoryDetailsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-         $details = Advisory_details::with('students')->get();
+       $materia = $request->materia;
+    $estado = $request->estado;
 
-        return view('basic_sciences.advisory_details.index', compact('details'));
+    $details = Advisory_details::with(['students', 'advisories.teacherSubject.subject'])
+        ->when($materia, function ($q) use ($materia) {
+            $q->whereHas('advisories.teacherSubject.subject', function ($sub) use ($materia) {
+                $sub->where('name', 'LIKE', "%$materia%");
+            });
+        })
+        ->when($estado, function ($q) use ($estado) {
+            $q->where('status', $estado);
+        })
+        ->orderBy('advisory_detail_id', 'DESC')
+        ->get();
+
+    return view('basic_sciences.advisory_details.index', compact('details', 'materia', 'estado'));
     }
 
     /**
@@ -108,7 +122,7 @@ class AdvisoryDetailsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Advisory_details $advisory_details)
+    public function update(Request $request, $id)
     {
         //
     }
