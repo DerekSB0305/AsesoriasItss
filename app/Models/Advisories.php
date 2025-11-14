@@ -41,7 +41,11 @@ class Advisories extends Model
 
     public function advisoryDetail()
     {
-        return $this->detail();
+        return $this->belongsTo(
+            Advisory_details::class,
+            'advisory_detail_id',
+            'advisory_detail_id'
+        );
     }
 
     // Maestro directo
@@ -68,5 +72,10 @@ class Advisories extends Model
             'advisory_detail_id',
             'enrollment'
         );
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'advisory_id';
     }
 }

@@ -40,4 +40,9 @@ class Advisory_details extends Model
             'enrollment'                 // PK/FK students
         );
     }
+
+    public function getRouteKeyName()
+    {
+        return 'advisory_detail_id';
+    }
 }

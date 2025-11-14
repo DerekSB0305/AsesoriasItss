@@ -11,12 +11,18 @@
     <div class="max-w-6xl mx-auto bg-white shadow-md rounded-xl p-8">
 
         {{-- Título --}}
+        
         <div class="flex items-center justify-between mb-6">
             <h1 class="text-3xl font-bold text-gray-800">📚 Asesorías Registradas</h1>
 
             <a href="{{ route('basic_sciences.advisory_details.index') }}"
                class="text-green-600 hover:text-green-800 font-medium">
                 → Ver Detalles de Asesoría
+            </a>
+
+            <a href="{{ route('basic_sciences.index') }}"
+               class="text-green-600 hover:text-green-800 font-medium">
+                Regresar a inicio
             </a>
         </div>
 
@@ -48,6 +54,9 @@
                         <th class="px-4 py-3 text-center">Total</th>
                         <th class="px-4 py-3 text-center">Hombres</th>
                         <th class="px-4 py-3 text-center">Mujeres</th>
+                        <th class="px-4 py-3">Aula</th>
+                        <th class="px-4 py-3">Edificio</th>
+                        <th class="px-4 py-3">Ficha de asignación</th>
                         <th class="px-4 py-3 text-center">Acciones</th>
                     </tr>
                 </thead>
@@ -89,6 +98,17 @@
                                 {{ $mujeres }}
                             </td>
 
+                            <td class="px-4 py-3">{{ $adv->classroom }}</td>
+
+                            <td class="px-4 py-3">{{ $adv->building }}</td>
+                            <td class="px-4 py-3">
+                            @if($adv->assignment_file)
+                            <a class="text-blue-600"  href="{{ asset('storage/' . $adv->assignment_file) }}" target="_blank">Ver archivo</a>
+                            @else
+                                Sin archivo
+                            @endif
+                            </td>
+
                             <td class="px-4 py-3 text-center space-x-3">
 
                                 {{-- Editar --}}
@@ -98,19 +118,11 @@
                                 </a>
 
                                 {{-- Eliminar --}}
-                                <form action="{{ route('basic_sciences.advisories.destroy', $adv) }}"
-                                      method="POST"
-                                      class="inline"
-                                      onsubmit="return confirm('¿Eliminar asesoría?')">
-
-                                    @csrf
-                                    @method('DELETE')
-
-                                    <button 
-                                        class="text-red-600 font-medium hover:text-red-800">
-                                        Eliminar
-                                    </button>
-
+                               <form action="{{ route('basic_sciences.advisories.destroy', $adv->advisory_id) }}"method="POST" class="inline" 
+                                onsubmit="return confirm('¿Eliminar asesoría?')">
+                                @csrf
+                                 @method('DELETE')
+                                 <button type="submit"class="text-red-600 font-medium hover:text-red-800"> Eliminar</button>
                                 </form>
 
                             </td>

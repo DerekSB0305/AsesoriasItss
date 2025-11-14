@@ -8,8 +8,15 @@
 
     <h1 class="text-2xl font-bold mb-4">Detalles de Asesorías</h1>
 
+     <a href="{{ route('basic_sciences.index') }}"
+               class="text-green-600 hover:text-green-800 font-medium">
+                Regresar a inicio
+            </a>
+
     {{-- BUSCADOR --}}
 <form method="GET" class="flex gap-4 mb-4 items-end">
+
+    
 
     {{-- Buscar por materia --}}
     <div>
