@@ -257,28 +257,59 @@ class AdvisoriesController extends Controller
             ->with('success', 'Asesoría actualizada correctamente.');
     }
 
+    public function details($id)
+    {
+        $advisory = Advisories::with([
+            'teacherSubject.teacher',
+            'teacherSubject.subject.career',
+            'teacherSubject.career',
+            'advisoryDetail.students'
+        ])->findOrFail($id);
+
+        $students = $advisory->advisoryDetail->students ?? collect();
+
+        $total = $students->count();
+        $hombres = $students->where('gender', 'Masculino')->count();
+        $mujeres = $students->where('gender', 'Femenino')->count();
+
+        return view('basic_sciences.advisories.individual_details', compact(
+            'advisory',
+            'students',
+            'total',
+            'hombres',
+            'mujeres'
+        ));
+    }
+
+
     /**
      * Remove the specified resource from storage.
      */
     public function destroy($id)
     {
-      $advisory = Advisories::findOrFail($id);
+        $advisory = Advisories::findOrFail($id);
+        $detail   = $advisory->advisoryDetail; // relación
 
-    // borrar archivo si existe
-    if ($advisory->assignment_file) {
-        Storage::disk('public')->delete($advisory->assignment_file);
-    }
+        //  Borrar archivo si existe
+        if ($advisory->assignment_file && Storage::disk('public')->exists($advisory->assignment_file)) {
+            Storage::disk('public')->delete($advisory->assignment_file);
+        }
 
-    // detach alumnos del detalle
-    if ($advisory->advisoryDetail) {
-        $advisory->advisoryDetail->students()->detach();
-    }
+        // Borrar alumnos del detalle
+        if ($detail) {
+            $detail->students()->detach();
+        }
 
-    // eliminar asesoría
-    $advisory->delete();
+        // Borrar la asesoría
+        $advisory->delete();
 
-    return redirect()
-        ->route('basic_sciences.advisories.index')
-        ->with('success', 'Asesoría eliminada correctamente.');
+        // Borrar detalle_asesoría completo
+        if ($detail) {
+            $detail->delete();
+        }
+
+        return redirect()
+            ->route('basic_sciences.advisories.index')
+            ->with('success', 'Asesoría y detalle asociados eliminados correctamente.');
     }
 }

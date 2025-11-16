@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Administrative;
+use App\Models\Career;
 use App\Models\Department;
 use Illuminate\Http\Request;
 
@@ -13,7 +14,7 @@ class AdministrativeController extends Controller
      */
     public function index()
     {
-      $administratives = Administrative::all();
+      $administratives = Administrative::with('career')->get();
         return view('basic_sciences.administratives.index', compact('administratives'));
     }
 
@@ -22,8 +23,8 @@ class AdministrativeController extends Controller
      */
     public function create()
     {
-
-        return view('basic_sciences.administratives.create');
+        $careers = Career::all();
+        return view('basic_sciences.administratives.create', compact('careers'));
     }
 
     /**
@@ -32,10 +33,12 @@ class AdministrativeController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'first_name' => 'required|string|max:50',
-            'last_name_father' => 'required|string|max:50',
-            'last_name_mother' => 'required|string|max:50',
+            'administrative_user' => 'required|string|max:20|unique:administratives,administrative_user',
+            'name' => 'required|string|max:50',
+            'last_name_f' => 'required|string|max:50',
+            'last_name_m' => 'required|string|max:50',
             'position' => 'required|string|max:50',
+            'career_id' => 'required|exists:careers,career_id',
         ]);
 
         Administrative::create($validated);
@@ -56,8 +59,8 @@ class AdministrativeController extends Controller
      */
     public function edit(Administrative $administrative)
     {
-        // $departments = Department::all();
-        return view('basic_sciences.administratives.edit', compact('administrative'));
+        $careers = Career::all();
+        return view('basic_sciences.administratives.edit', compact('administrative', 'careers'));
     }
 
     /**
@@ -66,15 +69,27 @@ class AdministrativeController extends Controller
     public function update(Request $request, Administrative $administrative)
     {
         $validated = $request->validate([
-            'first_name' => 'required|string|max:50',
-            'last_name_father' => 'required|string|max:50',
-            'last_name_mother' => 'required|string|max:50',
-            'position' => 'required|string|max:50',
-        ]);
+        'administrative_user' => 'required|string|max:50',
+        'name' => 'required|string|max:50',
+        'last_name_f' => 'required|string|max:50',
+        'last_name_m' => 'required|string|max:50',
+        'position' => 'required|string|max:50',
+        'career_id' => 'nullable|exists:careers,career_id',
+    ]);
 
-        $administrative->update($validated);
+    // Convertir nombres de la vista a nombres reales de la BD
+    $administrative->update([
+        'administrative_user' => $validated['administrative_user'],
+        'name' => $validated['name'],
+        'last_name_f' => $validated['last_name_f'],
+        'last_name_m' => $validated['last_name_m'],
+        'position' => $validated['position'],
+        'career_id' => $validated['career_id'],
+    ]);
 
-        return redirect()->route('basic_sciences.administratives.index')->with('success', 'Administrativo actualizado exitosamente.');
+    return redirect()
+        ->route('basic_sciences.administratives.index')
+        ->with('success', 'Administrativo actualizado exitosamente.');
     }
 
     /**

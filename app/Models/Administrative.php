@@ -15,6 +15,11 @@ class Administrative extends Model
     protected $keyType = 'string';
     protected $fillable = [
         'administrative_user', 'name', 'last_name_f', 'last_name_m',
-        'position', 'canalization_file'
+        'position', 'career_id', 'canalization_file'
     ];
+
+    public function career()
+    {
+        return $this->belongsTo(Career::class, 'career_id', 'career_id');
+    }
 }

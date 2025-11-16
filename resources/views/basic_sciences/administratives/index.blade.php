@@ -11,6 +11,9 @@
                 <td colspan="4">
                     <a href="{{ route('basic_sciences.administratives.create') }}">Crear nuevo administrativo</a>
                 </td>
+                <td colspan="4">
+                    <a href="{{ route('basic_sciences.index') }}">Regresar al inicio</a>
+                </td>
     <table border="1">
         <thead>
             <tr>
@@ -19,6 +22,7 @@
                 <th>Apellido Paterno</th>
                 <th>Apellido Materno</th>
                 <th>Puesto</th>
+                <th>Carrera</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -33,6 +37,7 @@
                     <td>{{ $administrative->last_name_f }}</td>
                     <td>{{ $administrative->last_name_m }}</td>
                     <td>{{ $administrative->position }}</td>
+                    <td>{{ $administrative->career->name ?? 'N/A' }}</td>
                     <td>
                         <a href="{{ route('basic_sciences.administratives.edit', $administrative) }}">Editar</a>
                         <form action="{{ route('basic_sciences.administratives.destroy', $administrative) }}" method="POST" style="display:inline;">

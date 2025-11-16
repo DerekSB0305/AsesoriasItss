@@ -44,6 +44,11 @@ Route::prefix('basic_sciences')->name('basic_sciences.')->middleware(['auth','ve
     Route::get('/advisory_details/students/{subject_id}',
         [AdvisoryDetailsController::class, 'getStudentsBySubject']
     )->name('advisory_details.getStudents');
+
+    Route::get('advisories/{id}/details',
+        [AdvisoriesController::class, 'details'])
+        ->name('advisories.details');
+
     
 });
 

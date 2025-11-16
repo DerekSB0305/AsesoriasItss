@@ -79,7 +79,7 @@ class AdvisoryDetailsController extends Controller
 
         // Crear detalle asesoría
         $detail = Advisory_details::create([
-            'status'       => 'Pending',
+            'status'       => 'Pendiente',
             'observations' => $request->observations,
         ]);
 

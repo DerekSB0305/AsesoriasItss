@@ -8,22 +8,23 @@
 
 <body class="bg-gray-100 min-h-screen p-6">
 
-    <div class="max-w-6xl mx-auto bg-white shadow-md rounded-xl p-8">
+    <div class="max-w-7xl mx-auto bg-white shadow-lg rounded-xl p-8">
 
-        {{-- Título --}}
-        
-        <div class="flex items-center justify-between mb-6">
-            <h1 class="text-3xl font-bold text-gray-800">📚 Asesorías Registradas</h1>
+        {{-- Header --}}
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8">
+            <h1 class="text-3xl font-extrabold text-gray-800">📚 Asesorías Registradas</h1>
 
-            <a href="{{ route('basic_sciences.advisory_details.index') }}"
-               class="text-green-600 hover:text-green-800 font-medium">
-                → Ver Detalles de Asesoría
-            </a>
+            <div class="flex flex-col sm:flex-row gap-3 mt-4 sm:mt-0">
+                <a href="{{ route('basic_sciences.advisory_details.index') }}"
+                   class="text-green-600 hover:text-green-800 font-medium">
+                    → Ver Detalles de Asesoría
+                </a>
 
-            <a href="{{ route('basic_sciences.index') }}"
-               class="text-green-600 hover:text-green-800 font-medium">
-                Regresar a inicio
-            </a>
+                <a href="{{ route('basic_sciences.index') }}"
+                   class="text-green-600 hover:text-green-800 font-medium">
+                    Regresar al inicio
+                </a>
+            </div>
         </div>
 
         {{-- Buscador --}}
@@ -33,7 +34,7 @@
                 name="q"
                 placeholder="Buscar por maestro o materia..."
                 value="{{ request('q') }}"
-                class="border border-gray-300 rounded-lg px-4 py-2 w-64 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                class="border border-gray-300 rounded-lg px-4 py-2 w-72 focus:ring-2 focus:ring-blue-500 focus:outline-none"
             >
             
             <button
@@ -43,30 +44,34 @@
         </form>
 
         {{-- Tabla --}}
-        <div class="overflow-x-auto">
-            <table class="w-full border-collapse rounded-lg overflow-hidden shadow-sm">
-                <thead class="bg-gray-200 text-gray-700 text-sm uppercase">
-                    <tr>
+        <div class="overflow-x-auto rounded-xl border border-gray-300 shadow">
+            <table class="min-w-full border-collapse text-sm">
+
+                {{-- ENCABEZADOS --}}
+                <thead class="bg-gray-100 text-gray-700 uppercase text-xs font-semibold">
+                    <tr class="border-b">
                         <th class="px-4 py-3">ID</th>
                         <th class="px-4 py-3">Maestro</th>
+                        <th class="px-4 py-3">Carrera</th>
                         <th class="px-4 py-3">Materia</th>
                         <th class="px-4 py-3">Fecha y Hora</th>
                         <th class="px-4 py-3 text-center">Total</th>
-                        <th class="px-4 py-3 text-center">Hombres</th>
-                        <th class="px-4 py-3 text-center">Mujeres</th>
+                        <th class="px-4 py-3 text-center">H</th>
+                        <th class="px-4 py-3 text-center">M</th>
                         <th class="px-4 py-3">Aula</th>
                         <th class="px-4 py-3">Edificio</th>
-                        <th class="px-4 py-3">Ficha de asignación</th>
+                        <th class="px-4 py-3">Archivo</th>
+                        <th class="px-4 py-3">Detalles</th>
                         <th class="px-4 py-3 text-center">Acciones</th>
                     </tr>
                 </thead>
 
+                {{-- CUERPO --}}
                 <tbody class="text-gray-700">
 
                     @foreach($advisories as $adv)
                         @php
                             $students = $adv->advisoryDetail->students ?? collect();
-
                             $total = $students->count();
                             $hombres = $students->where('gender', 'Masculino')->count();
                             $mujeres = $students->where('gender', 'Femenino')->count();
@@ -74,10 +79,14 @@
 
                         <tr class="border-b hover:bg-gray-50 transition">
 
-                            <td class="px-4 py-3">{{ $adv->advisory_id }}</td>
+                            <td class="px-4 py-3 font-medium">{{ $adv->advisory_id }}</td>
 
-                            <td class="px-4 py-3 font-medium">
+                            <td class="px-4 py-3">
                                 {{ $adv->teacherSubject->teacher->name }}
+                            </td>
+
+                            <td class="px-4 py-3">
+                                {{ $adv->teacherSubject->subject->career->name }}
                             </td>
 
                             <td class="px-4 py-3">
@@ -101,31 +110,48 @@
                             <td class="px-4 py-3">{{ $adv->classroom }}</td>
 
                             <td class="px-4 py-3">{{ $adv->building }}</td>
+
                             <td class="px-4 py-3">
-                            @if($adv->assignment_file)
-                            <a class="text-blue-600"  href="{{ asset('storage/' . $adv->assignment_file) }}" target="_blank">Ver archivo</a>
-                            @else
-                                Sin archivo
-                            @endif
+                                @if($adv->assignment_file)
+                                    <a href="{{ asset('storage/' . $adv->assignment_file) }}"
+                                       target="_blank"
+                                       class="text-blue-600 underline hover:text-blue-800">
+                                        Ver archivo
+                                    </a>
+                                @else
+                                    <span class="text-gray-500">Sin archivo</span>
+                                @endif
                             </td>
 
-                            <td class="px-4 py-3 text-center space-x-3">
+                            <td class="px-4 py-3 text-center">
+                                <a href="{{ route('basic_sciences.advisories.details', $adv->advisory_id) }}"
+                                   class="text-indigo-600 font-medium hover:text-indigo-800">
+                                    Ver detalles
+                                </a>
+                            </td>
+
+                            <td class="px-4 py-3 flex gap-3 justify-center">
 
                                 {{-- Editar --}}
                                 <a href="{{ route('basic_sciences.advisories.edit', $adv->advisory_id) }}"
-                                   class="text-blue-600 font-medium hover:text-blue-800">
+                                   class="text-blue-600 font-semibold hover:text-blue-800">
                                     Editar
                                 </a>
 
                                 {{-- Eliminar --}}
-                               <form action="{{ route('basic_sciences.advisories.destroy', $adv->advisory_id) }}"method="POST" class="inline" 
-                                onsubmit="return confirm('¿Eliminar asesoría?')">
-                                @csrf
-                                 @method('DELETE')
-                                 <button type="submit"class="text-red-600 font-medium hover:text-red-800"> Eliminar</button>
+                                <form action="{{ route('basic_sciences.advisories.destroy', $adv->advisory_id) }}"
+                                      method="POST"
+                                      onsubmit="return confirm('¿Eliminar asesoría?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button 
+                                        class="text-red-600 font-semibold hover:text-red-800">
+                                        Eliminar
+                                    </button>
                                 </form>
 
                             </td>
+
                         </tr>
                     @endforeach
 
@@ -137,4 +163,3 @@
 
 </body>
 </html>
-

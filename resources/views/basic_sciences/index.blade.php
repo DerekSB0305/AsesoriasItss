@@ -7,6 +7,14 @@
     <title>Inicio ciencias basicas</title>
 </head>
 <body>
+
+<br>
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit">Cerrar sesión</button>
+    </form>
+</br>
+
     <h1>Bienvenido</h1>
     <a href="{{ route('basic_sciences.administratives.index') }}">Gestionar Administrativos</a><br>
     <a href="{{ route('basic_sciences.teachers.index') }}">Crear Maestros</a><br>

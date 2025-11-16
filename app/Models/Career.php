@@ -33,4 +33,10 @@ class Career extends Model
     {
         return $this->hasMany(Student::class, 'career_id', 'career_id');
     }
+
+    // Relación con administrativos
+    public function administratives()
+    {
+        return $this->hasMany(Administrative::class, 'career_id', 'career_id');
+    }
 }

@@ -31,9 +31,9 @@
         <label class="text-sm text-gray-700 font-medium">Estado</label>
         <select name="estado" class="border p-2 rounded w-40">
             <option value="">Todos</option>
-            <option value="Pending"   {{ $estado=='Pending' ? 'selected' : '' }}>Pendiente</option>
-            <option value="Approved"  {{ $estado=='Approved' ? 'selected' : '' }}>Aprobado</option>
-            <option value="Rejected"  {{ $estado=='Rejected' ? 'selected' : '' }}>Rechazado</option>
+            <option value="Pendiente"   {{ $estado=='Pendiente' ? 'selected' : '' }}>Pendiente</option>
+            <option value="Aprobado"  {{ $estado=='Aprobado' ? 'selected' : '' }}>Aprobado</option>
+            <option value="Finalizado"  {{ $estado=='Finalizado' ? 'selected' : '' }}>Finalizado</option>
         </select>
     </div>
 
