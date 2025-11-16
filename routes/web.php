@@ -97,15 +97,24 @@ Route::prefix('basic_sciences')->name('basic_sciences.')->middleware(['auth','ve
             [TeacherAdvisoryReportController::class, 'index'])
             ->name('advisories.reports.index');
 
-        // Editar reporte
-        Route::get('reports/{id}/edit',
+            Route::get('advisories/{id}/reports', 
+            [TeacherAdvisoryReportController::class, 'listByAdvisory']
+            )->name('advisories.reports.index');
+        // EDITAR REPORTE
+        Route::get('advisories/reports/{id}/edit', 
             [TeacherAdvisoryReportController::class, 'edit'])
             ->name('advisories.reports.edit');
 
-        // Actualizar reporte
-        Route::put('reports/{id}',
+        // ACTUALIZAR REPORTE
+        Route::put('advisories/reports/{id}', 
             [TeacherAdvisoryReportController::class, 'update'])
             ->name('advisories.reports.update');
+
+        // ELIMINAR REPORTE
+        Route::delete('advisories/reports/{id}',
+            [TeacherAdvisoryReportController::class, 'destroy'])
+            ->name('advisories.reports.destroy');
+
 
 
 });

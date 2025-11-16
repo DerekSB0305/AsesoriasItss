@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('semester');
             $table->string('group', 5);
             $table->unsignedBigInteger('career_id');
+            $table->string('schedule_file');
             $table->string('gender', 10);
             $table->integer('age');
             $table->string('teacher_user', 50);

@@ -41,7 +41,7 @@
                         <th class="px-4 py-3">Aula</th>
                         <th class="px-4 py-3">Edificio</th>
                         <th class="px-4 py-3">Estado</th>
-                        <th class="px-4 py-3 text-center">Ficha</th>
+                        <th class="px-4 py-3 text-center">Ficha de asignación</th>
                         <th class="px-4 py-3 text-center">Acciones</th>
                     </tr>
                 </thead>
@@ -97,10 +97,19 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-center">
+                                            {{-- VER REPORTES --}}
+        <a href="{{ route('teachers.advisories.reports.index', $adv->advisory_id) }}"
+        class="bg-indigo-900 text-white px-3 py-1 rounded hover:bg-indigo-700">
+            Ver reportes
+        </a>
+
+        <br>
+        
         <a href="{{ route('teachers.advisories.reports.create', $adv->advisory_id) }}"
            class="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700 transition">
             Subir reporte
         </a>
+
     </td>
 
                             

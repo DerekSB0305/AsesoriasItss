@@ -27,7 +27,7 @@
     @endif
 
     {{-- Formulario --}}
-    <form method="POST" action="{{ route('teachers.students.store') }}" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <form method="POST" action="{{ route('teachers.students.store') }}" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         @csrf
 
         {{-- MATRÍCULA --}}
@@ -124,6 +124,13 @@
                     </option>
                 @endforeach
             </select>
+        </div>
+
+        <div>
+            <label>Horario del alumno (PDF / Imagen):</label>
+<input type="file" name="schedule_file" class="border rounded p-2 mb-4 w-full">
+<br><br>
+
         </div>
 
         {{-- Botón --}}

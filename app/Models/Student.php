@@ -15,7 +15,7 @@ class Student extends Model
     protected $keyType = 'string';
     protected $fillable = [
         'enrollment', 'last_name_f', 'last_name_m', 'name',
-        'semester', 'group', 'career_id', 'gender', 'age', 'teacher_user'
+        'semester', 'group', 'career_id', 'schedule_file', 'gender', 'age', 'teacher_user'
     ];
 
     // Un alumno pertenece a una carrera

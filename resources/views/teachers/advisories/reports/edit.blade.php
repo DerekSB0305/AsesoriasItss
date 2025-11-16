@@ -8,40 +8,17 @@
 
 <body class="bg-gray-100 min-h-screen p-6">
 
-<div class="max-w-3xl mx-auto bg-white shadow-lg rounded-xl p-8">
+<div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6">
 
-    <h2 class="text-3xl font-bold mb-6 text-gray-800">
-        ✏️ Editar Reporte
-    </h2>
+    <h2 class="text-2xl font-bold mb-4">✏️ Editar Reporte</h2>
 
-    <p class="text-gray-700 mb-3">
-        <strong>Asesoría:</strong>
-        {{ $report->advisory->teacherSubject->subject->name }}
+    <p class="mb-2">
+        <strong>Materia:</strong> {{ $report->advisory->teacherSubject->subject->name }}
     </p>
 
-    <p class="text-gray-700 mb-3">
-        <strong>Tipo:</strong>
-        {{ ucfirst($report->report_type) }}
+    <p class="mb-4">
+        <strong>Fecha/Hora:</strong> {{ $report->advisory->schedule }}
     </p>
-
-    <p class="text-gray-700 mb-6">
-        <strong>Archivo actual:</strong>
-        <a href="{{ asset('storage/reports/'.$report->file) }}"
-           target="_blank"
-           class="text-blue-600 hover:underline">
-            Descargar
-        </a>
-    </p>
-
-    @if ($errors->any())
-        <div class="mb-4 bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-lg">
-            <ul class="list-disc pl-6">
-                @foreach ($errors->all() as $item)
-                    <li>{{ $item }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
 
     <form action="{{ route('teachers.advisories.reports.update', $report->id) }}"
           method="POST" enctype="multipart/form-data">
@@ -49,18 +26,35 @@
         @csrf
         @method('PUT')
 
-        <label class="block font-semibold mb-2">
-            Reemplazar archivo (PDF/DOC máx 4MB):
-        </label>
+        <label class="block font-medium">Tipo de reporte:</label>
+        <select name="report_type" class="border rounded p-2 mb-4 w-full" required>
+            <option value="previo" {{ $report->report_type == 'previo' ? 'selected' : '' }}>Previo</option>
+            <option value="final" {{ $report->report_type == 'final' ? 'selected' : '' }}>Final</option>
+        </select>
 
-        <input type="file"
-               name="file"
-               class="border-gray-300 rounded-lg p-3 w-full shadow mb-6 bg-white">
+        <label class="block font-medium mb-2">Archivo actual:</label>
+        <a class="text-blue-600 underline" href="{{ asset('storage/' . $report->file_path) }}" download>
+            📄 Descargar archivo
+        </a>
 
-        <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
-            Actualizar Reporte
+        <label class="block font-medium mt-4">Subir nuevo archivo (opcional):</label>
+        <input type="file" name="file" class="border rounded p-2 mb-4 w-full">
+
+        <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            Actualizar
         </button>
 
+    </form>
+
+    <form action="{{ route('teachers.advisories.reports.destroy', $report->id) }}"
+          method="POST" class="mt-4"
+          onsubmit="return confirm('¿Eliminar este reporte?')">
+        @csrf
+        @method('DELETE')
+
+        <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+            Eliminar reporte
+        </button>
     </form>
 
 </div>

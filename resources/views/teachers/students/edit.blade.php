@@ -24,7 +24,7 @@
         </div>
     @endif
 
-    <form action="{{ route('teachers.students.update', $student->enrollment) }}" method="POST">
+    <form action="{{ route('teachers.students.update', $student->enrollment) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -73,6 +73,22 @@
                 </option>
             @endforeach
         </select>
+                <label>Horario actual:</label>
+        @if ($student->schedule_file)
+            <a href="{{ asset('storage/'.$student->schedule_file) }}" target="_blank" class="text-blue-600">
+                📄 Ver archivo actual
+            </a>
+        @else
+            <span class="text-gray-500">No subido</span>
+        @endif
+
+        <br><br>
+
+        <label>Subir nuevo horario (opcional):</label>
+        <input type="file" name="schedule_file" class="border rounded p-2 mb-4 w-full">
+
+        <br><br>
+
 
         <button type="submit"
                 class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">

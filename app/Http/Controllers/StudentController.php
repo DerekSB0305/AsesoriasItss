@@ -10,10 +10,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
 {
-    /**
+     /**
      * Display a listing of the resource.
      */
     public function index()
@@ -36,8 +37,8 @@ class StudentController extends Controller
      */
     public function create()
     {
-            $careers = Career::all();
-    return view('teachers.students.create', compact('careers'));
+        $careers = Career::all();
+        return view('teachers.students.create', compact('careers'));
     }
 
     /**
@@ -45,39 +46,47 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-       $validated = $request->validate([
-        'enrollment' => 'required|string|max:8|unique:students,enrollment',
-        'last_name_f' => 'required|string|max:50',
-        'last_name_m' => 'required|string|max:50',
-        'name' => 'required|string|max:40',
-        'semester' => 'required|integer',
-        'group' => 'required|string|max:5',
-        'career_id' => 'required|exists:careers,career_id',
-        'gender' => 'required|string|max:10',
-        'age' => 'required|integer',
-    ]);
+        $validated = $request->validate([
+            'enrollment'    => 'required|string|max:8|unique:students,enrollment',
+            'last_name_f'   => 'required|string|max:50',
+            'last_name_m'   => 'required|string|max:50',
+            'name'          => 'required|string|max:40',
+            'semester'      => 'required|integer',
+            'group'         => 'required|string|max:5',
+            'career_id'     => 'required|exists:careers,career_id',
+            'gender'        => 'required|string|max:10',
+            'age'           => 'required|integer',
+            'schedule_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:4096',
+        ]);
 
-    $teacherUser = Auth::user()->user; // usuario del maestro logueado
+        $teacherUser = Auth::user()->user; // usuario del maestro logueado
 
-    // guardar alumno
-    $student = Student::create([
-        ...$validated,
-        'teacher_user' => $teacherUser,
-    ]);
+        // Datos base del alumno
+        $studentData = $validated;
+        $studentData['teacher_user'] = $teacherUser;
 
-    // CREAR USUARIO AUTOMATICO PARA EL ALUMNO
-    $defaultPassword = strtolower($validated['enrollment']); // contraseña = matrícula
+        // Guardar archivo de horario si viene
+        if ($request->hasFile('schedule_file')) {
+            $path = $request->file('schedule_file')->store('student_schedules', 'public');
+            $studentData['schedule_file'] = $path;
+        }
 
-    $roleAlumno = Role::where('role_type', 'Alumno')->first(); // <-- aquí usamos el rol exacto
+        // Guardar alumno
+        $student = Student::create($studentData);
 
-    User::create([
-        'user' => $validated['enrollment'],            // el usuario será la matrícula
-        'password' => bcrypt($defaultPassword),        // contraseña encriptada
-        'role_id' => $roleAlumno->id,                  // rol alumno
-    ]);
+        // CREAR USUARIO AUTOMÁTICO PARA EL ALUMNO
+        $defaultPassword = strtolower($validated['enrollment']); // contraseña = matrícula
 
-    return redirect()->route('teachers.students.index')
-        ->with('success','Alumno registrado correctamente.');
+        $roleAlumno = Role::where('role_type', 'Alumno')->first();
+
+        User::create([
+            'user'     => $validated['enrollment'],           // usuario = matrícula
+            'password' => bcrypt($defaultPassword),           // contraseña encriptada
+            'role_id'  => $roleAlumno->id,                    // rol alumno
+        ]);
+
+        return redirect()->route('teachers.students.index')
+            ->with('success', 'Alumno registrado correctamente.');
     }
 
     /**
@@ -85,7 +94,7 @@ class StudentController extends Controller
      */
     public function show(Student $student)
     {
-      
+        //
     }
 
     /**
@@ -111,14 +120,31 @@ class StudentController extends Controller
             'gender'         => 'required|string|max:20',
             'age'            => 'required|integer|min:1|max:120',
             'career_id'      => 'required|exists:careers,career_id',
+            'schedule_file'  => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:4096',
         ]);
 
-        $student->update($validated);
+        $data = $validated;
+
+        // Si viene un nuevo archivo de horario
+        if ($request->hasFile('schedule_file')) {
+
+            // Borrar el archivo anterior si existe
+            if ($student->schedule_file && Storage::disk('public')->exists($student->schedule_file)) {
+                Storage::disk('public')->delete($student->schedule_file);
+            }
+
+            $path = $request->file('schedule_file')->store('student_schedules', 'public');
+            $data['schedule_file'] = $path;
+        } else {
+            // Para que no intente guardar el UploadedFile vacío
+            unset($data['schedule_file']);
+        }
+
+        $student->update($data);
 
         return redirect()
             ->route('teachers.students.index')
             ->with('success', 'Alumno actualizado correctamente.');
-    
     }
 
     /**
@@ -126,6 +152,15 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
+        // Borrar archivo de horario si existe
+        if ($student->schedule_file && Storage::disk('public')->exists($student->schedule_file)) {
+            Storage::disk('public')->delete($student->schedule_file);
+        }
+
+        // Borrar usuario asociado (user = matrícula)
+        User::where('user', $student->enrollment)->delete();
+
+        // Borrar alumno
         $student->delete();
 
         return redirect()->route('teachers.students.index')

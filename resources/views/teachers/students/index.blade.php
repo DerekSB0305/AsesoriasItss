@@ -41,6 +41,7 @@
                         <th class="px-4 py-3">Género</th>
                         <th class="px-4 py-3">Edad</th>
                         <th class="px-4 py-3">Carrera</th>
+                        <th class="px-4 py-3">Horario</th>
                         <th class="px-4 py-3 text-center">Acciones</th>
                     </tr>
                 </thead>
@@ -64,6 +65,14 @@
                             <td class="px-4 py-3 text-center">
                                 {{ $student->career?->name ?? '---' }}
                             </td>
+                            <td>
+    @if ($student->schedule_file)
+        <a href="{{ asset('storage/'.$student->schedule_file) }}" class="text-blue-600">📄 Ver horario</a>
+    @else
+        ---
+    @endif
+</td>
+
 
                             <td class="px-4 py-3 text-center space-x-3">
 
