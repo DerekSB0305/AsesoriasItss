@@ -93,7 +93,8 @@ class StudentController extends Controller
      */
     public function edit(Student $student)
     {
-
+        $careers = Career::all();
+        return view('teachers.students.edit', compact('student', 'careers'));
     }
 
     /**
@@ -101,7 +102,23 @@ class StudentController extends Controller
      */
     public function update(Request $request, Student $student)
     {
-     
+        $validated = $request->validate([
+            'name'           => 'required|string|max:100',
+            'last_name_f'    => 'required|string|max:100',
+            'last_name_m'    => 'nullable|string|max:100',
+            'semester'       => 'required|integer|min:1|max:12',
+            'group'          => 'required|string|max:5',
+            'gender'         => 'required|string|max:20',
+            'age'            => 'required|integer|min:1|max:120',
+            'career_id'      => 'required|exists:careers,career_id',
+        ]);
+
+        $student->update($validated);
+
+        return redirect()
+            ->route('teachers.students.index')
+            ->with('success', 'Alumno actualizado correctamente.');
+    
     }
 
     /**
@@ -109,6 +126,9 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
-  
+        $student->delete();
+
+        return redirect()->route('teachers.students.index')
+            ->with('success', 'Alumno eliminado correctamente.');
     }
 }

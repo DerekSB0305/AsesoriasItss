@@ -16,6 +16,7 @@
         <li><a href="{{ route('teachers.students.create') }}">➕ Registrar alumno</a></li>
         <li><a href="{{ route('teachers.requests.index') }}">📄 Ver solicitudes de asesoría</a></li>
         <li><a href="{{ route('teachers.requests.create') }}">➕ Solicitar asesoría</a></li>
+        <li><a href="{{ route('teachers.advisories.index') }}"> Ver asesorias</a></li>
     </ul>
 
     <br><br>

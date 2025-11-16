@@ -90,4 +90,25 @@ public function destroy(Teacher $teacher)
 
     return view('teachers.index', compact('teacher'));
     }
+
+    public function myAdvisories()
+    {
+        // obtener el usuario maestro logueado
+        $teacherUser = auth()->user()->user;
+
+        $advisories = \App\Models\Advisories::with([
+                'teacherSubject.teacher',
+                'teacherSubject.subject.career',
+                'advisoryDetail.students'
+            ])
+            ->whereHas('teacherSubject', function ($q) use ($teacherUser) {
+                $q->where('teacher_user', $teacherUser);
+            })
+            ->orderBy('schedule', 'ASC')
+            ->get();
+
+        return view('teachers.advisories.index', compact('advisories'));
+    }
+
+
 }

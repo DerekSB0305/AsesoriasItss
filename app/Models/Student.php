@@ -41,4 +41,16 @@ class Student extends Model
     {
         return $this->hasMany(Advisory_details::class, 'enrollment', 'enrollment');
     }
+
+    protected static function boot()
+{
+    parent::boot();
+
+    static::deleting(function ($student) {
+        // Borrar el usuario con esa matrícula
+        \App\Models\User::where('user', $student->enrollment)
+                        ->delete();
+    });
+}
+
 }

@@ -4,62 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitar Asesoría</title>
+    @vite('resources/css/app.css')
 </head>
-<body style="font-family:Arial; max-width:900px; margin:40px auto;">
 
-    <h2>Solicitar Asesoría</h2>
+<body class="bg-gray-100 min-h-screen p-6">
 
-    <form action="{{ route('teachers.requests.store') }}" method="POST" enctype="multipart/form-data">
+<div class="max-w-3xl mx-auto bg-white shadow-lg rounded-xl p-8">
+
+    {{-- Título --}}
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">📩 Solicitar Asesoría</h1>
+
+    {{-- Formulario --}}
+    <form action="{{ route('teachers.requests.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
 
-        <div style="margin-bottom:15px;">
-                <label>Alumnos:</label>
-    <select name="enrollments[]" multiple size="6" class="w-full border rounded p-2" required>
-        @foreach($students as $s)
-            <option value="{{ $s->enrollment }}">
-                {{ $s->enrollment }} — {{ $s->name }} {{ $s->last_name_f }}
-            </option>
-        @endforeach
-    </select>
-    <p style="color: blue; font-weight: bold;">
-        * Mantén presionado CTRL para seleccionar varios alumnos
-    </p>
+        {{-- Selección de alumnos --}}
+        <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Alumnos:</label>
 
+            <select name="enrollments[]" multiple size="6"
+                class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500" required>
+                @foreach($students as $s)
+                    <option value="{{ $s->enrollment }}">
+                        {{ $s->enrollment }} — {{ $s->name }} {{ $s->last_name_f }}
+                    </option>
+                @endforeach
+            </select>
+
+            <p class="text-blue-600 text-sm font-medium mt-1">
+                * Mantén presionado CTRL para seleccionar varios alumnos
+            </p>
         </div>
 
-        <div style="margin-bottom:15px;">
-            <label><strong>Materia:</strong></label><br>
-            <select name="subject_id" required style="width:100%; padding:6px;">
+        {{-- Materia --}}
+        <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Materia:</label>
+
+            <select name="subject_id" required
+                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="">Seleccione una materia</option>
                 @foreach($subjects as $sub)
                     <option value="{{ $sub->subject_id }}">{{ $sub->name }}</option>
                 @endforeach
             </select>
+
             @error('subject_id')
-                <small style="color:red">{{ $message }}</small>
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
 
-        <div style="margin-bottom:15px;">
-            <label><strong>Motivo / detalle de la asesoría:</strong></label><br>
-            <textarea name="reason" rows="4" placeholder="Explica por qué solicitas esta asesoría" style="width:100%; padding:6px;">{{ old('reason') }}</textarea>
+        {{-- Motivo --}}
+        <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Motivo / detalle de la asesoría:</label>
+
+            <textarea name="reason" rows="4"
+                placeholder="Explica por qué solicitas esta asesoría"
+                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">{{ old('reason') }}</textarea>
+
             @error('reason')
-                <small style="color:red">{{ $message }}</small>
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
 
-        <div style="margin-bottom:15px;">
-            <label><strong>Hoja de canalización (PDF/JPG/PNG, máx. 2MB)</strong></label><br>
-            <input type="file" name="canalization_file" accept=".pdf,.jpg,.jpeg,.png">
+        {{-- Archivo --}}
+        <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">
+                Hoja de canalización (PDF/JPG/PNG, máx. 2MB)
+            </label>
+
+            <input type="file" name="canalization_file" accept=".pdf,.jpg,.jpeg,.png"
+                class="w-full p-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500">
+
             @error('canalization_file')
-                <small style="color:red">{{ $message }}</small>
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
 
-        <button type="submit" style="padding:8px 14px; background:#1e88e5; color:#fff; border:0; border-radius:4px;">
-            Enviar Solicitud
-        </button>
+        {{-- Botón --}}
+        <div class="flex justify-end">
+            <button type="submit"
+                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                Enviar Solicitud
+            </button>
+        </div>
 
     </form>
+
+</div>
 
 </body>
 </html>

@@ -4,6 +4,7 @@ use App\Http\Controllers\AdvisoriesController;
 use App\Http\Controllers\AdvisoryDetailsController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TeacherController;
 use App\Models\Advisories;
 use Illuminate\Support\Facades\Route;
 
@@ -79,6 +80,8 @@ Route::prefix('basic_sciences')->name('basic_sciences.')->middleware(['auth','ve
         ->except(['index'])
         ->names('requests');
 
+            Route::get('advisories', [TeacherController::class, 'myAdvisories'])
+        ->name('advisories.index');
 });
 
 Route::resource('/students', \App\Http\Controllers\StudentController::class)->middleware('auth', 'verified');
