@@ -4,6 +4,7 @@ use App\Http\Controllers\AdvisoriesController;
 use App\Http\Controllers\AdvisoryDetailsController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TeacherAdvisoryReportController;
 use App\Http\Controllers\TeacherController;
 use App\Models\Advisories;
 use Illuminate\Support\Facades\Route;
@@ -82,6 +83,31 @@ Route::prefix('basic_sciences')->name('basic_sciences.')->middleware(['auth','ve
 
             Route::get('advisories', [TeacherController::class, 'myAdvisories'])
         ->name('advisories.index');
+
+            Route::get('advisories/{id}/reports/create', 
+        [TeacherAdvisoryReportController::class, 'create']
+            )->name('advisories.reports.create');
+
+        Route::post('advisories/{id}/reports', 
+        [TeacherAdvisoryReportController::class, 'store']
+            )->name('advisories.reports.store');
+
+            // Listar reportes del maestro
+        Route::get('reports', 
+            [TeacherAdvisoryReportController::class, 'index'])
+            ->name('advisories.reports.index');
+
+        // Editar reporte
+        Route::get('reports/{id}/edit',
+            [TeacherAdvisoryReportController::class, 'edit'])
+            ->name('advisories.reports.edit');
+
+        // Actualizar reporte
+        Route::put('reports/{id}',
+            [TeacherAdvisoryReportController::class, 'update'])
+            ->name('advisories.reports.update');
+
+
 });
 
 Route::resource('/students', \App\Http\Controllers\StudentController::class)->middleware('auth', 'verified');

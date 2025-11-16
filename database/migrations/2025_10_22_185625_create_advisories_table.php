@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id('advisory_id');
             $table->unsignedBigInteger('teacher_subject_id');
             $table->unsignedBigInteger('advisory_detail_id');
-            // $table->unsignedBigInteger('subject_id');
             $table->dateTime('schedule');
             $table->string('classroom', 10)->nullable();
             $table->string('building', 10)->nullable();
@@ -23,7 +22,6 @@ return new class extends Migration
 
             $table->foreign('teacher_subject_id')->references('teacher_subject_id')->on('teacher_subjects')->onDelete('cascade');
             $table->foreign('advisory_detail_id')->references('advisory_detail_id')->on('advisory_details')->onDelete('cascade');
-            // $table->foreign('subject_id')->references('subject_id')->on('subjects')->onDelete('cascade');
             $table->timestamps();
         });
     }

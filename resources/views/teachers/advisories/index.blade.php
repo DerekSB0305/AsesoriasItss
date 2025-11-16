@@ -42,6 +42,7 @@
                         <th class="px-4 py-3">Edificio</th>
                         <th class="px-4 py-3">Estado</th>
                         <th class="px-4 py-3 text-center">Ficha</th>
+                        <th class="px-4 py-3 text-center">Acciones</th>
                     </tr>
                 </thead>
 
@@ -95,6 +96,14 @@
                                     <span class="text-gray-500">---</span>
                                 @endif
                             </td>
+                            <td class="px-4 py-3 text-center">
+        <a href="{{ route('teachers.advisories.reports.create', $adv->advisory_id) }}"
+           class="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700 transition">
+            Subir reporte
+        </a>
+    </td>
+
+                            
 
                         </tr>
                     @endforeach

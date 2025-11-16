@@ -17,6 +17,9 @@
         <li><a href="{{ route('teachers.requests.index') }}">📄 Ver solicitudes de asesoría</a></li>
         <li><a href="{{ route('teachers.requests.create') }}">➕ Solicitar asesoría</a></li>
         <li><a href="{{ route('teachers.advisories.index') }}"> Ver asesorias</a></li>
+        <li>
+    <a href="{{ route('teachers.advisories.reports.index') }}">📄 Ver mis reportes</a></li>
+
     </ul>
 
     <br><br>

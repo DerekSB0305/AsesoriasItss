@@ -78,4 +78,10 @@ class Advisories extends Model
     {
         return 'advisory_id';
     }
+
+    public function reports()
+    {
+        return $this->hasMany(AdvisoryReport::class, 'advisory_id', 'advisory_id');
+    }
+
 }
