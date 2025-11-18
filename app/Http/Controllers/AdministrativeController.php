@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Administrative;
 use App\Models\Career;
 use App\Models\Department;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AdministrativeController extends Controller
@@ -14,7 +15,7 @@ class AdministrativeController extends Controller
      */
     public function index()
     {
-      $administratives = Administrative::with('career')->get();
+        $administratives = Administrative::with('career')->get();
         return view('basic_sciences.administratives.index', compact('administratives'));
     }
 
@@ -40,6 +41,13 @@ class AdministrativeController extends Controller
             'position' => 'required|string|max:50',
             'career_id' => 'required|exists:careers,career_id',
         ]);
+
+        $user = \App\Models\User::create([
+            'user'     => $request->administrative_user,
+            'password' => $request->administrative_user,
+            'role_id'  => 2,
+        ]);
+
 
         Administrative::create($validated);
 
@@ -68,28 +76,32 @@ class AdministrativeController extends Controller
      */
     public function update(Request $request, Administrative $administrative)
     {
+        $oldUser = $administrative->administrative_user;
+        
         $validated = $request->validate([
-        'administrative_user' => 'required|string|max:50',
-        'name' => 'required|string|max:50',
-        'last_name_f' => 'required|string|max:50',
-        'last_name_m' => 'required|string|max:50',
-        'position' => 'required|string|max:50',
-        'career_id' => 'nullable|exists:careers,career_id',
-    ]);
+            'administrative_user' => 'required|string|max:50|unique:administratives,administrative_user,' . $administrative->administrative_user . ',administrative_user',
+            'name' => 'required|string|max:50',
+            'last_name_f' => 'required|string|max:50',
+            'last_name_m' => 'required|string|max:50',
+            'position' => 'required|string|max:50',
+            'career_id' => 'nullable|exists:careers,career_id',
+        ]);
 
-    // Convertir nombres de la vista a nombres reales de la BD
-    $administrative->update([
-        'administrative_user' => $validated['administrative_user'],
-        'name' => $validated['name'],
-        'last_name_f' => $validated['last_name_f'],
-        'last_name_m' => $validated['last_name_m'],
-        'position' => $validated['position'],
-        'career_id' => $validated['career_id'],
-    ]);
+        // Actualizar administrativo
+        $administrative->update($validated);
 
-    return redirect()
-        ->route('basic_sciences.administratives.index')
-        ->with('success', 'Administrativo actualizado exitosamente.');
+        // Actualizar usuario en tabla users
+        $user = \App\Models\User::where('user', $oldUser)->first();
+
+        if ($user) {
+            $user->update([
+                'user' => $validated['administrative_user'],
+            ]);
+        }
+
+        return redirect()
+            ->route('basic_sciences.administratives.index')
+            ->with('success', 'Administrativo actualizado exitosamente.');
     }
 
     /**

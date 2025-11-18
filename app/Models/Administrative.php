@@ -22,4 +22,15 @@ class Administrative extends Model
     {
         return $this->belongsTo(Career::class, 'career_id', 'career_id');
     }
+
+     protected static function boot()
+{
+    parent::boot();
+
+    static::deleting(function ($administrative) {
+        // Borrar el usuario con esa matrícula
+        \App\Models\User::where('user', $administrative->administrative_user)
+                        ->delete();
+    });
+}
 }

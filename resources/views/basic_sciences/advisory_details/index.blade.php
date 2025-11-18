@@ -1,109 +1,141 @@
-<html>
-    <head>
-        <title>Detalles de Asesorías</title>
-        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    </head>
-<body class="bg-gray-50 min-h-screen p-6">      
-<div class="max-w-5xl mx-auto bg-white shadow p-6 rounded">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalles de Asesorías</title>
+    @vite('resources/css/app.css')
+</head>
 
-    <h1 class="text-2xl font-bold mb-4">Detalles de Asesorías</h1>
+<body class="bg-gray-100 min-h-screen p-6">
 
-     <a href="{{ route('basic_sciences.index') }}"
-               class="text-green-600 hover:text-green-800 font-medium">
-                Regresar a inicio
-            </a>
+<div class="max-w-6xl mx-auto bg-white shadow-lg rounded-xl p-8">
+
+    {{-- Título --}}
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-extrabold text-gray-800">📄 Detalles de Asesorías</h1>
+
+        <a href="{{ route('basic_sciences.index') }}"
+           class="text-green-600 hover:text-green-800 font-semibold">
+            ← Regresar al inicio
+        </a>
+    </div>
 
     {{-- BUSCADOR --}}
-<form method="GET" class="flex gap-4 mb-4 items-end">
+    <form method="GET" class="flex flex-wrap gap-4 mb-6 items-end">
 
-    
+        {{-- BUSCAR MATERIA --}}
+        <div>
+            <label class="text-sm font-semibold text-gray-700">Materia</label>
+            <input type="text" name="materia" value="{{ $materia }}"
+                placeholder="Buscar materia..."
+                class="border border-gray-300 px-3 py-2 rounded-lg w-48 
+                       focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
 
-    {{-- Buscar por materia --}}
-    <div>
-        <label class="text-sm text-gray-700 font-medium">Materia</label>
-        <input type="text" name="materia" value="{{ $materia }}"
-               placeholder="Buscar materia..."
-               class="border p-2 rounded w-48">
-    </div>
+        {{-- ESTADO --}}
+        <div>
+            <label class="text-sm font-semibold text-gray-700">Estado</label>
+            <select name="estado"
+                    class="border border-gray-300 px-3 py-2 rounded-lg w-40
+                           focus:ring-2 focus:ring-blue-500">
+                <option value="">Todos</option>
+                <option value="Pendiente"  {{ $estado=='Pendiente' ? 'selected' : '' }}>Pendiente</option>
+                <option value="Aprobado"   {{ $estado=='Aprobado' ? 'selected' : '' }}>Aprobado</option>
+                <option value="Finalizado" {{ $estado=='Finalizado' ? 'selected' : '' }}>Finalizado</option>
+            </select>
+        </div>
 
-    {{-- Buscar por estado --}}
-    <div>
-        <label class="text-sm text-gray-700 font-medium">Estado</label>
-        <select name="estado" class="border p-2 rounded w-40">
-            <option value="">Todos</option>
-            <option value="Pendiente"   {{ $estado=='Pendiente' ? 'selected' : '' }}>Pendiente</option>
-            <option value="Aprobado"  {{ $estado=='Aprobado' ? 'selected' : '' }}>Aprobado</option>
-            <option value="Finalizado"  {{ $estado=='Finalizado' ? 'selected' : '' }}>Finalizado</option>
-        </select>
-    </div>
+        {{-- BOTÓN BUSCAR --}}
+        <button class="bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700">
+            Buscar
+        </button>
 
-    <button class="bg-blue-600 text-white px-4 py-2 rounded shadow">
-        Buscar
-    </button>
+        {{-- LIMPIAR --}}
+        @if($materia || $estado)
+            <a href="{{ route('basic_sciences.advisory_details.index') }}"
+               class="text-red-600 font-semibold hover:text-red-800 px-3 py-2">
+               Limpiar
+            </a>
+        @endif
+    </form>
 
-    {{-- Botón limpiar --}}
-    @if($materia || $estado)
-        <a href="{{ route('basic_sciences.advisory_details.index') }}"
-           class="text-red-600 px-3 py-2">
-           Limpiar
-        </a>
-    @endif
-</form>
-
-
+    {{-- BOTÓN CREAR DETALLE --}}
     <a href="{{ route('basic_sciences.advisory_details.create') }}"
-       class="bg-green-600 text-white px-3 py-2 rounded mb-4 inline-block">
-       Crear Detalle
+       class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 inline-block mb-5">
+        ➕ Crear Detalle de Asesoría
     </a>
 
-   <table class="w-full border mt-3 text-sm">
-    <thead class="bg-gray-100">
-        <tr>
-            <th class="border px-2 py-1">ID</th>
-            <th class="border px-2 py-1">Materia</th>
-            <th class="border px-2 py-1">Alumnos</th>
-            <th class="border px-2 py-1">Estado</th>
-            <th class="border px-2 py-1">Observaciones</th>
-            <th class="border px-2 py-1">Acciones</th>
-        </tr>
-    </thead>
+    {{-- TABLA --}}
+    <div class="overflow-x-auto border border-gray-300 rounded-xl shadow">
+        <table class="min-w-full border-collapse text-sm">
 
-    <tbody>
-    @foreach($details as $d)
-        <tr>
-            <td class="border px-2 py-1">{{ $d->advisory_detail_id }}</td>
+            {{-- ENCABEZADOS --}}
+            <thead style="background-color:#0B3D7E;" class="text-white font-bold">
+                <tr>
+                    <th class="px-4 py-3">ID</th>
+                    <th class="px-4 py-3">Materia</th>
+                    <th class="px-4 py-3">Alumnos</th>
+                    <th class="px-4 py-3">Estado</th>
+                    <th class="px-4 py-3">Observaciones</th>
+                    <th class="px-4 py-3 text-center">Acciones</th>
+                </tr>
+            </thead>
 
-            <td class="border px-2 py-1">
-                {{ $d->subject->name ?? 'Sin asesoría creada' }}
-            </td>
+            {{-- CUERPO --}}
+            <tbody class="text-gray-700">
 
-            <td class="border px-2 py-1">
-                <ul class="list-disc ml-4">
-                    @foreach($d->students as $s)
-                        <li>{{ $s->enrollment }} - {{ $s->name }} {{ $s->last_name_f }}</li>
-                    @endforeach
-                </ul>
-            </td>
+            @foreach($details as $d)
+                <tr class="border-b hover:bg-gray-50 transition">
 
-            <td class="border px-2 py-1">{{ $d->status }}</td>
+                    {{-- ID --}}
+                    <td class="px-4 py-3 font-semibold">{{ $d->advisory_detail_id }}</td>
 
-            <td class="border px-2 py-1">{{ $d->observations }}</td>
+                    {{-- MATERIA --}}
+                    <td class="px-4 py-3">
+                        {{ $d->subject->name ?? 'Sin asesoría creada' }}
+                    </td>
 
-            <td class="border px-2 py-1 space-x-2">
-                <a href="{{ route('basic_sciences.advisory_details.show', $d) }}"
-                   class="text-blue-600">Ver</a>
+                    {{-- ALUMNOS --}}
+                    <td class="px-4 py-3">
+                        <ul class="list-disc ml-5">
+                            @foreach($d->students as $s)
+                                <li>{{ $s->enrollment }} - {{ $s->name }} {{ $s->last_name_f }}</li>
+                            @endforeach
+                        </ul>
+                    </td>
 
-                <a href="{{ route('basic_sciences.advisories.create', ['detail_id' => $d->advisory_detail_id]) }}"
-                   class="text-green-600 font-bold">
-                   Crear Asesoría
-                </a>
-            </td>
-        </tr>
-    @endforeach
-    </tbody>
-</table>
+                    {{-- ESTADO --}}
+                    <td class="px-4 py-3">
+                        <span class="font-semibold">{{ $d->status }}</span>
+                    </td>
 
+                    {{-- OBSERVACIONES --}}
+                    <td class="px-4 py-3">
+                        {{ $d->observations }}
+                    </td>
+
+                    {{-- ACCIONES --}}
+                    <td class="px-4 py-3 text-center space-y-1">
+
+                        <br>
+
+                        {{-- Crear Asesoría --}}
+                        <a href="{{ route('basic_sciences.advisories.create', ['detail_id' => $d->advisory_detail_id]) }}"
+                           class="text-white font-semibold px-3 py-1 rounded-lg"
+                           style="background-color:#28A745;">
+                           ➕ Crear Asesoría
+                        </a>
+
+                    </td>
+
+                </tr>
+            @endforeach
+
+            </tbody>
+        </table>
+    </div>
 
 </div>
+
 </body>
 </html>

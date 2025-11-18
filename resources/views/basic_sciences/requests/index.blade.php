@@ -1,58 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Solicitudes</title>
+    @vite('resources/css/app.css')
 </head>
-<body>
-    <h1>Lista de Solicitudes</h1>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Matricula</th>
-                <th>nombre estudiante</th>
-                <th>apellido paterno</th>
-                <th>apellido materno</th>
-                <th>carrera</th>
-                <th>semestre</th>
-                <th>grupo</th>
-                <th>Asunto</th>
-                <th>Materias solicitada</th>
-                <th>Tutor</th>
-                <th>Hoja de canalizacion</th>
-                <th>Accion</th>
-            </tr>
-        </thead>
-       <tbody>
-    @foreach ($requests as $request)
-        <tr>
-            <td>{{ $request->student->enrollment }}</td>
-            <td>{{ $request->student->name }}</td>
-            <td>{{ $request->student->last_name_f }}</td>
-            <td>{{ $request->student->last_name_m }}</td>
-            <td>{{ $request->student->career->name ?? 'N/A' }}</td>
-            <td>{{ $request->student->semester }}</td>
-            <td>{{ $request->student->group ?? 'N/A' }}</td>
-            <td>{{ $request->reason }}</td>
-            <td>{{ $request->subject->name }}</td> {{-- o si tienes otro campo diferente --}}
-            <td>{{ $request->teacher->name ?? 'N/A' }}</td>
 
-            <td>
-                @if($request->canalization_file)
-                    <a href="{{ asset('storage/' . $request->canalization_file) }}" target="_blank">Ver Hoja</a>
-                @else
-                    No disponible
-                @endif
-            </td>
-            <td>
-                {{-- <a href="{{ route('teachers.advisories.create', $request->request_id) }}"class="bg-blue-600 text-white px-3 py-1 rounded">Crear asesoría</a> --}}
-            </td>
-        </tr>
-    @endforeach
-</tbody>
+<body class="bg-gray-100 min-h-screen p-6">
 
-    </table>
+<div class="max-w-7xl mx-auto bg-white shadow-xl rounded-xl p-8">
+
+    {{-- ENCABEZADO --}}
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">📄 Lista de Solicitudes</h1>
+
+        <a href="{{ route('basic_sciences.index') }}"
+           class="text-green-600 hover:text-green-800 font-semibold">
+            ← Volver al inicio
+        </a>
+    </div>
+
+    {{-- TABLA --}}
+    <div class="overflow-x-auto">
+        <table class="w-full border-collapse shadow rounded-lg overflow-hidden">
+
+            {{-- ENCABEZADOS --}}
+            <thead style="background-color:#0B3D7E;">
+                <tr>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Matrícula</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Nombre</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Apellido P.</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Apellido M.</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Carrera</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Semestre</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Grupo</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Asunto</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Materia solicitada</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Tutor</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Hoja canalización</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm text-center">Acción</th>
+                </tr>
+            </thead>
+
+            {{-- CUERPO --}}
+            <tbody class="text-gray-700">
+                @foreach ($requests as $request)
+                <tr class="border-b hover:bg-gray-50 transition">
+
+                    <td class="px-4 py-3">{{ $request->student->enrollment }}</td>
+
+                    <td class="px-4 py-3">{{ $request->student->name }}</td>
+                    <td class="px-4 py-3">{{ $request->student->last_name_f }}</td>
+                    <td class="px-4 py-3">{{ $request->student->last_name_m }}</td>
+
+                    <td class="px-4 py-3">{{ $request->student->career->name ?? 'N/A' }}</td>
+
+                    <td class="px-4 py-3">{{ $request->student->semester }}</td>
+                    <td class="px-4 py-3">{{ $request->student->group ?? 'N/A' }}</td>
+
+                    <td class="px-4 py-3">{{ $request->reason }}</td>
+
+                    <td class="px-4 py-3">{{ $request->subject->name }}</td>
+
+                    <td class="px-4 py-3">{{ $request->teacher->name ?? 'N/A' }}</td>
+
+                    {{-- Hoja de canalización --}}
+                    <td class="px-4 py-3">
+                        @if($request->canalization_file)
+                            <a href="{{ asset('storage/' . $request->canalization_file) }}"
+                               class="text-blue-600 hover:underline"
+                               target="_blank">
+                                Ver Hoja
+                            </a>
+                        @else
+                            <span class="text-gray-500">No disponible</span>
+                        @endif
+                    </td>
+
+                    {{-- ACCIÓN CREAR ASESORÍA --}}
+                    <td class="px-4 py-3 text-center">
+                        <a href="{{ route('basic_sciences.advisory_details.create', ['subject_id' => $request->subject_id]) }}"
+                            class="bg-blue-600 text-white px-3 py-1 rounded">
+                            Crear asesoría
+                        </a>
+
+                    </td>
+
+                </tr>
+                @endforeach
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
 </body>
 </html>

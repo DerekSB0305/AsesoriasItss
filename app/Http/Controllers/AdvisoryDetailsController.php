@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Advisories;
-use Illuminate\Http\Request; 
+use Illuminate\Http\Request;
 use App\Models\Requests;
-use App\Models\Advisory_details; 
+use App\Models\Advisory_details;
 
 class AdvisoryDetailsController extends Controller
 {
@@ -14,30 +14,31 @@ class AdvisoryDetailsController extends Controller
      */
     public function index(Request $request)
     {
-       $materia = $request->materia;
-    $estado = $request->estado;
+        $materia = $request->materia;
+        $estado = $request->estado;
 
-    $details = Advisory_details::with(['students', 'advisories.teacherSubject.subject'])
-        ->when($materia, function ($q) use ($materia) {
-            $q->whereHas('advisories.teacherSubject.subject', function ($sub) use ($materia) {
-                $sub->where('name', 'LIKE', "%$materia%");
-            });
-        })
-        ->when($estado, function ($q) use ($estado) {
-            $q->where('status', $estado);
-        })
-        ->orderBy('advisory_detail_id', 'DESC')
-        ->get();
+        $details = Advisory_details::with(['students', 'advisories.teacherSubject.subject'])
+            ->when($materia, function ($q) use ($materia) {
+                $q->whereHas('advisories.teacherSubject.subject', function ($sub) use ($materia) {
+                    $sub->where('name', 'LIKE', "%$materia%");
+                });
+            })
+            ->when($estado, function ($q) use ($estado) {
+                $q->where('status', $estado);
+            })
+            ->orderBy('advisory_detail_id', 'DESC')
+            ->get();
 
-    return view('basic_sciences.advisory_details.index', compact('details', 'materia', 'estado'));
+        return view('basic_sciences.advisory_details.index', compact('details', 'materia', 'estado'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-           // Traer materias que han sido solicitadas (desde requests)
+
+        // Traer materias que han sido solicitadas (desde requests)
         $subjects = Requests::with('subject')
             ->select('subject_id')
             ->distinct()
@@ -45,24 +46,50 @@ class AdvisoryDetailsController extends Controller
             ->map(fn($r) => $r->subject)
             ->filter();
 
-        return view('basic_sciences.advisory_details.create', compact('subjects'));
+        // Si viene desde solicitudes
+        $subjectId = $request->subject_id ?? null;
+
+        return view('basic_sciences.advisory_details.create', [
+            'subjects' => $subjects,
+            'subjectId' => $subjectId
+        ]);
     }
 
- public function getStudentsBySubject(int $subject_id)
+    public function getStudentsBySubject(int $subject_id)
     {
-        $students = Requests::where('subject_id', $subject_id)
-            ->with('student')
-            ->get()
-            ->map(function ($req) {
-                return [
-                    'request_id' => $req->request_id,
-                    'enrollment' => $req->student->enrollment,
-                    'name'       => $req->student->name,
-                    'last_name_f'=> $req->student->last_name_f,
-                ];
-            });
+      $requests = Requests::where('subject_id', $subject_id)
+        ->with('student')
+        ->get();
 
-        return response()->json($students);
+    // 2) Obtener matrículas de alumnos que YA tienen asesoría para esta materia
+    $alumnosConAsesoria = \App\Models\Advisories::whereHas('teacherSubject', function ($q) use ($subject_id) {
+            $q->where('subject_id', $subject_id);
+        })
+        ->whereHas('advisoryDetail.students')
+        ->get()
+        ->flatMap(function ($adv) {
+            return $adv->advisoryDetail->students->pluck('enrollment');
+        })
+        ->unique()
+        ->toArray();
+
+    // 3) Filtrar los alumnos disponibles
+    $alumnosDisponibles = $requests->filter(function ($req) use ($alumnosConAsesoria) {
+        return !in_array($req->student->enrollment, $alumnosConAsesoria);
+    });
+
+    // 4) Respuesta limpia
+    return response()->json(
+        $alumnosDisponibles->map(function ($req) {
+            return [
+                'request_id' => $req->request_id,
+                'enrollment' => $req->student->enrollment,
+                'name'       => $req->student->name,
+                'last_name_f' => $req->student->last_name_f,
+            ];
+        })->values()
+    );
+    
     }
     /**
      * Crea uno o varios advisory_details a partir de los request_id seleccionados.
@@ -70,8 +97,8 @@ class AdvisoryDetailsController extends Controller
      */
     public function store(Request $request)
     {
-       
-       $request->validate([
+
+        $request->validate([
             'subject_id'   => 'required|integer|exists:subjects,subject_id',
             'request_id'   => 'required|array', // array de request_id seleccionados
             'observations' => 'nullable|string|max:255',
@@ -83,7 +110,7 @@ class AdvisoryDetailsController extends Controller
             'observations' => $request->observations,
         ]);
 
-         foreach ($request->request_id as $reqId) {
+        foreach ($request->request_id as $reqId) {
             $req = Requests::find($reqId);
 
             if ($req && $req->student) {
@@ -91,7 +118,7 @@ class AdvisoryDetailsController extends Controller
             }
         }
 
-         return redirect()->route('basic_sciences.advisories.create', [
+        return redirect()->route('basic_sciences.advisories.create', [
             'detail_id' => $detail->advisory_detail_id
         ])->with('success', 'Detalle creado, ahora completa la asesoría.');
     }
@@ -101,13 +128,13 @@ class AdvisoryDetailsController extends Controller
      */
 
     // Traer a los alumnos por materia
-  
+
     /**
      * Display the specified resource.
      */
     public function show(Advisory_details $advisory_details)
     {
-         $advisory_details->load('students');
+        $advisory_details->load('students');
         return view('basic_sciences.advisory_details.show', compact('advisory_details'));
     }
 
@@ -132,7 +159,7 @@ class AdvisoryDetailsController extends Controller
      */
     public function destroy(Advisory_details $advisory_details)
     {
-         $advisory_details->delete();
+        $advisory_details->delete();
 
         return redirect()->route('basic_sciences.advisory_details.index')
             ->with('success', 'Detalle eliminado correctamente.');

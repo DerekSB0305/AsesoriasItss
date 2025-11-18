@@ -15,6 +15,14 @@
             <h1 class="text-3xl font-extrabold text-gray-800">📚 Asesorías Registradas</h1>
 
             <div class="flex flex-col sm:flex-row gap-3 mt-4 sm:mt-0">
+
+                {{-- Crear Detalle Asesoría --}}
+                <a href="{{ route('basic_sciences.advisory_details.create') }}"
+                   class="px-4 py-2 rounded-lg text-white font-semibold text-center hover:opacity-90"
+                   style="background-color:#28A745;">
+                    ➕ Crear Detalle Asesoría
+                </a>
+
                 <a href="{{ route('basic_sciences.advisory_details.index') }}"
                    class="text-green-600 hover:text-green-800 font-medium">
                     → Ver Detalles de Asesoría
@@ -48,9 +56,8 @@
             <table class="min-w-full border-collapse text-sm">
 
                 {{-- ENCABEZADOS --}}
-                <thead class="bg-gray-100 text-gray-700 uppercase text-xs font-semibold">
+                <thead class="text-white uppercase text-xs font-semibold" style="background-color:#0B3D7E;">
                     <tr class="border-b">
-                        <th class="px-4 py-3">ID</th>
                         <th class="px-4 py-3">Maestro</th>
                         <th class="px-4 py-3">Carrera</th>
                         <th class="px-4 py-3">Materia</th>
@@ -78,8 +85,6 @@
                         @endphp
 
                         <tr class="border-b hover:bg-gray-50 transition">
-
-                            <td class="px-4 py-3 font-medium">{{ $adv->advisory_id }}</td>
 
                             <td class="px-4 py-3">
                                 {{ $adv->teacherSubject->teacher->name }}
@@ -134,7 +139,8 @@
 
                                 {{-- Editar --}}
                                 <a href="{{ route('basic_sciences.advisories.edit', $adv->advisory_id) }}"
-                                   class="text-blue-600 font-semibold hover:text-blue-800">
+                                   class="text-white font-semibold px-3 py-1 rounded"
+                                   style="background-color:#F39C12;">
                                     Editar
                                 </a>
 
@@ -145,7 +151,8 @@
                                     @csrf
                                     @method('DELETE')
                                     <button 
-                                        class="text-red-600 font-semibold hover:text-red-800">
+                                        class="text-white font-semibold px-3 py-1 rounded"
+                                        style="background-color:#E74C3C;">
                                         Eliminar
                                     </button>
                                 </form>
@@ -163,3 +170,6 @@
 
 </body>
 </html>
+
+
+

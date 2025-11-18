@@ -13,9 +13,39 @@ class TeacherSubjectController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $teacherSubjects = TeacherSubject::with(['teacher', 'subject', 'career'])->get();
+           $searchTeacher = $request->search_teacher;
+        $searchSubject = $request->search_subject;
+        $searchCareer  = $request->search_career;
+
+        $query = TeacherSubject::with(['teacher', 'subject', 'career']);
+
+        // Filtro por maestro
+        if (!empty($searchTeacher)) {
+            $query->whereHas('teacher', function($q) use ($searchTeacher) {
+                $q->where('name', 'LIKE', "%$searchTeacher%")
+                  ->orWhere('last_name_f', 'LIKE', "%$searchTeacher%")
+                  ->orWhere('last_name_m', 'LIKE', "%$searchTeacher%");
+            });
+        }
+
+        // Filtro por materia
+        if (!empty($searchSubject)) {
+            $query->whereHas('subject', function($q) use ($searchSubject) {
+                $q->where('name', 'LIKE', "%$searchSubject%");
+            });
+        }
+
+        // Filtro por carrera
+        if (!empty($searchCareer)) {
+            $query->whereHas('career', function($q) use ($searchCareer) {
+                $q->where('name', 'LIKE', "%$searchCareer%");
+            });
+        }
+
+        // Obtener resultados
+        $teacherSubjects = $query->get();
         return view('basic_sciences.teacher_subjects.index', compact('teacherSubjects'));
     }
 
@@ -24,10 +54,13 @@ class TeacherSubjectController extends Controller
      */
     public function create()
     {
-        $teachers = Teacher::all();
-        $subjects = Subject::all();
-        $careers = Career::all();
-        return view('basic_sciences.teacher_subjects.create', compact('teachers', 'subjects', 'careers'));
+        $teachers = Teacher::where('science_department', 1)->get();
+
+    $subjects = Subject::all();
+    $careers  = Career::all();
+
+    return view('basic_sciences.teacher_subjects.create',
+                compact('teachers', 'subjects', 'careers'));
     }
 
     /**
@@ -35,41 +68,48 @@ class TeacherSubjectController extends Controller
      */
     public function store(Request $request)
     {
-          $request->validate([
-        'teacher_user' => 'required|string|exists:teachers,teacher_user',
-        'subjects'     => 'required|array', // subjects[subject_id][career_id]
+         $request->validate([
+        'teacher_user' => 'required|exists:teachers,teacher_user',
+        'subjects' => 'required|array|min:1',
+        'subjects.*.subject_id' => 'required|exists:subjects,subject_id',
+        'subjects.*.career_id' => 'required|exists:careers,career_id',
+    ], [
+        'teacher_user.required' => 'Debes seleccionar un maestro.',
+        'teacher_user.exists' => 'El maestro seleccionado no existe.',
+        'subjects.required' => 'Debes agregar al menos una materia.',
+        'subjects.*.subject_id.required' => 'Debes seleccionar una materia.',
+        'subjects.*.career_id.required' => 'Debes seleccionar una carrera.',
     ]);
 
-    $duplicados = 0;
+    $teacherUser = $request->teacher_user;
 
-    foreach($request->subjects as $data){
-        if(!isset($data['subject_id']) || !isset($data['career_id'])){
-            continue; // si no marcaron la materia, skip
-        }
+    foreach ($request->subjects as $materia) {
 
-        $exists = TeacherSubject::where('teacher_user', $request->teacher_user)
-            ->where('subject_id', $data['subject_id'])
-            ->where('career_id', $data['career_id'])
+        // Verificar duplicados
+        $existe = \App\Models\TeacherSubject::where('teacher_user', $teacherUser)
+            ->where('subject_id', $materia['subject_id'])
+            ->where('career_id', $materia['career_id'])
             ->exists();
 
-        if($exists){
-            $duplicados++;
-            continue;
+        if ($existe) {
+            return back()
+                ->withErrors([
+                    'duplicado' => 'El maestro ya tiene asignada la materia seleccionada en esa carrera.'
+                ])
+                ->withInput();
         }
 
-        TeacherSubject::create([
-            'teacher_user' => $request->teacher_user,
-            'subject_id'   => $data['subject_id'],
-            'career_id'    => $data['career_id'],
+        // Crear asignación
+        \App\Models\TeacherSubject::create([
+            'teacher_user' => $teacherUser,
+            'subject_id' => $materia['subject_id'],
+            'career_id' => $materia['career_id'],
         ]);
     }
 
-    $msg = $duplicados > 0
-        ? "Algunas materias ya estaban asignadas"
-        : "Materias asignadas correctamente";
-
-    return redirect()->route('basic_sciences.teacher_subjects.index')
-        ->with('success',$msg);
+    return redirect()
+        ->route('basic_sciences.teacher_subjects.index')
+        ->with('success', 'Materias asignadas correctamente.');
     }
 
     /**

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('degree', 40);
             $table->boolean('tutor')->default(false);
             $table->boolean('science_department')->default(false);
-            $table->string('report', 45)->nullable();
+            $table->string('schedule');
 
             $table->foreign('career_id')->references('career_id')->on('careers')->onDelete('cascade');
             $table->timestamps();

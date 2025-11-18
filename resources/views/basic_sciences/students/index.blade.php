@@ -1,64 +1,112 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Estudiantes</title>
+    @vite('resources/css/app.css')
 </head>
-<body>
-    <h1>Lista de Estudiantes</h1>
 
-    <a href="{{ route('basic_sciences.index') }}">🔙 Volver al inicio</a>
+<body class="bg-gray-100 min-h-screen p-6">
 
-    <table border="1" cellpadding="5">
-        <thead>
-            <tr>
-                <th>Matrícula</th>
-                 <th>Nombre</th>
-                <th>Apellido Paterno</th>
-                <th>Apellido Materno</th>
-                 <th>Carrera</th>
-                <th>Semestre</th>
-                <th>Grupo</th>
-                <th>Materia</th>
-                <th>Género</th>
-                <th>Edad</th>
-                <th>Maestro tutor</th>
-                <th>Horario</th>
-                <th>Horario de asesoria</th>
-                <th>Asesor</th>
-                <th>evaluacion</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($students as $student)
+<div class="max-w-7xl mx-auto bg-white shadow-xl rounded-xl p-8">
+
+    {{-- ENCABEZADO --}}
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">📚 Lista de Estudiantes</h1>
+
+        <a href="{{ route('basic_sciences.index') }}"
+           class="text-green-600 hover:text-green-800 font-semibold">
+            ← Volver al inicio
+        </a>
+    </div>
+
+    {{-- TABLA --}}
+    <div class="overflow-x-auto">
+        <table class="w-full border-collapse rounded-lg overflow-hidden shadow">
+
+            {{-- HEAD --}}
+            <thead style="background-color:#0B3D7E;">
                 <tr>
-                    <td>{{ $student->enrollment }}</td>
-                    <td>{{ $student->name }}</td>
-                    <td>{{ $student->last_name_f }}</td>
-                    <td>{{ $student->last_name_m }}</td>
-                    <td>{{ $student->semester }}</td>
-                    <td>{{ $student->career->name ?? 'N/A' }}</td>
-                    <td>{{ $student->group ?? 'N/A' }}</td>
-                    <td>{{ $student->request->subject->name ?? 'N/A' }}</td>
-                    <td>{{ $student->gender ?? 'N/A' }}</td>
-                    <td>{{ $student->age ?? 'N/A' }}</td>
-                    <td>{{ $student->teacher->name ?? 'N/A' }}</td>
-                    <td>{{ $student->schedule ?? 'N/A' }}</td>
-                    <td>{{ $student->advisory_schedule ?? 'N/A' }}</td>
-                    <td>{{ $student->advisor ?? 'N/A' }}</td>
-                    <td>{{ $student->evaluation ?? 'N/A' }}</td>
-                    <td>
-                        {{-- <form method="POST" action="{{ route('basic_sciences.students.destroy', $student) }}">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit">Ver evaluacion</button>
-                        </form> --}}
-                    </td>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Matrícula</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Nombre</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Apellido Paterno</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Apellido Materno</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Carrera</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Semestre</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Grupo</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Materia</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Género</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Edad</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Maestro Tutor</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Horario</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Horario Asesoría</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Asesor</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm">Evaluación</th>
+                    <th class="px-4 py-3 text-white font-bold text-sm text-center">Acciones</th>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </thead>
+
+            {{-- BODY --}}
+            <tbody class="text-gray-700">
+
+                @foreach ($students as $student)
+                <tr class="border-b hover:bg-gray-50 transition">
+
+                    <td class="px-4 py-3">{{ $student->enrollment }}</td>
+
+                    <td class="px-4 py-3">{{ $student->name }}</td>
+                    <td class="px-4 py-3">{{ $student->last_name_f }}</td>
+                    <td class="px-4 py-3">{{ $student->last_name_m }}</td>
+
+                    <td class="px-4 py-3">
+                        {{ $student->career->name ?? 'N/A' }}
+                    </td>
+
+                    <td class="px-4 py-3">{{ $student->semester }}</td>
+                    <td class="px-4 py-3">{{ $student->group }}</td>
+
+                    <td class="px-4 py-3">
+                        {{ $student->request->subject->name ?? 'N/A' }}
+                    </td>
+
+                    <td class="px-4 py-3">{{ $student->gender }}</td>
+                    <td class="px-4 py-3">{{ $student->age }}</td>
+
+                    <td class="px-4 py-3">
+                        {{ $student->teacher->name ?? 'N/A' }}
+                    </td>
+
+                    <td class="px-4 py-3">
+                        {{ $student->schedule ?? 'N/A' }}
+                    </td>
+
+                    <td class="px-4 py-3">
+                        {{ $student->advisory_schedule ?? 'N/A' }}
+                    </td>
+
+                    <td class="px-4 py-3">
+                        {{ $student->advisor ?? 'N/A' }}
+                    </td>
+
+                    <td class="px-4 py-3">
+                        {{ $student->evaluation ?? 'N/A' }}
+                    </td>
+
+                    <td class="px-4 py-3 text-center">
+                        <a href="#"
+                           class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm">
+                           Ver Evaluación
+                        </a>
+                    </td>
+
+                </tr>
+                @endforeach
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
 </body>
 </html>

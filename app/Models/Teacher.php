@@ -15,7 +15,7 @@ class Teacher extends Model
     protected $keyType = 'string';
     protected $fillable = [
         'teacher_user', 'name', 'last_name_f', 'last_name_m',
-        'career_id', 'degree', 'tutor', 'science_department', 'report'
+        'career_id', 'degree', 'tutor', 'science_department', 'schedule'
     ];
 
     // Un profesor pertenece a una carrera
@@ -47,4 +47,14 @@ class Teacher extends Model
         return $this->belongsTo(User::class, 'teacher_user', 'user');
     }
 
+     protected static function boot()
+{
+    parent::boot();
+
+    static::deleting(function ($teacher) {
+        // Borrar el usuario con esa matrícula
+        \App\Models\User::where('user', $teacher->teacher_user)
+                        ->delete();
+    });
+}
 }

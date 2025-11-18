@@ -1,55 +1,179 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Maestros</title>
+    @vite('resources/css/app.css')
 </head>
-<body>
-    <h1>Lista de Maestros</h1>
-<a href="{{ route('basic_sciences.index') }}">🔙 Volver al inicio</a>
-<br>
-    <a href="{{ route('basic_sciences.teachers.create') }}">Agregar Maestro</a>
 
-    <table border="1" cellpadding="5" cellspacing="0">
-        <thead>
-            <tr>
-                <th>Usuario</th>
-                <th>Nombre(s)</th>
-                <th>Apellido Paterno</th>
-                <th>Apellido Materno</th>
-                <th>Grado de Estudios</th>
-                <th>Tutor</th>
-                <th>Ciencias Basicas</th>
-                <th>Carrera</th>
-                <th>Reporte</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($teachers as $teacher)
+<body class="bg-gray-100 p-8">
+
+<div class="max-w-7xl mx-auto bg-white shadow-lg rounded-xl p-8">
+
+    {{-- Título --}}
+    <h1 class="text-3xl font-bold text-[#0B3D7E] mb-6">
+        👨‍🏫 Lista de Maestros
+    </h1>
+
+    <div class="flex justify-between mb-4">
+
+        {{-- Botón crear --}}
+        <a href="{{ route('basic_sciences.teachers.create') }}"
+           class="px-4 py-2 rounded text-white font-semibold shadow"
+           style="background-color:#28A745;">
+            ➕ Agregar Maestro
+        </a>
+
+        {{-- Botón volver --}}
+        <a href="{{ route('basic_sciences.index') }}"
+           class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold">
+            ← Volver al inicio
+        </a>
+    </div>
+
+    {{-- Éxito --}}
+    @if(session('success'))
+        <div class="bg-green-100 border border-green-300 text-green-700 p-3 rounded mb-4">
+            ✔ {{ session('success') }}
+        </div>
+    @endif
+
+    {{-- Tabla --}}
+    <div class="overflow-x-auto">
+        <table class="w-full border-collapse shadow">
+
+            <thead style="background-color:#0B3D7E;" class="text-white font-bold">
                 <tr>
-                    <td>{{ $teacher->teacher_user }}</td>
-                    <td>{{ $teacher->name }}</td>
-                    <td>{{ $teacher->last_name_f }}</td>
-                    <td>{{ $teacher->last_name_m }}</td>
-                    <td>{{ $teacher->degree }}</td>
-                    <td>{{ $teacher->tutor ? 'Sí' : 'No' }}</td>
-                    <td>{{ $teacher->science_department ? 'Sí' : 'No' }}</td>
-                    <td>{{ $teacher->career->name ?? 'Sin carrera' }}</td>
-                    <td>{{ $teacher->report }}</td>
-                    <td>
-                        <a href="{{ route('basic_sciences.teachers.edit', $teacher) }}">Editar</a> |
-                        <form action="{{ route('basic_sciences.teachers.destroy', $teacher) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit">Eliminar</button>
-                        </form> |
-                    </td>
+                    <th class="px-4 py-3 text-left">Usuario</th>
+                    <th class="px-4 py-3 text-left">Nombre</th>
+                    <th class="px-4 py-3 text-left">Apellido Paterno</th>
+                    <th class="px-4 py-3 text-left">Apellido Materno</th>
+                    <th class="px-4 py-3 text-left">Grado de estudios</th>
+                    <th class="px-4 py-3 text-left">Tutor</th>
+                    <th class="px-4 py-3 text-left">Horas en Ciencias Básicas</th>
+                    <th class="px-4 py-3 text-left">Carrera</th>
+                    <th class="px-4 py-3 text-center">Horario</th>
+                    <th class="px-4 py-3 text-center">Asesoría</th>
+                    <th class="px-4 py-3 text-center">Acciones</th>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
-    
+            </thead>
+
+            <tbody class="text-gray-700">
+
+                @foreach ($teachers as $t)
+                    <tr class="border-b hover:bg-gray-50 transition">
+
+                        <td class="px-4 py-3">{{ $t->teacher_user }}</td>
+                        <td class="px-4 py-3">{{ $t->name }}</td>
+                        <td class="px-4 py-3">{{ $t->last_name_f }}</td>
+                        <td class="px-4 py-3">{{ $t->last_name_m }}</td>
+                        <td class="px-4 py-3">{{ $t->degree }}</td>
+                        <td class="px-4 py-3">{{ $t->tutor ? 'Sí' : 'No' }}</td>
+                        <td class="px-4 py-3">{{ $t->science_department ? 'Sí' : 'No' }}</td>
+                        <td class="px-4 py-3">{{ $t->career->name ?? 'Sin carrera' }}</td>
+
+                        <td class="px-4 py-3 text-center">
+                            @if($t->schedule)
+                                <a href="{{ asset('storage/'.$t->schedule) }}"
+                                   class="text-blue-600 hover:text-blue-800"
+                                   target="_blank">
+                                    📄 Ver
+                                </a>
+                            @else
+                                <span class="text-gray-500">No disponible</span>
+                            @endif
+                        </td>
+
+                        <td class="px-4 py-3 text-center">
+                            @if($t->advisory)
+                                <a href="{{ route('basic_sciences.advisories.show', $t->advisory) }}"
+                                   class="text-blue-600 hover:underline">
+                                    Ver
+                                </a>
+                            @else
+                                <span class="text-gray-500">Sin asignar</span>
+                            @endif
+                        </td>
+
+                        <td class="px-4 py-3 text-center flex gap-2 justify-center">
+
+                            {{-- EDITAR --}}
+                            <a href="{{ route('basic_sciences.teachers.edit', $t) }}"
+                               class="px-3 py-1 rounded text-white font-semibold"
+                               style="background-color:#F39C12;">
+                                Editar
+                            </a>
+
+                            {{-- ELIMINAR --}}
+                            <button onclick="openDeleteModal('{{ $t->teacher_user }}')"
+                                    class="px-3 py-1 rounded text-white font-semibold"
+                                    style="background-color:#E74C3C;">
+                                Eliminar
+                            </button>
+
+                        </td>
+
+                    </tr>
+                @endforeach
+
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+{{-- Modal --}}
+<div id="deleteModal"
+     class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+
+    <div class="bg-white w-full max-w-md p-6 rounded-lg shadow-xl">
+
+        <h2 class="text-2xl font-bold text-[#0B3D7E] mb-4">⚠ Confirmar Eliminación</h2>
+
+        <p class="text-gray-700 mb-6">
+            ¿Deseas eliminar al maestro  
+            <strong id="teacherName" class="text-red-600"></strong>?
+            <br><br>
+            Esta acción no se puede deshacer.
+        </p>
+
+        <div class="flex justify-end gap-3">
+
+            <button onclick="closeDeleteModal()"
+                    class="px-4 py-2 rounded text-white font-bold shadow"
+                    style="background-color:#28A745;">
+                Cancelar
+            </button>
+
+            <form id="deleteForm" method="POST" class="inline">
+                @csrf
+                @method('DELETE')
+
+                <button type="submit"
+                        class="px-4 py-2 rounded text-white font-bold shadow"
+                        style="background-color:#E74C3C;">
+                    Eliminar
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function openDeleteModal(username) {
+        document.getElementById('deleteModal').classList.remove('hidden');
+        document.getElementById('teacherName').innerText = username;
+
+        document.getElementById('deleteForm').action =
+            "/basic_sciences/teachers/" + encodeURIComponent(username);
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.add('hidden');
+    }
+</script>
+
 </body>
 </html>

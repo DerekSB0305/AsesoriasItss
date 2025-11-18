@@ -12,10 +12,22 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with('role')->get();
-        return view('basic_sciences.users.index', compact('users'));
+        $search = $request->input('search');
+        $role   = $request->input('role');
+
+        $users = User::with('role')
+            ->when($search, function ($q) use ($search) {
+                $q->where('user', 'LIKE', "%{$search}%");
+            })
+            ->when($role, function ($q) use ($role) {
+                $q->where('role_id', $role);
+            })
+            ->get();
+
+        $roles = Role::all();
+        return view('basic_sciences.users.index', compact('users', 'roles', 'role', 'search'));
     }
 
     /**
@@ -23,7 +35,7 @@ class UserController extends Controller
      */
     public function create()
     {
-         $roles = Role::all();
+        $roles = Role::all();
         return view('basic_sciences.users.create', compact('roles'));
     }
 
@@ -33,20 +45,20 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-        'user' => 'required|string|unique:users,user',
-        'role_id' => 'required|integer|exists:roles,id',
-        
-    ]);
+            'user' => 'required|string|unique:users,user',
+            'role_id' => 'required|integer|exists:roles,id',
 
-    User::create([
-        'user'     => $request->user,
-        'role_id'  => $request->role_id,
-        // Usa el usuario como contraseña provisional 
-        'password' => Hash::make($request->user), 
-    ]);
+        ]);
 
-    return redirect()->route('basic_sciences.users.index')
-        ->with('success', 'Usuario creado correctamente.');
+        User::create([
+            'user'     => $request->user,
+            'role_id'  => $request->role_id,
+            // Usa el usuario como contraseña provisional 
+            'password' => Hash::make($request->user),
+        ]);
+
+        return redirect()->route('basic_sciences.users.index')
+            ->with('success', 'Usuario creado correctamente.');
     }
 
     /**
@@ -72,7 +84,7 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-         $request->validate([
+        $request->validate([
             'password' => 'required|string|min:8|confirmed',
         ]);
 
@@ -89,7 +101,7 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-         $user->delete();
+        $user->delete();
         return redirect()->route('basic_sciences.users.index')
             ->with('success', 'Usuario eliminado correctamente.');
     }
