@@ -97,20 +97,22 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-center">
-                                            {{-- VER REPORTES --}}
-        <a href="{{ route('teachers.advisories.reports.index', $adv->advisory_id) }}"
-        class="bg-indigo-900 text-white px-3 py-1 rounded hover:bg-indigo-700">
-            Ver reportes
-        </a>
 
-        <br>
-        
-        <a href="{{ route('teachers.advisories.reports.create', $adv->advisory_id) }}"
-           class="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700 transition">
-            Subir reporte
-        </a>
+                        {{-- VER REPORTES --}}
+                        <a href="{{ route('teachers.advisories.reports.by_advisory', $adv->advisory_id) }}"
+                        class="bg-indigo-900 text-white px-3 py-1 rounded hover:bg-indigo-700">
+                            Ver reportes
+                        </a>
 
-    </td>
+                        <br>
+
+                        <a href="{{ route('teachers.advisories.reports.create', $adv->advisory_id) }}"
+                        class="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700 transition">
+                            Subir reporte
+                        </a>
+
+                    </td>
+
 
                             
 

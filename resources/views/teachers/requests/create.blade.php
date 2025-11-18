@@ -69,10 +69,10 @@
         {{-- Archivo --}}
         <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">
-                Hoja de canalización (PDF/JPG/PNG, máx. 2MB)
+                Hoja de canalización (DOC/DOCX/PDF/JPG/PNG, máx. 2MB)
             </label>
 
-            <input type="file" name="canalization_file" accept=".pdf,.jpg,.jpeg,.png"
+            <input type="file" name="canalization_file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                 class="w-full p-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500">
 
             @error('canalization_file')

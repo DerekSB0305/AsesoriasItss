@@ -14,9 +14,6 @@ use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
 {
-     /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $students = Student::with(['career', 'teacher'])->get();
@@ -26,15 +23,10 @@ class StudentController extends Controller
     public function indexTeacher()
     {
         $teacher_user = Auth::user()->user;
-
         $students = Student::where('teacher_user', $teacher_user)->get();
-
         return view('teachers.students.index', compact('students'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $careers = Career::all();
@@ -42,7 +34,9 @@ class StudentController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * ===========================================
+     * STORE → guardar archivo como {matricula}_horario.ext
+     * ===========================================
      */
     public function store(Request $request)
     {
@@ -59,47 +53,46 @@ class StudentController extends Controller
             'schedule_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:4096',
         ]);
 
-        $teacherUser = Auth::user()->user; // usuario del maestro logueado
+        $teacherUser = Auth::user()->user;
 
-        // Datos base del alumno
         $studentData = $validated;
         $studentData['teacher_user'] = $teacherUser;
 
-        // Guardar archivo de horario si viene
+        /**
+         * SUBIR ARCHIVO COMO matricula_horario.ext
+         */
         if ($request->hasFile('schedule_file')) {
-            $path = $request->file('schedule_file')->store('student_schedules', 'public');
+
+            $file = $request->file('schedule_file');
+            $ext = $file->getClientOriginalExtension();
+
+            // nombre base
+            $baseName = $validated['enrollment'] . "_horario";
+            $folder = 'student_schedules';
+
+            // obtener nombre final evitando duplicados
+            $finalName = $this->avoidDuplicateNames($folder, $baseName, $ext);
+
+            $path = $file->storeAs($folder, $finalName, 'public');
+
             $studentData['schedule_file'] = $path;
         }
 
-        // Guardar alumno
         $student = Student::create($studentData);
 
-        // CREAR USUARIO AUTOMÁTICO PARA EL ALUMNO
-        $defaultPassword = strtolower($validated['enrollment']); // contraseña = matrícula
-
+        // Crear usuario automático del alumno
+        $defaultPassword = strtolower($validated['enrollment']);
         $roleAlumno = Role::where('role_type', 'Alumno')->first();
 
         User::create([
-            'user'     => $validated['enrollment'],           // usuario = matrícula
-            'password' => bcrypt($defaultPassword),           // contraseña encriptada
-            'role_id'  => $roleAlumno->id,                    // rol alumno
+            'user'     => $validated['enrollment'],
+            'password' => bcrypt($defaultPassword),
+            'role_id'  => $roleAlumno->id,
         ]);
 
         return redirect()->route('teachers.students.index')
             ->with('success', 'Alumno registrado correctamente.');
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Student $student)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Student $student)
     {
         $careers = Career::all();
@@ -107,7 +100,9 @@ class StudentController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * ===========================================
+     * UPDATE → también usa matricula_horario.ext
+     * ===========================================
      */
     public function update(Request $request, Student $student)
     {
@@ -125,18 +120,26 @@ class StudentController extends Controller
 
         $data = $validated;
 
-        // Si viene un nuevo archivo de horario
         if ($request->hasFile('schedule_file')) {
 
-            // Borrar el archivo anterior si existe
+            // Borrar archivo anterior
             if ($student->schedule_file && Storage::disk('public')->exists($student->schedule_file)) {
                 Storage::disk('public')->delete($student->schedule_file);
             }
 
-            $path = $request->file('schedule_file')->store('student_schedules', 'public');
+            $file = $request->file('schedule_file');
+            $ext = $file->getClientOriginalExtension();
+
+            $baseName = $student->enrollment . "_horario";
+            $folder = 'student_schedules';
+
+            // evitar repetidos
+            $finalName = $this->avoidDuplicateNames($folder, $baseName, $ext);
+
+            $path = $file->storeAs($folder, $finalName, 'public');
             $data['schedule_file'] = $path;
+
         } else {
-            // Para que no intente guardar el UploadedFile vacío
             unset($data['schedule_file']);
         }
 
@@ -147,23 +150,37 @@ class StudentController extends Controller
             ->with('success', 'Alumno actualizado correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Student $student)
     {
-        // Borrar archivo de horario si existe
         if ($student->schedule_file && Storage::disk('public')->exists($student->schedule_file)) {
             Storage::disk('public')->delete($student->schedule_file);
         }
 
-        // Borrar usuario asociado (user = matrícula)
         User::where('user', $student->enrollment)->delete();
-
-        // Borrar alumno
         $student->delete();
 
         return redirect()->route('teachers.students.index')
             ->with('success', 'Alumno eliminado correctamente.');
+    }
+
+    /**
+     * ============================================================
+     * FUNCIÓN PARA EVITAR NOMBRES REPETIDOS:
+     * base.ext → base(1).ext → base(2).ext ...
+     * ============================================================
+     */
+    private function avoidDuplicateNames($folder, $baseName, $ext)
+    {
+        $disk = Storage::disk('public');
+
+        $filename = $baseName . '.' . $ext;
+        $counter = 1;
+
+        while ($disk->exists("$folder/$filename")) {
+            $filename = $baseName . "($counter)." . $ext;
+            $counter++;
+        }
+
+        return $filename;
     }
 }

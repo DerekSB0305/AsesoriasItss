@@ -7,12 +7,10 @@ use App\Models\Student;
 use App\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class RequestsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $requests = Requests::all();
@@ -24,97 +22,109 @@ class RequestsController extends Controller
         $teacher_user = Auth::user()->teacher->teacher_user;
 
         $requests = Requests::where('teacher_user', $teacher_user)
-                    ->with(['student','subject'])
-                    ->get();
+            ->with(['student','subject'])
+            ->get();
 
         return view('teachers.requests.index', compact('requests'));
     }
 
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-            $teacher_user = Auth::user()->teacher->teacher_user;
+        $teacher_user = Auth::user()->teacher->teacher_user;
 
-    $students = Student::where('teacher_user', $teacher_user)->get();
-    $subjects = Subject::all();
+        $students = Student::where('teacher_user', $teacher_user)->get();
+        $subjects = Subject::all();
 
-    return view('teachers.requests.create', compact('students','subjects'));
+        return view('teachers.requests.create', compact('students','subjects'));
     }
 
+
     /**
-     * Store a newly created resource in storage.
+     * ===========================================
+     * STORE — Archivo compartido y nombre maestro
+     * ===========================================
      */
     public function store(Request $request)
     {
-            $request->validate([
-        'enrollments'   => ['required', 'array'],
-        'enrollments.*' => ['string', 'exists:students,enrollment'],
+        $request->validate([
+            'enrollments'   => ['required', 'array'],
+            'enrollments.*' => ['string', 'exists:students,enrollment'],
 
-        'subject_id'    => ['required', 'integer', 'exists:subjects,subject_id'],
+            'subject_id'    => ['required', 'integer', 'exists:subjects,subject_id'],
+            'reason'        => ['nullable', 'string', 'max:500'],
 
-        'reason'        => ['nullable', 'string', 'max:500'],
-        'canalization_file' => ['nullable','file','mimes:pdf,jpg,jpeg,png','max:2048'],
-    ]);
-
-    $teacher = Auth::user()->teacher;
-    if (!$teacher) {
-        abort(403, "Solo los docentes pueden crear solicitudes.");
-    }
-
-    // Guardar archivo una sola vez (opcional)
-    $path = null;
-    if ($request->hasFile('canalization_file')) {
-        $path = $request->file('canalization_file')->store('canalizations', 'public');
-    }
-
-    // Crear una solicitud por alumno
-    foreach ($request->enrollments as $enrollment) {
-        Requests::create([
-            'enrollment' => $enrollment,
-            'teacher_user' => $teacher->teacher_user,
-            'subject_id' => $request->subject_id,
-            'reason' => $request->reason,
-            'canalization_file' => $path,
+            'canalization_file' => ['nullable','file','mimes:pdf,doc,docx,jpg,jpeg,png','max:2048'],
         ]);
+
+        $teacher = Auth::user()->teacher;
+
+        if (!$teacher) {
+            abort(403, "Solo los docentes pueden crear solicitudes.");
+        }
+
+        $filePath = null;
+
+        /**
+         * ==========================================================
+         * 1) GUARDAR ARCHIVO UNA SOLA VEZ (nombre = teacher_user)
+         * ==========================================================
+         */
+        if ($request->hasFile('canalization_file')) {
+
+            $file = $request->file('canalization_file');
+            $ext = $file->getClientOriginalExtension();
+
+            // Nombre base con el usuario del maestro
+            $baseName = $teacher->teacher_user . "_canalizacion";
+
+            $folder = "canalizations";
+
+            // Evitar duplicados
+            $finalName = $this->avoidDuplicateNames($folder, $baseName, $ext);
+
+            // Guardar solo UNA VEZ
+            $filePath = $file->storeAs($folder, $finalName, 'public');
+        }
+
+        /**
+         * ==========================================================
+         * 2) CREAR UNA SOLICITUD POR ALUMNO
+         * ==========================================================
+         */
+        foreach ($request->enrollments as $enrollment) {
+            Requests::create([
+                'enrollment'        => $enrollment,
+                'teacher_user'      => $teacher->teacher_user,
+                'subject_id'        => $request->subject_id,
+                'reason'            => $request->reason,
+                'canalization_file' => $filePath,  // 🔥 TODOS COMPARTEN EL MISMO ARCHIVO
+            ]);
+        }
+
+        return redirect()
+            ->route('teachers.requests.index')
+            ->with('success', 'Solicitudes enviadas correctamente.');
     }
 
-    return redirect()
-        ->route('teachers.requests.index')
-        ->with('success', 'Solicitudes enviadas correctamente.');
-    }
 
     /**
-     * Display the specified resource.
+     * ============================================================
+     * FUNCIÓN PARA EVITAR NOMBRES REPETIDOS
+     * base.ext → base(1).ext → base(2).ext ...
+     * ============================================================
      */
-    public function show(Requests $requests)
+    private function avoidDuplicateNames($folder, $baseName, $ext)
     {
-        //
-    }
+        $disk = Storage::disk('public');
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Requests $requests)
-    {
-        //
-    }
+        $filename = "$baseName.$ext";
+        $counter = 1;
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Requests $requests)
-    {
-        //
-    }
+        while ($disk->exists("$folder/$filename")) {
+            $filename = $baseName . "($counter)." . $ext;
+            $counter++;
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Requests $requests)
-    {
-        //
+        return $filename;
     }
 }

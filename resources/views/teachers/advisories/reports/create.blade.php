@@ -68,8 +68,8 @@
                         class="border-gray-300 rounded-lg p-3 w-full shadow-sm focus:ring-blue-500 focus:border-blue-500"
                         required>
                     <option value="">Seleccione...</option>
-                    <option value="previo">📘 Reporte previo</option>
-                    <option value="final">📗 Reporte final</option>
+                    <option value="previo">📘 Primer Reporte</option>
+                    <option value="final">📗 Segundo Reporte</option>
                 </select>
             </div>
 
