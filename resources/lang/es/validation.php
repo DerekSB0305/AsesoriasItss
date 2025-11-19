@@ -51,10 +51,22 @@ return [
     'numeric'              => 'Debe ser un número.',
     'required'             => 'Este campo es obligatorio.',
     'same'                 => 'Este campo y :other deben coincidir.',
-
     'uploaded'             => 'Error al subir el archivo.',
+    'unique'               => 'El valor ya está registrado.',
+    'custom' => [
+        'teacher_user' => [
+            'unique' => 'El usuario de maestro ya está registrado.',
+        ],
+        'administrative_user' => [
+            'unique' => 'El usuario administrativo ya existe.',
+        ],
+        'user' => [
+            'unique' => 'Este usuario ya está siendo usado.',
+        ],
+    ],
 
-    'attributes'           => [
+
+    'attributes' => [
         'password' => 'contraseña',
         'password_confirmation' => 'confirmación de contraseña',
         'name' => 'nombre',

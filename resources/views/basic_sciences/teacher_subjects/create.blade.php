@@ -7,9 +7,11 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.0/dist/cdn.min.js"></script>
 </head>
 
-<body class="bg-gray-100 min-h-screen p-6">
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    
+    <x-basic-sciences-navbar />
 
-<div class="max-w-4xl mx-auto bg-white shadow-xl rounded-xl p-8">
+<div  class="w-full max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8 mt-8">
 
     <h1 class="text-3xl font-bold text-gray-800 mb-6">
         📘 Asignar Materias a Maestro (Ciencias Básicas)
@@ -177,6 +179,7 @@
     </form>
 
 </div>
+    <x-basic-sciences-footer />
 
 </body>
 </html>

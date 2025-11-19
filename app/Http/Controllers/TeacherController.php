@@ -45,12 +45,16 @@ class TeacherController extends Controller
             'schedule' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
         ]);
 
+        // Guardar archivo con nombre original
         if ($request->hasFile('schedule')) {
-            $path = $request->file('schedule')->store('teacher_schedules', 'public');
+            $file = $request->file('schedule');
+            $originalName = $file->getClientOriginalName();
+
+            $path = $file->storeAs('teacher_schedules', $originalName, 'public');
             $validated['schedule'] = $path;
         }
 
-        //Crear usuario maestro
+        // Crear usuario maestro
         $user = User::create([
             'user'      => $request->teacher_user,
             'password'  => $request->teacher_user,
@@ -99,7 +103,10 @@ class TeacherController extends Controller
                 Storage::disk('public')->delete($teacher->schedule);
             }
 
-            $validated['schedule'] = $request->file('schedule')->store('teacher_schedules', 'public');
+            $file = $request->file('schedule');
+            $originalName = $file->getClientOriginalName();
+
+            $validated['schedule'] = $file->storeAs('teacher_schedules', $originalName, 'public');
         }
 
         $oldUser = $teacher->teacher_user;
@@ -133,7 +140,7 @@ class TeacherController extends Controller
     }
 
     // Modulo Maestro
-        public function indexTeacher()
+    public function indexTeacher()
     {
         // Maestro logueado
         $teacher = Auth::user()->teacher;
@@ -141,7 +148,7 @@ class TeacherController extends Controller
         return view('teachers.index', compact('teacher'));
     }
 
-        public function myAdvisories()
+    public function myAdvisories()
     {
         // obtener el usuario maestro logueado
         $teacherUser = auth()->user()->user;
@@ -160,7 +167,7 @@ class TeacherController extends Controller
         return view('teachers.advisories.index', compact('advisories'));
     }
 
-        public function showChangePasswordForm()
+    public function showChangePasswordForm()
     {
         return view('teachers.change_password');
     }
@@ -177,7 +184,24 @@ class TeacherController extends Controller
         $user->save();
 
         return redirect()->route('teachers.index')
-                        ->with('success', 'Contraseña actualizada correctamente.');
+            ->with('success', 'Contraseña actualizada correctamente.');
     }
+
+    public function indexCareerHead()
+{
+    $admin = Auth::user()->administrative;
+
+    if (!$admin) {
+        return back()->withErrors(['error' => 'Tu cuenta no está registrada como Jefe de Carrera.']);
+    }
+
+    $careerId = $admin->career_id;
+
+    $teachers = Teacher::where('career_id', $careerId)
+        ->with('career')
+        ->get();
+
+    return view('career_head.teachers.index', compact('teachers'));
+}
 
 }

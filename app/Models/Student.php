@@ -10,12 +10,21 @@ class Student extends Model
     /** @use HasFactory<\Database\Factories\StudentFactory> */
     use HasFactory;
 
-        protected $primaryKey = 'enrollment';
+    protected $primaryKey = 'enrollment';
     public $incrementing = false;
     protected $keyType = 'string';
     protected $fillable = [
-        'enrollment', 'last_name_f', 'last_name_m', 'name',
-        'semester', 'group', 'career_id', 'schedule_file', 'gender', 'age', 'teacher_user'
+        'enrollment',
+        'last_name_f',
+        'last_name_m',
+        'name',
+        'semester',
+        'group',
+        'career_id',
+        'schedule_file',
+        'gender',
+        'age',
+        'teacher_user'
     ];
 
     // Un alumno pertenece a una carrera
@@ -39,18 +48,22 @@ class Student extends Model
     // Relación con detalles de asesoría
     public function advisoryDetails()
     {
-        return $this->hasMany(Advisory_details::class, 'enrollment', 'enrollment');
+        return $this->belongsToMany(
+            Advisory_details::class,
+            'advisory_detail_student',    // tabla pivot
+            'enrollment',                 // clave del estudiante en pivot
+            'advisory_detail_id'          // clave del detalle en pivot
+        );
     }
 
     protected static function boot()
-{
-    parent::boot();
+    {
+        parent::boot();
 
-    static::deleting(function ($student) {
-        // Borrar el usuario con esa matrícula
-        \App\Models\User::where('user', $student->enrollment)
-                        ->delete();
-    });
-}
-
+        static::deleting(function ($student) {
+            // Borrar el usuario con esa matrícula
+            \App\Models\User::where('user', $student->enrollment)
+                ->delete();
+        });
+    }
 }

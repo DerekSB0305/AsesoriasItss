@@ -7,6 +7,7 @@ use App\Http\Controllers\{
     Auth\AuthenticatedSessionController,
     ManualController,
     ProfileController,
+    StudentController,
     StudentPanelController,
     TeacherAdvisoryReportController,
     TeacherController
@@ -32,12 +33,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// Ciencias Basicas
 require __DIR__.'/auth.php';
 
-
-// --------------------------------------------------------------------------
-// 📌 RUTAS DEL MÓDULO DE CIENCIAS BÁSICAS
-// --------------------------------------------------------------------------
 Route::prefix('basic_sciences')
     ->name('basic_sciences.')
     ->middleware(['auth','verified'])
@@ -61,7 +59,28 @@ Route::prefix('basic_sciences')
     Route::get('advisories/{id}/details',
         [AdvisoriesController::class, 'details'])
         ->name('advisories.details');
+
+        Route::get('manuals/index', [ManualController::class, 'listManuals'])
+            ->name('manuals.index');
+        
 });
+
+// Jefes de carrera
+Route::prefix('career_head')
+    ->name('career_head.')
+    ->middleware(['auth','verified'])
+    ->group(function () {
+
+    Route::get('/', function () {
+            return view('career_head.index');
+        })->name('index');
+
+    Route::get('/teachers', [TeacherController::class, 'indexCareerHead'])->name('teachers.index');
+    Route::get('/students', [StudentController::class, 'indexCareerHead'])->name('students.index');
+    Route::get('/manuals', [ManualController::class, 'indexCareerHead'])->name('manuals.index');
+    Route::get('/advisories', [AdvisoriesController::class, 'indexCareerHead'])->name('advisories.index');
+});
+
 
 
 // --------------------------------------------------------------------------

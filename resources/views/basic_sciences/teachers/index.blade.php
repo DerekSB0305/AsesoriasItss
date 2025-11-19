@@ -6,9 +6,12 @@
     @vite('resources/css/app.css')
 </head>
 
-<body class="bg-gray-100 p-8">
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
-<div class="max-w-7xl mx-auto bg-white shadow-lg rounded-xl p-8">
+    {{-- NAVBAR --}}
+    <x-basic-sciences-navbar />
+
+<div class="w-[95%] max-w-7xl mx-auto bg-white shadow-lg rounded-xl p-8 my-12">
 
     {{-- Título --}}
     <h1 class="text-3xl font-bold text-[#0B3D7E] mb-6">
@@ -38,23 +41,23 @@
         </div>
     @endif
 
-    {{-- Tabla --}}
+    {{-- Tabla sin scroll --}}
     <div class="overflow-x-auto">
-        <table class="w-full border-collapse shadow">
+        <table class="w-full border-collapse shadow table-auto">
 
             <thead style="background-color:#0B3D7E;" class="text-white font-bold">
                 <tr>
-                    <th class="px-4 py-3 text-left">Usuario</th>
-                    <th class="px-4 py-3 text-left">Nombre</th>
-                    <th class="px-4 py-3 text-left">Apellido Paterno</th>
-                    <th class="px-4 py-3 text-left">Apellido Materno</th>
-                    <th class="px-4 py-3 text-left">Grado de estudios</th>
-                    <th class="px-4 py-3 text-left">Tutor</th>
-                    <th class="px-4 py-3 text-left">Horas en Ciencias Básicas</th>
-                    <th class="px-4 py-3 text-left">Carrera</th>
-                    <th class="px-4 py-3 text-center">Horario</th>
-                    <th class="px-4 py-3 text-center">Asesoría</th>
-                    <th class="px-4 py-3 text-center">Acciones</th>
+                    <th class="px-2 py-2 text-left">Usuario</th>
+                    <th class="px-2 py-2 text-left">Nombre</th>
+                    <th class="px-2 py-2 text-left">Apellido Paterno</th>
+                    <th class="px-2 py-2 text-left">Apellido Materno</th>
+                    <th class="px-2 py-2 text-left">Grado</th>
+                    <th class="px-2 py-2 text-left">Tutor</th>
+                    <th class="px-2 py-2 text-left">Ciencias Básicas</th>
+                    <th class="px-2 py-2 text-left">Carrera</th>
+                    <th class="px-2 py-2 text-center">Horario</th>
+                    <th class="px-2 py-2 text-center">Asesoría</th>
+                    <th class="px-2 py-2 text-center">Acciones</th>
                 </tr>
             </thead>
 
@@ -63,28 +66,28 @@
                 @foreach ($teachers as $t)
                     <tr class="border-b hover:bg-gray-50 transition">
 
-                        <td class="px-4 py-3">{{ $t->teacher_user }}</td>
-                        <td class="px-4 py-3">{{ $t->name }}</td>
-                        <td class="px-4 py-3">{{ $t->last_name_f }}</td>
-                        <td class="px-4 py-3">{{ $t->last_name_m }}</td>
-                        <td class="px-4 py-3">{{ $t->degree }}</td>
-                        <td class="px-4 py-3">{{ $t->tutor ? 'Sí' : 'No' }}</td>
-                        <td class="px-4 py-3">{{ $t->science_department ? 'Sí' : 'No' }}</td>
-                        <td class="px-4 py-3">{{ $t->career->name ?? 'Sin carrera' }}</td>
+                        <td class="px-2 py-2">{{ $t->teacher_user }}</td>
+                        <td class="px-2 py-2">{{ $t->name }}</td>
+                        <td class="px-2 py-2">{{ $t->last_name_f }}</td>
+                        <td class="px-2 py-2">{{ $t->last_name_m }}</td>
+                        <td class="px-2 py-2">{{ $t->degree }}</td>
+                        <td class="px-2 py-2">{{ $t->tutor ? 'Sí' : 'No' }}</td>
+                        <td class="px-2 py-2">{{ $t->science_department ? 'Sí' : 'No' }}</td>
+                        <td class="px-2 py-2">{{ $t->career->name ?? 'Sin carrera' }}</td>
 
-                        <td class="px-4 py-3 text-center">
+                        {{-- Horario --}}
+                        <td class="px-2 py-2 text-center">
                             @if($t->schedule)
                                 <a href="{{ asset('storage/'.$t->schedule) }}"
                                    class="text-blue-600 hover:text-blue-800"
-                                   target="_blank">
-                                    📄 Ver
-                                </a>
+                                   target="_blank">📄 Ver</a>
                             @else
                                 <span class="text-gray-500">No disponible</span>
                             @endif
                         </td>
 
-                        <td class="px-4 py-3 text-center">
+                        {{-- Asesoría --}}
+                        <td class="px-2 py-2 text-center">
                             @if($t->advisory)
                                 <a href="{{ route('basic_sciences.advisories.show', $t->advisory) }}"
                                    class="text-blue-600 hover:underline">
@@ -95,20 +98,21 @@
                             @endif
                         </td>
 
-                        <td class="px-4 py-3 text-center flex gap-2 justify-center">
+                        {{-- Acciones --}}
+                        <td class="px-2 py-2 text-center flex justify-center gap-2">
 
-                            {{-- EDITAR --}}
+                            {{-- Editar --}}
                             <a href="{{ route('basic_sciences.teachers.edit', $t) }}"
                                class="px-3 py-1 rounded text-white font-semibold"
                                style="background-color:#F39C12;">
-                                Editar
+                                ✏ Editar
                             </a>
 
-                            {{-- ELIMINAR --}}
+                            {{-- Eliminar --}}
                             <button onclick="openDeleteModal('{{ $t->teacher_user }}')"
                                     class="px-3 py-1 rounded text-white font-semibold"
                                     style="background-color:#E74C3C;">
-                                Eliminar
+                                🗑 Eliminar
                             </button>
 
                         </td>
@@ -160,6 +164,8 @@
 
     </div>
 </div>
+
+<x-basic-sciences-footer />
 
 <script>
     function openDeleteModal(username) {

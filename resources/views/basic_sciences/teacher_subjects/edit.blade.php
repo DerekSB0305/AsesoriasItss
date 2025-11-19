@@ -7,9 +7,10 @@
     <script src="//unpkg.com/alpinejs" defer></script>
 </head>
 
-<body class="bg-gray-100 min-h-screen p-6">
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <x-basic-sciences-navbar />
 
-<div class="max-w-4xl mx-auto bg-white shadow-md rounded-xl p-8">
+<div  class="w-full max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8 mt-8">
 
     <h1 class="text-3xl font-bold text-gray-800 mb-6">✏ Editar Asignación</h1>
 
@@ -84,22 +85,26 @@
                 @endforeach
             </select>
         </div>
+    
+       <div class="flex justify-between gap-4 mt-6">
+            <a href="{{ route('basic_sciences.teacher_subjects.index') }}"
+            class="w-1/2 text-center py-3 font-bold rounded-lg shadow text-white hover:opacity-90"
+            style="background-color:#6C757D;">
+            ← Cancelar
+            </a>
+            <button type="submit"
+            class="w-1/2 py-3 text-white font-bold rounded-lg shadow hover:opacity-90"
+            style="background-color:#28A745;">
+        Guardar cambios
+    </button>
 
-        <button 
-            type="submit"
-            class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-            Guardar Cambios
-        </button>
+</div>
 
     </form>
 
-    <br>
-    <a href="{{ route('basic_sciences.teacher_subjects.index') }}" 
-       class="text-gray-600 hover:text-gray-800">
-        ← Regresar
-    </a>
 
 </div>
+    <x-basic-sciences-footer />
 
 </body>
 </html>

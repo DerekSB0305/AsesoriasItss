@@ -27,14 +27,14 @@ class ManualController extends Controller
 
     public function selectSubject()
     {
-    $teacherUser = Auth::user()->teacher->teacher_user;
+        $teacherUser = Auth::user()->teacher->teacher_user;
 
-    // Ver materias del maestro
-    $subjects = \App\Models\TeacherSubject::with(['subject', 'subject.career'])
-        ->where('teacher_user', $teacherUser)
-        ->get();
+        // Ver materias del maestro
+        $subjects = \App\Models\TeacherSubject::with(['subject', 'subject.career'])
+            ->where('teacher_user', $teacherUser)
+            ->get();
 
-    return view('teachers.manuals.select_subject', compact('subjects'));
+        return view('teachers.manuals.select_subject', compact('subjects'));
     }
 
 
@@ -76,7 +76,7 @@ class ManualController extends Controller
         $counter = 1;
         while (Storage::disk('public')->exists("$dir/$filename")) {
             $filename = pathinfo($origName, PATHINFO_FILENAME)
-                        . "_$counter." . $file->getClientOriginalExtension();
+                . "_$counter." . $file->getClientOriginalExtension();
             $counter++;
         }
 
@@ -131,4 +131,36 @@ class ManualController extends Controller
             abort(403, 'No puedes subir manuales de materias que no impartes.');
         }
     }
+
+    public function listManuals()
+    {
+        $manuals = \App\Models\Manual::with([
+            'teacherSubject.teacher',
+            'teacherSubject.subject.career'
+        ])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('basic_sciences.manuals.index', compact('manuals'));
+    }
+
+    public function indexCareerHead()
+{
+    $admin = Auth::user()->administrative;
+
+    if (!$admin) {
+        return back()->withErrors(['error' => 'Tu cuenta no está registrada como Jefe de Carrera.']);
+    }
+
+    $careerId = $admin->career_id;
+
+    $manuals = Manual::with(['teacherSubject.teacher', 'teacherSubject.subject'])
+        ->whereHas('teacherSubject', function ($q) use ($careerId) {
+            $q->where('career_id', $careerId);
+        })
+        ->get();
+
+    return view('career_head.manuals.index', compact('manuals'));
+}
+
 }

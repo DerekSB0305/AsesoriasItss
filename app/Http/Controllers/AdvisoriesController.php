@@ -5,14 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Advisories;
 use App\Models\Advisory_details;
 use App\Models\TeacherSubject;
+use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Facades\Storage;
 
 class AdvisoriesController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $query = Advisories::with(['teacherSubject.teacher', 'teacherSubject.subject']);
@@ -30,9 +29,6 @@ class AdvisoriesController extends Controller
         return view('basic_sciences.advisories.index', compact('advisories'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create(Request $request)
     {
         $detailId = $request->detail_id;
@@ -44,15 +40,13 @@ class AdvisoriesController extends Controller
 
         $detail = Advisory_details::with(['students'])->findOrFail($detailId);
 
-        // 1) Obtener los maestros tutores que hicieron la solicitud
         $tutorUsers = \App\Models\Requests::whereIn(
-                'enrollment',
-                $detail->students->pluck('enrollment')
-            )
+            'enrollment',
+            $detail->students->pluck('enrollment')
+        )
             ->pluck('teacher_user')
             ->toArray();
 
-        // 2) Filtrar maestros que NO sean tutores
         $teacherSubjects = \App\Models\TeacherSubject::with(['teacher', 'subject', 'career'])
             ->whereNotIn('teacher_user', $tutorUsers)
             ->get();
@@ -60,9 +54,6 @@ class AdvisoriesController extends Controller
         return view('basic_sciences.advisories.create', compact('detail', 'teacherSubjects'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -74,16 +65,34 @@ class AdvisoriesController extends Controller
             'assignment_file'    => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:4096',
         ]);
 
-        $schedule = $request->schedule;
+        // ---------------------------
+        // VALIDACIÓN DE DÍA Y HORA
+        // ---------------------------
+        $timestamp = strtotime($request->schedule);
+        $hour = intval(date('H', $timestamp));
+        $day = date('N', $timestamp); // 1=Lunes, 7=Domingo
 
-        // Validación maestro ocupado en ese horario
+        if ($day >= 6) {
+            return back()->withErrors([
+                'schedule' => 'No se pueden crear asesorías sábado ni domingo.'
+            ])->withInput();
+        }
+
+        if ($hour < 6 || $hour > 18) {
+            return back()->withErrors([
+                'schedule' => 'La asesoría debe estar entre las 6:00 AM y 6:00 PM.'
+            ])->withInput();
+        }
+
+        // Validación maestro ocupado
+        $schedule = $request->schedule;
         $conflictoMaestro = Advisories::where('teacher_subject_id', $request->teacher_subject_id)
             ->where('schedule', $schedule)
             ->exists();
 
         if ($conflictoMaestro) {
             return back()->withErrors([
-                'schedule' => 'El maestro ya tiene una asesoría asignada en este horario.'
+                'schedule' => 'El maestro ya tiene una asesoría en ese horario.'
             ])->withInput();
         }
 
@@ -92,15 +101,14 @@ class AdvisoriesController extends Controller
             $conflictoAula = Advisories::where('classroom', $request->classroom)
                 ->where('schedule', $schedule)
                 ->exists();
-
             if ($conflictoAula) {
                 return back()->withErrors([
-                    'classroom' => 'El aula ya está asignada en este horario.'
+                    'classroom' => 'El aula ya está asignada en ese horario.'
                 ])->withInput();
             }
         }
 
-        // Validación alumno con asesoría en ese horario
+        // Validación alumno ocupado
         $detail = Advisory_details::with('students')->find($request->advisory_detail_id);
 
         foreach ($detail->students as $student) {
@@ -111,16 +119,16 @@ class AdvisoriesController extends Controller
 
             if ($alumnoTieneAsesoria) {
                 return back()->withErrors([
-                    'schedule' => "El alumno {$student->name} ({$student->enrollment}) ya tiene una asesoría en este horario."
+                    'schedule' => "El alumno {$student->name} ({$student->enrollment}) ya tiene asesoría en ese horario."
                 ])->withInput();
             }
         }
-        $path = null;
 
+        // GUARDAR ARCHIVO CON NOMBRE ORIGINAL
+        $path = null;
         if ($request->hasFile('assignment_file')) {
             $file = $request->file('assignment_file');
             $originalName = $file->getClientOriginalName();
-
             $path = $file->storeAs('assignments', $originalName, 'public');
         }
 
@@ -134,24 +142,14 @@ class AdvisoriesController extends Controller
             'assignment_file'    => $path,
         ]);
 
+        // Cambiar estado de PENDIENTE → APROBADO
+        $detail->update(['status' => 'Aprobado']);
+
         return redirect()
             ->route('basic_sciences.advisories.index')
             ->with('success', 'Asesoría creada correctamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Advisories $advisories)
-    {
-        $advisories->load('detail.students', 'teacherSubject.teacher', 'teacherSubject.subject');
-
-        return view('basic_sciences.advisories.show', compact('advisories'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit($id)
     {
         $advisory = Advisories::with([
@@ -161,10 +159,8 @@ class AdvisoriesController extends Controller
             'advisoryDetail.students'
         ])->findOrFail($id);
 
-        // alumnos inscritos actualmente
         $currentStudents = $advisory->advisoryDetail->students->pluck('enrollment')->toArray();
 
-        // alumnos disponibles por materia
         $students = \App\Models\Requests::where('subject_id', $advisory->teacherSubject->subject_id)
             ->with('student')
             ->get()
@@ -178,9 +174,6 @@ class AdvisoriesController extends Controller
         return view('basic_sciences.advisories.edit', compact('advisory', 'students', 'currentStudents'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
         $advisory = Advisories::findOrFail($id);
@@ -191,14 +184,26 @@ class AdvisoriesController extends Controller
             'building'  => 'nullable|string|max:10',
             'students'  => 'required|array',
             'assignment_file' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:4096',
+            'status' => 'nullable|string|in:Aprobado,Finalizado'
         ]);
 
-        $schedule = $request->schedule;
+        // Validación día/hora
+        $timestamp = strtotime($request->schedule);
+        $hour = intval(date('H', $timestamp));
+        $day = date('N', $timestamp);
 
-        // Aula única
+        if ($day >= 6) {
+            return back()->withErrors(['schedule' => 'No se pueden asignar asesorías sábado o domingo.'])->withInput();
+        }
+
+        if ($hour < 6 || $hour > 18) {
+            return back()->withErrors(['schedule' => 'La asesoría debe ser entre 6 AM y 6 PM.'])->withInput();
+        }
+
+        // Conflictos
         if ($request->classroom) {
             $conflictoAula = Advisories::where('classroom', $request->classroom)
-                ->where('schedule', $schedule)
+                ->where('schedule', $request->schedule)
                 ->where('advisory_id', '!=', $id)
                 ->exists();
 
@@ -207,9 +212,8 @@ class AdvisoriesController extends Controller
             }
         }
 
-        // Alumno no puede duplicar asesorías
         foreach ($request->students as $enrollment) {
-            $conflictoAlumno = Advisories::where('schedule', $schedule)
+            $conflictoAlumno = Advisories::where('schedule', $request->schedule)
                 ->where('advisory_id', '!=', $id)
                 ->whereHas('advisoryDetail.students', function ($q) use ($enrollment) {
                     $q->where('students.enrollment', $enrollment);
@@ -221,65 +225,40 @@ class AdvisoriesController extends Controller
                 ]);
             }
         }
+
+        // Guardar nuevo archivo con nombre original
         if ($request->hasFile('assignment_file')) {
 
-            // Borrar archivo anterior si existe
             if ($advisory->assignment_file && Storage::disk('public')->exists($advisory->assignment_file)) {
                 Storage::disk('public')->delete($advisory->assignment_file);
             }
 
             $file = $request->file('assignment_file');
             $originalName = $file->getClientOriginalName();
-
             $path = $file->storeAs('assignments', $originalName, 'public');
 
             $advisory->assignment_file = $path;
         }
 
-        // Guardar cambios normales
+        // Actualizar asesoría
         $advisory->update([
             'schedule' => $request->schedule,
             'classroom' => $request->classroom,
             'building'  => $request->building,
         ]);
 
+        // Sincronizar alumnos
         $advisory->advisoryDetail->students()->sync($request->students);
+
+        // Actualizar estado si se envió
+        if ($request->status) {
+            $advisory->advisoryDetail->update(['status' => $request->status]);
+        }
 
         return redirect()->route('basic_sciences.advisories.index')
             ->with('success', 'Asesoría actualizada correctamente.');
     }
 
-    public function details($id)
-    {
-        $advisory = Advisories::with([
-            'teacherSubject.teacher',
-            'teacherSubject.subject.career',
-            'teacherSubject.career',
-            'advisoryDetail.students',
-            'reports'  
-        ])->findOrFail($id);
-
-        $students = $advisory->advisoryDetail->students ?? collect();
-
-        $total = $students->count();
-        $hombres = $students->where('gender', 'Masculino')->count();
-        $mujeres = $students->where('gender', 'Femenino')->count();
-
-        $reports = $advisory->reports; 
-
-        return view('basic_sciences.advisories.individual_details', compact(
-            'advisory',
-            'students',
-            'total',
-            'hombres',
-            'mujeres',
-            'reports'
-        ));
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         $advisory = Advisories::findOrFail($id);
@@ -302,5 +281,56 @@ class AdvisoriesController extends Controller
         return redirect()
             ->route('basic_sciences.advisories.index')
             ->with('success', 'Asesoría y detalle eliminados correctamente.');
+    }
+
+    public function details($id)
+    {
+        $advisory = Advisories::with([
+            'teacherSubject.teacher',
+            'teacherSubject.subject.career',
+            'teacherSubject.career',
+            'advisoryDetail.students',
+            'reports'
+        ])->findOrFail($id);
+
+        $students = $advisory->advisoryDetail->students ?? collect();
+
+        $total = $students->count();
+        $hombres = $students->where('gender', 'Masculino')->count();
+        $mujeres = $students->where('gender', 'Femenino')->count();
+
+        $reports = $advisory->reports;
+
+        return view('basic_sciences.advisories.individual_details', compact(
+            'advisory',
+            'students',
+            'total',
+            'hombres',
+            'mujeres',
+            'reports'
+        ));
+    }
+
+    public function indexCareerHead()
+    {
+        $admin = FacadesAuth::user()->administrative;
+
+        if (!$admin) {
+            return back()->withErrors(['error' => 'Tu cuenta no está registrada como Jefe de Carrera.']);
+        }
+
+        $careerId = $admin->career_id;
+
+        $advisories = Advisories::with([
+            'teacherSubject.teacher',
+            'teacherSubject.subject',
+            'advisoryDetail.students'
+        ])
+            ->whereHas('teacherSubject', function ($q) use ($careerId) {
+                $q->where('career_id', $careerId);
+            })
+            ->get();
+
+        return view('career_head.advisories.index', compact('advisories'));
     }
 }

@@ -16,4 +16,14 @@ class Manual extends Model
     {
         return $this->belongsTo(TeacherSubject::class, 'teacher_subject_id');
     }
+    
+      public function teacher()
+    {
+        return $this->teacherSubject->teacher;
+    }
+
+    public function subject()
+    {
+        return $this->teacherSubject->subject;
+    }
 }

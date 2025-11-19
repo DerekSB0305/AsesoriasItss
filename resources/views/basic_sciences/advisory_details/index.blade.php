@@ -6,136 +6,140 @@
     @vite('resources/css/app.css')
 </head>
 
-<body class="bg-gray-100 min-h-screen p-6">
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
-<div class="max-w-6xl mx-auto bg-white shadow-lg rounded-xl p-8">
+    <x-basic-sciences-navbar />
 
-    {{-- Título --}}
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-extrabold text-gray-800">📄 Detalles de Asesorías</h1>
+    <div class="flex-1">
 
-        <a href="{{ route('basic_sciences.index') }}"
-           class="text-green-600 hover:text-green-800 font-semibold">
-            ← Regresar al inicio
-        </a>
-    </div>
+        <div class="max-w-6xl mx-auto bg-white shadow-lg rounded-xl p-8 mt-10">
 
-    {{-- BUSCADOR --}}
-    <form method="GET" class="flex flex-wrap gap-4 mb-6 items-end">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-extrabold text-gray-800 flex items-center gap-2">
+                    📄 Detalles de Asesorías
+                </h1>
 
-        {{-- BUSCAR MATERIA --}}
-        <div>
-            <label class="text-sm font-semibold text-gray-700">Materia</label>
-            <input type="text" name="materia" value="{{ $materia }}"
-                placeholder="Buscar materia..."
-                class="border border-gray-300 px-3 py-2 rounded-lg w-48 
-                       focus:ring-2 focus:ring-blue-500 focus:outline-none">
-        </div>
+                <a href="{{ route('basic_sciences.advisories.index') }}"
+                   class="text-green-600 hover:text-green-800 font-semibold">
+                    ← Regresar a Asesorías
+                </a>
+            </div>
 
-        {{-- ESTADO --}}
-        <div>
-            <label class="text-sm font-semibold text-gray-700">Estado</label>
-            <select name="estado"
-                    class="border border-gray-300 px-3 py-2 rounded-lg w-40
-                           focus:ring-2 focus:ring-blue-500">
-                <option value="">Todos</option>
-                <option value="Pendiente"  {{ $estado=='Pendiente' ? 'selected' : '' }}>Pendiente</option>
-                <option value="Aprobado"   {{ $estado=='Aprobado' ? 'selected' : '' }}>Aprobado</option>
-                <option value="Finalizado" {{ $estado=='Finalizado' ? 'selected' : '' }}>Finalizado</option>
-            </select>
-        </div>
+            <form method="GET" class="flex flex-wrap gap-4 mb-6 items-end">
 
-        {{-- BOTÓN BUSCAR --}}
-        <button class="bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700">
-            Buscar
-        </button>
+                <div>
+                    <label class="text-sm font-semibold text-gray-700">Materia</label>
+                    <input type="text" name="materia" value="{{ $materia }}"
+                        placeholder="Ej. Cálculo"
+                        class="border border-gray-300 px-3 py-2 rounded-lg w-48
+                               focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
 
-        {{-- LIMPIAR --}}
-        @if($materia || $estado)
-            <a href="{{ route('basic_sciences.advisory_details.index') }}"
-               class="text-red-600 font-semibold hover:text-red-800 px-3 py-2">
-               Limpiar
+                <div>
+                    <label class="text-sm font-semibold text-gray-700">Estado</label>
+                    <select name="estado"
+                            class="border border-gray-300 px-3 py-2 rounded-lg w-40
+                                   focus:ring-2 focus:ring-blue-500">
+                        <option value="">Todos</option>
+                        <option value="Pendiente"  {{ $estado=='Pendiente' ? 'selected' : '' }}>Pendiente</option>
+                        <option value="Aprobado"   {{ $estado=='Aprobado' ? 'selected' : '' }}>Aprobado</option>
+                        <option value="Finalizado" {{ $estado=='Finalizado' ? 'selected' : '' }}>Finalizado</option>
+                    </select>
+                </div>
+
+                <button class="mt-4 px-4 py-2 bg-[#1ABC9C] text-white font-semibold rounded-lg hover:bg-blue-900 shadow">
+                🔍 Buscar
+                </button>
+
+                @if($materia || $estado)
+                    <a href="{{ route('basic_sciences.advisory_details.index') }}"
+                       class="text-red-600 font-semibold hover:text-red-800 px-3 py-2">
+                       Limpiar
+                    </a>
+                @endif
+            </form>
+
+            <a href="{{ route('basic_sciences.advisory_details.create') }}"
+               class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 inline-flex items-center gap-2 mb-4">
+                ➕ Crear Detalle de Asesoría
             </a>
-        @endif
-    </form>
 
-    {{-- BOTÓN CREAR DETALLE --}}
-    <a href="{{ route('basic_sciences.advisory_details.create') }}"
-       class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 inline-block mb-5">
-        ➕ Crear Detalle de Asesoría
-    </a>
+            <div class="overflow-x-auto border border-gray-300 rounded-xl shadow">
+                <table class="min-w-full border-collapse text-sm">
 
-    {{-- TABLA --}}
-    <div class="overflow-x-auto border border-gray-300 rounded-xl shadow">
-        <table class="min-w-full border-collapse text-sm">
+                    <thead style="background-color:#0B3D7E;" class="text-white font-bold">
+                        <tr>
+                            <th class="px-4 py-3">Materia</th>
+                            <th class="px-4 py-3">Alumnos</th>
+                            <th class="px-4 py-3">Estado</th>
+                            <th class="px-4 py-3">Observaciones</th>
+                            <th class="px-4 py-3 text-center">Acciones</th>
+                        </tr>
+                    </thead>
 
-            {{-- ENCABEZADOS --}}
-            <thead style="background-color:#0B3D7E;" class="text-white font-bold">
-                <tr>
-                    <th class="px-4 py-3">ID</th>
-                    <th class="px-4 py-3">Materia</th>
-                    <th class="px-4 py-3">Alumnos</th>
-                    <th class="px-4 py-3">Estado</th>
-                    <th class="px-4 py-3">Observaciones</th>
-                    <th class="px-4 py-3 text-center">Acciones</th>
-                </tr>
-            </thead>
+                    <tbody class="text-gray-700">
 
-            {{-- CUERPO --}}
-            <tbody class="text-gray-700">
+                    @foreach($details as $d)
+                        <tr class="border-b hover:bg-gray-50 transition">
 
-            @foreach($details as $d)
-                <tr class="border-b hover:bg-gray-50 transition">
+                            <td class="px-4 py-3">
+                                {{ $d->subject->name ?? 'Sin asesoría creada' }}
+                            </td>
 
-                    {{-- ID --}}
-                    <td class="px-4 py-3 font-semibold">{{ $d->advisory_detail_id }}</td>
+                            <td class="px-4 py-3">
+                                <ul class="list-disc ml-5">
+                                    @foreach($d->students as $s)
+                                        <li>{{ $s->enrollment }} - {{ $s->name }} {{ $s->last_name_f }}</li>
+                                    @endforeach
+                                </ul>
+                            </td>
 
-                    {{-- MATERIA --}}
-                    <td class="px-4 py-3">
-                        {{ $d->subject->name ?? 'Sin asesoría creada' }}
-                    </td>
+                            <td class="px-4 py-3 font-semibold">
+                                @if($d->status === 'Aprobado')
+                                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded">
+                                        Aprobado
+                                    </span>
+                                @elseif($d->status === 'Pendiente')
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded">
+                                        Pendiente
+                                    </span>
+                                @else
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded">
+                                        Finalizado
+                                    </span>
+                                @endif
+                            </td>
 
-                    {{-- ALUMNOS --}}
-                    <td class="px-4 py-3">
-                        <ul class="list-disc ml-5">
-                            @foreach($d->students as $s)
-                                <li>{{ $s->enrollment }} - {{ $s->name }} {{ $s->last_name_f }}</li>
-                            @endforeach
-                        </ul>
-                    </td>
+                            <td class="px-4 py-3">
+                                {{ $d->observations }}
+                            </td>
 
-                    {{-- ESTADO --}}
-                    <td class="px-4 py-3">
-                        <span class="font-semibold">{{ $d->status }}</span>
-                    </td>
+                            <td class="px-4 py-3 text-center">
 
-                    {{-- OBSERVACIONES --}}
-                    <td class="px-4 py-3">
-                        {{ $d->observations }}
-                    </td>
+                                <a href="{{ route('basic_sciences.advisories.create', ['detail_id' => $d->advisory_detail_id]) }}"
+                                   class="text-white font-semibold px-3 py-1 rounded-lg inline-flex items-center gap-1"
+                                   style="background-color:#28A745;">
+                                    ➕ Crear Asesoría
+                                </a>
 
-                    {{-- ACCIONES --}}
-                    <td class="px-4 py-3 text-center space-y-1">
+                            </td>
 
-                        <br>
+                        </tr>
+                    @endforeach
 
-                        {{-- Crear Asesoría --}}
-                        <a href="{{ route('basic_sciences.advisories.create', ['detail_id' => $d->advisory_detail_id]) }}"
-                           class="text-white font-semibold px-3 py-1 rounded-lg"
-                           style="background-color:#28A745;">
-                           ➕ Crear Asesoría
-                        </a>
+                    </tbody>
 
-                    </td>
+                </table>
+            </div>
 
-                </tr>
-            @endforeach
+        </div>
 
-            </tbody>
-        </table>
     </div>
 
-</div>
+    {{-- FOOTER --}}
+    <x-basic-sciences-footer />
 
 </body>
 </html>
+
+

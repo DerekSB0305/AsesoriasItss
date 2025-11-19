@@ -25,67 +25,73 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-    $request->validate([
-        'user' => ['required', 'string'],
-        'password' => ['required', 'string'],
-    ]);
-
-    // Intentar autenticación con campo 'user' en lugar de 'email'
-    if (!Auth::attempt($request->only('user', 'password'), $request->boolean('remember'))) {
-        return back()->withErrors([
-            'user' => 'Las credenciales no coinciden con nuestros registros.',
+        $request->validate([
+            'user' => ['required', 'string'],
+            'password' => ['required', 'string'],
         ]);
-    }
 
-    $request->session()->regenerate();
-    $user = Auth::user();
+        // Intentar autenticación con campo 'user' en lugar de 'email'
+        if (!Auth::attempt($request->only('user', 'password'), $request->boolean('remember'))) {
+            return back()->withErrors([
+                'user' => 'Las credenciales no coinciden con nuestros registros.',
+            ]);
+        }
 
-    // Detectar el tipo de rol
-    $role = strtolower(trim($user->role->role_type ?? ''));
+        $request->session()->regenerate();
+        $user = Auth::user();
 
-    if (!$role) {
-        Auth::logout();
-        return redirect()->route('login')->withErrors([
-            'user' => 'Tu cuenta no tiene un rol asignado, contacta al administrador.',
-        ]);
-    }
+    //      dd([
+    //     'auth' => Auth::check(),
+    //     'user' => Auth::user(),
+    //     'role' => Auth::user()?->role?->role_type,
+    // ]);
 
-    // ✅ Redirección manual (anula el dashboard)
-    switch ($role) {
-        case 'ciencias básicas':
-        case 'ciencias basicas':
-            return redirect()->route('basic_sciences.index');
+        // Detectar el tipo de rol
+        $role = strtolower(trim($user->role->role_type ?? ''));
 
-        case 'jefatura':
-            return redirect()->route('jefatura.dashboard');
-
-        case 'docente':
-        case 'maestro':
-        case 'profesor':
-            return redirect()->route('teachers.index'); 
-
-        case 'alumno':
-        case 'alumnos':
-        case 'estudiante':
-        case 'student':
-            return redirect()->route('students.panel.index');
-
-
-        default:
+        if (!$role) {
             Auth::logout();
             return redirect()->route('login')->withErrors([
-                'user' => 'Rol desconocido. Contacta al administrador.',
+                'user' => 'Tu cuenta no tiene un rol asignado, contacta al administrador.',
             ]);
+        }
+
+        // ✅ Redirección manual (anula el dashboard)
+        switch ($role) {
+            case 'ciencias básicas':
+            case 'ciencias basicas':
+                return redirect()->route('basic_sciences.index');
+
+            case 'jefatura de division':
+                return redirect()->route('career_head.index');
+
+
+            case 'docente':
+            case 'maestro':
+            case 'profesor':
+                return redirect()->route('teachers.index');
+
+            case 'alumno':
+            case 'alumnos':
+            case 'estudiante':
+            case 'student':
+                return redirect()->route('students.panel.index');
+
+
+            default:
+                Auth::logout();
+                return redirect()->route('login')->withErrors([
+                    'user' => 'Rol desconocido. Contacta al administrador.',
+                ]);
+        }
     }
-}
     public function destroy(Request $request): RedirectResponse
-{
-    Auth::guard('web')->logout();
+    {
+        Auth::guard('web')->logout();
 
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
-    return redirect('/');
-}
-
+        return redirect('/');
+    }
 }

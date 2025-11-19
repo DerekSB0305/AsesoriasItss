@@ -138,7 +138,6 @@ class StudentController extends Controller
 
             $path = $file->storeAs($folder, $finalName, 'public');
             $data['schedule_file'] = $path;
-
         } else {
             unset($data['schedule_file']);
         }
@@ -182,5 +181,32 @@ class StudentController extends Controller
         }
 
         return $filename;
+    }
+
+    public function indexCareerHead()
+    {
+        // Obtener el administrativo logueado
+        $admin = Auth::user()->administrative;
+
+        // Validar que realmente sea jefe de carrera
+        $admin = Auth::user()->administrative;
+
+    if (!$admin || !$admin->career_id) {
+        return back()->withErrors([
+            'error' => 'No tienes carrera asignada, contacta al administrador.'
+        ]);
+    }
+
+    $careerId = $admin->career_id;
+
+    $students = Student::where('career_id', $careerId)
+        ->with([
+            'career',
+            'teacher',           
+            'advisoryDetails',   
+        ])
+        ->get();
+
+    return view('career_head.students.index', compact('students'));
     }
 }
