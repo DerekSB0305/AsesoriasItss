@@ -25,6 +25,19 @@ class ManualController extends Controller
         return view('teachers.manuals.index', compact('manuals'));
     }
 
+    public function selectSubject()
+    {
+    $teacherUser = Auth::user()->teacher->teacher_user;
+
+    // Ver materias del maestro
+    $subjects = \App\Models\TeacherSubject::with(['subject', 'subject.career'])
+        ->where('teacher_user', $teacherUser)
+        ->get();
+
+    return view('teachers.manuals.select_subject', compact('subjects'));
+    }
+
+
     /**
      * Formulario para subir manual
      */

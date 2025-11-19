@@ -8,6 +8,7 @@ use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
@@ -132,7 +133,7 @@ class TeacherController extends Controller
     }
 
     // Modulo Maestro
-    public function indexTeacher()
+        public function indexTeacher()
     {
         // Maestro logueado
         $teacher = Auth::user()->teacher;
@@ -140,7 +141,7 @@ class TeacherController extends Controller
         return view('teachers.index', compact('teacher'));
     }
 
-    public function myAdvisories()
+        public function myAdvisories()
     {
         // obtener el usuario maestro logueado
         $teacherUser = auth()->user()->user;
@@ -158,4 +159,25 @@ class TeacherController extends Controller
 
         return view('teachers.advisories.index', compact('advisories'));
     }
+
+        public function showChangePasswordForm()
+    {
+        return view('teachers.change_password');
+    }
+
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $user = Auth::user();
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return redirect()->route('teachers.index')
+                        ->with('success', 'Contraseña actualizada correctamente.');
+    }
+
 }

@@ -24,7 +24,7 @@ return new class extends Migration
 
             // Foreign key con unsignedBigInteger
             $table->foreign('teacher_subject_id')
-                ->references('id')
+                ->references('teacher_subject_id')
                 ->on('teacher_subjects')
                 ->onDelete('cascade');
         });

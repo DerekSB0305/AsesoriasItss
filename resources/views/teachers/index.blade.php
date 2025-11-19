@@ -1,3 +1,10 @@
+@php
+    $user = Auth::user();
+    $teacher = $user->teacher;
+
+    $isDefaultPassword = Hash::check($teacher->teacher_user, $user->password);
+@endphp
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -10,13 +17,13 @@
 
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
 
-    <div class="max-w-3xl w-full bg-white rounded-xl shadow-xl p-8">
+    <div class="max-w-4xl w-full bg-white rounded-2xl shadow-xl p-10">
 
         {{-- Encabezado --}}
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-800">👨‍🏫 Panel del Maestro</h1>
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-extrabold text-gray-800">👨‍🏫 Panel del Maestro</h1>
 
-            <p class="text-lg text-gray-600 mt-2">
+            <p class="text-xl text-gray-600 mt-3">
                 Bienvenido,
                 <span class="font-semibold text-indigo-700">
                     {{ Auth::user()->teacher->name }}
@@ -25,54 +32,162 @@
                 </span>
             </p>
         </div>
+        @if ($isDefaultPassword)
+    <div class="mb-8 p-4 rounded-xl bg-red-100 border border-red-300 shadow">
+        <h2 class="text-xl font-bold text-red-700 mb-1">⚠️ Es necesario actualizar tu contraseña</h2>
+        <p class="text-red-600">
+            Actualmente estás usando tu contraseña por defecto (tu usuario).  
+            Por seguridad, cambia tu contraseña lo antes posible.
+        </p>
+
+        <a href="{{ route('password.change.form') }}"
+           class="inline-block mt-3 px-4 py-2 bg-red-600 text-white rounded-lg
+                  hover:bg-red-700 shadow transition">
+            Cambiar contraseña
+        </a>
+    </div>
+@endif
+
 
         {{-- Acciones --}}
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">📌 Acciones disponibles</h2>
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6">📌 Acciones disponibles</h2>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        @php
+            $teacher = Auth::user()->teacher;
+            $tutor = $teacher->tutor;
+            $basic = $teacher->science_department;
+        @endphp
 
-            {{-- Ver alumnos --}}
-            <a href="{{ route('teachers.students.index') }}"
-                class="flex items-center gap-3 p-4 bg-indigo-50 rounded-lg shadow-sm hover:bg-indigo-100 transition">
-                <span class="text-2xl">📘</span>
-                <span class="font-medium text-gray-800">Ver alumnos registrados</span>
-            </a>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            {{-- Registrar alumno --}}
-            <a href="{{ route('teachers.students.create') }}"
-                class="flex items-center gap-3 p-4 bg-green-50 rounded-lg shadow-sm hover:bg-green-100 transition">
-                <span class="text-2xl">➕</span>
-                <span class="font-medium text-gray-800">Registrar alumno</span>
-            </a>
+            {{-- *******************************
+                CASO 1: ES TUTOR PERO NO ES BÁSICAS
+            ******************************** --}}
+            @if ($tutor && !$basic)
 
-            {{-- Ver solicitudes --}}
-            <a href="{{ route('teachers.requests.index') }}"
-                class="flex items-center gap-3 p-4 bg-yellow-50 rounded-lg shadow-sm hover:bg-yellow-100 transition">
-                <span class="text-2xl">📄</span>
-                <span class="font-medium text-gray-800">Ver solicitudes de asesoría</span>
-            </a>
+                {{-- Ver alumnos registrados --}}
+                <a href="{{ route('teachers.students.index') }}"
+                   class="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl shadow-md 
+                          hover:shadow-2xl transition bg-white border border-gray-200 hover:bg-blue-50">
+                    <span class="text-5xl">📘</span>
+                    <span class="text-xl font-semibold text-gray-800">Ver alumnos registrados</span>
+                </a>
 
-            {{-- Solicitar asesoría --}}
-            <a href="{{ route('teachers.requests.create') }}"
-                class="flex items-center gap-3 p-4 bg-blue-50 rounded-lg shadow-sm hover:bg-blue-100 transition">
-                <span class="text-2xl">✏️</span>
-                <span class="font-medium text-gray-800">Solicitar asesoría</span>
-            </a>
+                {{-- Registrar alumno --}}
+                <a href="{{ route('teachers.students.create') }}"
+                   class="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl shadow-md 
+                          hover:shadow-2xl transition bg-white border border-gray-200 hover:bg-green-50">
+                    <span class="text-5xl">➕</span>
+                    <span class="text-xl font-semibold text-gray-800">Registrar alumno</span>
+                </a>
 
-            {{-- Ver asesorías --}}
-            <a href="{{ route('teachers.advisories.index') }}"
-                class="flex items-center gap-3 p-4 bg-purple-50 rounded-lg shadow-sm hover:bg-purple-100 transition">
-                <span class="text-2xl">📅</span>
-                <span class="font-medium text-gray-800">Ver asesorías programadas</span>
-            </a>
+                {{-- Ver solicitudes --}}
+                <a href="{{ route('teachers.requests.index') }}"
+                   class="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl shadow-md
+                          hover:shadow-2xl transition bg-white border border-gray-200 hover:bg-yellow-50">
+                    <span class="text-5xl">📄</span>
+                    <span class="text-xl font-semibold text-gray-800">Ver solicitudes de asesoría</span>
+                </a>
+
+                {{-- Solicitar asesoría --}}
+                <a href="{{ route('teachers.requests.create') }}"
+                   class="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl shadow-md
+                          hover:shadow-2xl transition bg-white border border-gray-200 hover:bg-indigo-50">
+                    <span class="text-5xl">✏️</span>
+                    <span class="text-xl font-semibold text-gray-800">Solicitar asesoría</span>
+                </a>
+
+            @endif
+
+
+            {{-- *******************************
+                CASO 2: NO ES TUTOR PERO SÍ ES BÁSICAS
+            ******************************** --}}
+            @if (!$tutor && $basic)
+
+                {{-- Ver asesorías programadas --}}
+                <a href="{{ route('teachers.advisories.index') }}"
+                   class="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl shadow-md 
+                          hover:shadow-2xl transition bg-white border border-gray-200 hover:bg-purple-50">
+                    <span class="text-5xl">📅</span>
+                    <span class="text-xl font-semibold text-gray-800">Ver asesorías programadas</span>
+                </a>
+
+                {{-- Manuales --}}
+                <a href="{{ route('teachers.manuals.index') }}"
+                   class="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl shadow-md
+                          hover:shadow-2xl transition bg-white border border-gray-200 hover:bg-cyan-50">
+                    <span class="text-5xl">📘</span>
+                    <span class="text-xl font-semibold text-gray-800">Manuales de materias</span>
+                </a>
+
+            @endif
+
+
+            {{-- *******************************
+                CASO 3: ES TUTOR Y ES BÁSICAS
+                Acceso TOTAL
+            ******************************** --}}
+            @if ($tutor && $basic)
+
+                {{-- Ver alumnos registrados --}}
+                <a href="{{ route('teachers.students.index') }}"
+                   class="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl shadow-md 
+                          hover:shadow-2xl transition bg-white border border-gray-200 hover:bg-blue-50">
+                    <span class="text-5xl">📘</span>
+                    <span class="text-xl font-semibold text-gray-800">Ver alumnos registrados</span>
+                </a>
+
+                {{-- Registrar alumno --}}
+                <a href="{{ route('teachers.students.create') }}"
+                   class="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl shadow-md 
+                          hover:shadow-2xl transition bg-white border border-gray-200 hover:bg-green-50">
+                    <span class="text-5xl">➕</span>
+                    <span class="text-xl font-semibold text-gray-800">Registrar alumno</span>
+                </a>
+
+                {{-- Ver solicitudes --}}
+                <a href="{{ route('teachers.requests.index') }}"
+                   class="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl shadow-md
+                          hover:shadow-2xl transition bg-white border border-gray-200 hover:bg-yellow-50">
+                    <span class="text-5xl">📄</span>
+                    <span class="text-xl font-semibold text-gray-800">Ver solicitudes de asesoría</span>
+                </a>
+
+                {{-- Solicitar asesoría --}}
+                <a href="{{ route('teachers.requests.create') }}"
+                   class="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl shadow-md
+                          hover:shadow-2xl transition bg-white border border-gray-200 hover:bg-indigo-50">
+                    <span class="text-5xl">✏️</span>
+                    <span class="text-xl font-semibold text-gray-800">Solicitar asesoría</span>
+                </a>
+
+                {{-- Ver asesorías programadas --}}
+                <a href="{{ route('teachers.advisories.index') }}"
+                   class="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl shadow-md
+                          hover:shadow-2xl transition bg-white border border-gray-200 hover:bg-purple-50">
+                    <span class="text-5xl">📅</span>
+                    <span class="text-xl font-semibold text-gray-800">Ver asesorías programadas</span>
+                </a>
+
+                {{-- Manuales --}}
+                <a href="{{ route('teachers.manuals.index') }}"
+                   class="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl shadow-md
+                          hover:shadow-2xl transition bg-white border border-gray-200 hover:bg-cyan-50">
+                    <span class="text-5xl">📘</span>
+                    <span class="text-xl font-semibold text-gray-800">Manuales de materias</span>
+                </a>
+
+            @endif
 
         </div>
 
+
         {{-- Logout --}}
-        <form method="POST" action="{{ route('logout') }}" class="mt-10 text-center">
+        <form method="POST" action="{{ route('logout') }}" class="mt-12 text-center">
             @csrf
             <button type="submit"
-                class="px-6 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition">
+                class="px-8 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition shadow">
                 Cerrar sesión
             </button>
         </form>

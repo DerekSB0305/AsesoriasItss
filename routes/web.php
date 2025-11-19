@@ -5,6 +5,7 @@ use App\Http\Controllers\{
     AdvisoriesController,
     AdvisoryDetailsController,
     Auth\AuthenticatedSessionController,
+    ManualController,
     ProfileController,
     TeacherAdvisoryReportController,
     TeacherController
@@ -127,4 +128,30 @@ Route::prefix('teachers')
     Route::delete('advisories/reports/{id}',
         [TeacherAdvisoryReportController::class, 'destroy'])
         ->name('advisories.reports.destroy');
+
+        // SUBIR MANUALES (solo ciencias básicas)
+    Route::get('manuals', [ManualController::class, 'index'])
+        ->name('manuals.index');
+
+    Route::get('manuals/create/{teacher_subject}', [ManualController::class, 'create'])
+        ->name('manuals.create');
+
+    Route::post('manuals/store/{teacher_subject}', [ManualController::class, 'store'])
+        ->name('manuals.store');
+
+    Route::delete('manuals/{manual}', [ManualController::class, 'destroy'])
+        ->name('manuals.destroy');
+
+    Route::get('manuals/select/subject', [ManualController::class, 'selectSubject'])
+    ->name('manuals.select_subject');
+
 });
+
+   //Cambiar contraseña
+    Route::get('/teacher/change-password', [TeacherController::class, 'showChangePasswordForm'])
+     ->name('password.change.form')
+     ->middleware('auth');
+
+    Route::post('/teacher/change-password', [TeacherController::class, 'changePassword'])
+     ->name('password.change')
+     ->middleware('auth');
