@@ -81,7 +81,7 @@ class StudentController extends Controller
         $student = Student::create($studentData);
 
         // Crear usuario automático del alumno
-        $defaultPassword = strtolower($validated['enrollment']);
+        $defaultPassword = $validated['enrollment'];
         $roleAlumno = Role::where('role_type', 'Alumno')->first();
 
         User::create([

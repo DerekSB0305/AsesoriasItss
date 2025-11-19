@@ -7,6 +7,7 @@ use App\Http\Controllers\{
     Auth\AuthenticatedSessionController,
     ManualController,
     ProfileController,
+    StudentPanelController,
     TeacherAdvisoryReportController,
     TeacherController
 };
@@ -155,3 +156,34 @@ Route::prefix('teachers')
     Route::post('/teacher/change-password', [TeacherController::class, 'changePassword'])
      ->name('password.change')
      ->middleware('auth');
+
+     //Vistas y rutas del módulo del alumno
+
+     Route::prefix('students')
+    ->name('students.')
+    ->middleware(['auth','verified'])
+    ->group(function () {
+
+        // Panel principal
+        Route::get('/', [StudentPanelController::class, 'index'])
+            ->name('panel.index');
+
+        // Horario
+        Route::get('/schedule', [StudentPanelController::class, 'schedule'])
+            ->name('panel.schedule');
+
+        // Asesorías asignadas
+        Route::get('/advisories', [StudentPanelController::class, 'advisories'])
+            ->name('panel.advisories');
+
+        // Manuales
+        Route::get('/manuals', [StudentPanelController::class, 'manuals'])
+            ->name('panel.manuals');
+
+        // Cambiar contraseña
+        Route::get('/change-password', [StudentPanelController::class, 'showChangePasswordForm'])
+            ->name('panel.change_password_form');
+
+        Route::post('/change-password', [StudentPanelController::class, 'changePassword'])
+            ->name('panel.change_password');
+    });
