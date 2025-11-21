@@ -15,7 +15,11 @@ return new class extends Migration
             $table->id('advisory_id');
             $table->unsignedBigInteger('teacher_subject_id');
             $table->unsignedBigInteger('advisory_detail_id');
-            $table->dateTime('schedule');
+            $table->date('start_date');          
+            $table->date('end_date');             
+            $table->string('day_of_week', 15);   
+            $table->time('start_time');           
+            $table->time('end_time')->nullable(); 
             $table->string('classroom', 10)->nullable();
             $table->string('building', 10)->nullable();
             $table->string('assignment_file')->nullable();

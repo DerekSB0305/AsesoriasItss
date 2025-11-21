@@ -14,7 +14,11 @@ class Advisories extends Model
     protected $fillable = [
         'teacher_subject_id',
         'advisory_detail_id',
-        'schedule',
+        'start_date',
+        'end_date',
+        'day_of_week',
+        'start_time',
+        'end_time',
         'classroom',
         'building',
         'assignment_file'
