@@ -6,7 +6,9 @@
     @vite('resources/css/app.css')
 </head>
 
-<body class="bg-gray-100 min-h-screen p-6">
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+     <div class="flex-grow p-6">
 
 <div class="max-w-5xl mx-auto bg-white p-8 shadow-xl rounded-2xl">
 
@@ -65,7 +67,7 @@
                             <td class="px-4 py-3">
                                 <span class="px-3 py-1 rounded text-white text-sm
                                     @if($adv->advisoryDetail->status == 'Pending') bg-yellow-500
-                                    @elseif($adv->advisoryDetail->status == 'Approved') bg-green-600
+                                    @elseif($adv->advisoryDetail->status == 'Aprobado') bg-green-600
                                     @else bg-gray-600 @endif">
                                     {{ $adv->advisoryDetail->status }}
                                 </span>
@@ -87,6 +89,7 @@
     @endif
 
 </div>
-
+</div>
+<x-basic-sciences-footer />
 </body>
 </html>

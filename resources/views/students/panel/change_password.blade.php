@@ -6,7 +6,8 @@
     @vite('resources/css/app.css')
 </head>
 
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
+<body class="bg-gray-100 min-h-screen flex items-center justify-center flex-col">
+    <div class="flex-grow p-6">
 
     <div class="max-w-md w-full bg-white p-8 rounded-xl shadow-xl">
 
@@ -39,6 +40,7 @@
         </form>
 
     </div>
-
+    </div>
+ <x-basic-sciences-footer/>
 </body>
 </html>
