@@ -7,7 +7,7 @@
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
-
+    <x-students-navbar/>
      <div class="flex-grow p-6">
 
 <div class="max-w-5xl mx-auto bg-white p-8 shadow-xl rounded-2xl">
