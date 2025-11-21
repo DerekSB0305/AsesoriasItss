@@ -7,8 +7,10 @@
     @vite('resources/css/app.css')
 </head>
 
-<body class="bg-gray-100 min-h-screen p-6">
-
+<body class="bg-gray-100 min-h-screen flex flex-col">
+         {{-- contenido --}}
+    <div class="flex-grow p-6">
+ 
     <div class="max-w-6xl mx-auto bg-white shadow-lg rounded-xl p-8">
 
         {{-- Encabezado --}}
@@ -118,6 +120,10 @@
         </div>
 
     </div>
-
+    </div>
+    
+{{-- FOOTER --}}
+    <x-basic-sciences-footer />
 </body>
+
 </html>
