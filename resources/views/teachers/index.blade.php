@@ -16,6 +16,8 @@
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
+    <x-teachers-navbar/>
+
     {{-- CONTENIDO --}}
     <div class="flex-grow flex items-center justify-center p-6">
 
