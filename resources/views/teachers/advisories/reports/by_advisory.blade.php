@@ -6,7 +6,10 @@
     @vite('resources/css/app.css')
 </head>
 
-<body class="bg-gray-100 min-h-screen p-6">
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <x-teachers-navbar/>
+
+     <div class="flex-grow p-6">
 
 <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
 
@@ -91,6 +94,7 @@
     @endif
 
 </div>
-
+</div>
+    <x-basic-sciences-footer />
 </body>
 </html>

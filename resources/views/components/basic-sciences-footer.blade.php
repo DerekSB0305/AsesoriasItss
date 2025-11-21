@@ -15,7 +15,7 @@
             <h3 class="font-semibold text-lg mb-1">Contacto</h3>
             <p class="text-sm">
                 <span class="font-semibold">Email:</span><br>
-                regionsierra@regionsierra.tecnm.mx
+                Ciencias_basicas@regionsierra.tecnm.mx
             </p>
         </div>
 
@@ -23,7 +23,7 @@
         <div>
             <h3 class="font-semibold text-lg mb-1">Conmutador:</h3>
             <p class="text-sm">
-                932 3 240 650
+                168 932 3 240 650
             </p>
         </div>
 
