@@ -33,7 +33,7 @@
         <div class="overflow-x-auto">
             <table class="w-full border-collapse rounded-lg overflow-hidden shadow-sm">
                 
-                <thead class="bg-gray-200 text-gray-700 text-sm uppercase">
+                <thead class="text-white uppercase text-xs font-semibold" style="background-color:#0B3D7E;">
                     <tr>
                         <th class="px-4 py-3">Alumno</th>
                         <th class="px-4 py-3">Materia</th>

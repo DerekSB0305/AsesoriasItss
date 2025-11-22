@@ -7,8 +7,10 @@
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
-    <x-students-navbar/>
-     <div class="flex-grow p-6">
+
+<x-students-navbar/>
+
+<div class="flex-grow p-6">
 
 <div class="max-w-5xl mx-auto bg-white p-8 shadow-xl rounded-2xl">
 
@@ -25,19 +27,22 @@
         <p class="text-center text-gray-600 text-lg">
             Aún no tienes asesorías asignadas.
         </p>
+
     @else
 
         <div class="overflow-x-auto">
+
             <table class="w-full border-collapse shadow rounded-lg">
 
-                <thead class="bg-gray-200 text-gray-700 uppercase text-sm">
+                <thead class="text-white uppercase text-xs font-semibold" style="background-color:#0B3D7E;">
                     <tr>
-                        <th class="px-4 py-3">Fecha</th>
-                        <th class="px-4 py-3">Hora</th>
+                        <th class="px-4 py-3">Periodo</th>
+                        <th class="px-4 py-3">Horario</th>
                         <th class="px-4 py-3">Materia</th>
                         <th class="px-4 py-3">Maestro</th>
                         <th class="px-4 py-3">Estado</th>
-                        <th class="px-4 py-3">Aula y edificio</th>
+                        <th class="px-4 py-3">Aula</th>
+                        <th class="px-4 py-3">Edificio</th>
                     </tr>
                 </thead>
 
@@ -46,50 +51,74 @@
                     @foreach ($advisories as $adv)
 
                         @php
-                            $date = \Carbon\Carbon::parse($adv->schedule)->format('Y-m-d');
-                            $time = \Carbon\Carbon::parse($adv->schedule)->format('H:i');
+                            $startDate = \Carbon\Carbon::parse($adv->start_date)->format('d/m/Y');
+                            $endDate = \Carbon\Carbon::parse($adv->end_date)->format('d/m/Y');
+
+                            $startTime = \Carbon\Carbon::parse($adv->start_time)->format('H:i');
+                            $endTime = \Carbon\Carbon::parse($adv->end_time)->format('H:i');
+
+                            $day = ucfirst($adv->day_of_week);
                         @endphp
 
                         <tr class="border-b hover:bg-gray-50 transition">
 
-                            <td class="px-4 py-3">{{ $date }}</td>
-                            <td class="px-4 py-3">{{ $time }} hrs</td>
+                            {{-- PERIODO --}}
+                            <td class="px-4 py-3 font-semibold">
+                                📅 {{ $startDate }} — {{ $endDate }}
+                            </td>
 
+                            {{-- HORARIO --}}
+                            <td class="px-4 py-3 font-semibold">
+                                🕒 {{ $day }}<br>
+                                {{ $startTime }} - {{ $endTime }}
+                            </td>
+
+                            {{-- MATERIA --}}
                             <td class="px-4 py-3 font-semibold">
                                 {{ $adv->teacherSubject->subject->name }}
                             </td>
 
+                            {{-- MAESTRO --}}
                             <td class="px-4 py-3">
                                 {{ $adv->teacherSubject->teacher->name }}
                                 {{ $adv->teacherSubject->teacher->last_name_f }}
+                                {{ $adv->teacherSubject->teacher->last_name_m }}
                             </td>
 
+                            {{-- ESTADO --}}
                             <td class="px-4 py-3">
                                 <span class="px-3 py-1 rounded text-white text-sm
-                                    @if($adv->advisoryDetail->status == 'Pending') bg-yellow-500
+                                    @if($adv->advisoryDetail->status == 'Pendiente') bg-yellow-500
                                     @elseif($adv->advisoryDetail->status == 'Aprobado') bg-green-600
-                                    @else bg-gray-600 @endif">
+                                    @elseif($adv->advisoryDetail->status == 'Finalizado') bg-gray-600
+                                    @else bg-gray-500 @endif">
                                     {{ $adv->advisoryDetail->status }}
                                 </span>
                             </td>
 
+                            {{-- AULA --}}
                             <td class="px-4 py-3">
-                                {{ $adv->classroom ?? '---' }} - {{ $adv->building ?? '---' }}
+                                {{ $adv->classroom ?? '---' }}
                             </td>
-
+                            {{-- EDIFICIO --}}
+                            <td class="px-4 py-3">
+                                {{ $adv->building ?? '---' }}
+                            </td>
                         </tr>
 
                     @endforeach
 
                 </tbody>
-
             </table>
+
         </div>
 
     @endif
 
 </div>
 </div>
+
 <x-basic-sciences-footer />
+
 </body>
 </html>

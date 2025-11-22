@@ -33,7 +33,7 @@
         <div class="overflow-x-auto">
             <table class="w-full border-collapse rounded-lg overflow-hidden shadow-sm">
 
-                <thead class="bg-gray-200 text-gray-700 text-sm uppercase">
+                <thead class="text-white uppercase text-xs font-semibold" style="background-color:#0B3D7E;">
                     <tr>
                         <th class="px-4 py-3">Fecha</th>
                         <th class="px-4 py-3">Hora</th>
@@ -52,15 +52,27 @@
 
                     @foreach ($advisories as $adv)
                         @php
-                            $students = $adv->advisoryDetail->students ?? collect();
-                            $date = \Carbon\Carbon::parse($adv->schedule)->format('Y-m-d');
-                            $time = \Carbon\Carbon::parse($adv->schedule)->format('H:i');
+                        // Fechas
+                        $startDate = \Carbon\Carbon::parse($adv->start_date)->format('d/m/Y');
+                        $endDate   = \Carbon\Carbon::parse($adv->end_date)->format('d/m/Y');
+
+                        // Horas
+                        $startTime = \Carbon\Carbon::parse($adv->start_time)->format('H:i');
+                        $endTime   = \Carbon\Carbon::parse($adv->end_time)->format('H:i');
+
+                        // Día (ya viene como texto, solo aseguramos capitalización)
+                        $day = ucfirst($adv->day_of_week);
                         @endphp
 
-                        <tr class="border-b hover:bg-gray-50 transition">
 
-                            <td class="px-4 py-3">{{ $date }}</td>
-                            <td class="px-4 py-3">{{ $time }} hrs</td>
+                        <tr class="border-b hover:bg-gray-50 transition">
+                            <td class="px-4 py-3 font-semibold">
+                                📅 Del {{ $startDate }} al {{ $endDate }}
+                            </td>
+
+                            <td class="px-4 py-3 font-semibold">
+                                🕒 {{ $day }} {{ $startTime }} - {{ $endTime }}
+                            </td>
 
                             <td class="px-4 py-3 font-semibold">
                                 {{ $adv->teacherSubject->subject->name }}
@@ -70,9 +82,10 @@
                                 {{ $adv->teacherSubject->subject->career->name }}
                             </td>
 
-                            <td class="px-4 py-3 text-center font-bold">
-                                {{ $students->count() }}
+                           <td class="px-4 py-3 text-center font-bold">
+                                {{ optional($adv->advisoryDetail->students)->count() ?? 0 }}
                             </td>
+
 
                             <td class="px-4 py-3">{{ $adv->classroom ?? '---' }}</td>
 
@@ -81,7 +94,7 @@
                             <td class="px-4 py-3">
                                 <span class="px-3 py-1 rounded text-white text-sm
                                     @if($adv->advisoryDetail->status == 'Pending') bg-yellow-500
-                                    @elseif($adv->advisoryDetail->status == 'Approved') bg-green-600
+                                    @elseif($adv->advisoryDetail->status == 'Aprobado') bg-green-600
                                     @else bg-gray-600 @endif">
                                     {{ $adv->advisoryDetail->status }}
                                 </span>

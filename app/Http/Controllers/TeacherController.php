@@ -150,21 +150,21 @@ class TeacherController extends Controller
 
     public function myAdvisories()
     {
-        // obtener el usuario maestro logueado
-        $teacherUser = auth()->user()->user;
+           $teacherUser = auth()->user()->user;
 
-        $advisories = \App\Models\Advisories::with([
-            'teacherSubject.teacher',
-            'teacherSubject.subject.career',
-            'advisoryDetail.students'
-        ])
-            ->whereHas('teacherSubject', function ($q) use ($teacherUser) {
-                $q->where('teacher_user', $teacherUser);
-            })
-            ->orderBy('schedule', 'ASC')
-            ->get();
+    $advisories = \App\Models\Advisories::with([
+        'teacherSubject.teacher',
+        'teacherSubject.subject.career',
+        'advisoryDetail.students'
+    ])
+        ->whereHas('teacherSubject', function ($q) use ($teacherUser) {
+            $q->where('teacher_user', $teacherUser);
+        })
+        ->orderBy('start_date', 'ASC')
+        ->orderBy('start_time', 'ASC')
+        ->get();
 
-        return view('teachers.advisories.index', compact('advisories'));
+    return view('teachers.advisories.index', compact('advisories'));
     }
 
     public function showChangePasswordForm()

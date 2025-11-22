@@ -35,7 +35,7 @@
         {{-- Tabla --}}
         <div class="overflow-x-auto">
             <table class="w-full border-collapse rounded-lg overflow-hidden shadow">
-                <thead class="bg-gray-200 text-gray-700 text-sm uppercase">
+                <thead class="text-white uppercase text-xs font-semibold" style="background-color:#0B3D7E;">
                     <tr>
                         <th class="px-4 py-3">Matrícula</th>
                         <th class="px-4 py-3">Nombre</th>
@@ -77,11 +77,12 @@
 </td>
 
 
-                            <td class="px-4 py-3 text-center space-x-3">
+                            <td class="px-2 py-2 text-center flex justify-center gap-2">
 
                                 {{-- Editar --}}
                                 <a href="{{ route('teachers.students.edit', $student->enrollment) }}"
-                                   class="text-blue-600 hover:text-blue-800 font-medium">
+                                   class="px-3 py-1 rounded text-white font-semibold"
+                                    style="background-color:#F39C12;">
                                     Editar
                                 </a>
 
@@ -92,7 +93,8 @@
                                     @method('DELETE')
 
                                     <button
-                                        class="text-red-600 hover:text-red-800 font-medium"
+                                        class="px-3 py-1 rounded text-white font-semibold"
+                                    style="background-color:#E74C3C;"
                                         onclick="return confirm('¿Eliminar alumno?')">
                                         Eliminar
                                     </button>

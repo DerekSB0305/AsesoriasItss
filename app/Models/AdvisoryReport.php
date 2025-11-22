@@ -8,7 +8,7 @@ class AdvisoryReport extends Model
 {
         protected $fillable = [
         'advisory_id',
-        'report_type',
+        'description',
         'file_path',
     ];
 

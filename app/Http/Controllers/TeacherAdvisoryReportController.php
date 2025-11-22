@@ -42,7 +42,7 @@ class TeacherAdvisoryReportController extends Controller
         $advisory = Advisories::findOrFail($advisory_id);
 
         $request->validate([
-            'report_type' => 'required|in:previo,final',
+            'description' => 'nullable|string|max:255',
             'file'        => 'required|file|mimes:pdf,doc,docx,xls,xlsx|max:4096',
         ]);
 
@@ -64,7 +64,7 @@ class TeacherAdvisoryReportController extends Controller
 
         AdvisoryReport::create([
             'advisory_id' => $advisory->advisory_id,
-            'report_type' => $request->report_type,
+            'description' => $request->description,
             'file_path'   => $path,
         ]);
 
@@ -105,11 +105,11 @@ class TeacherAdvisoryReportController extends Controller
         $report = AdvisoryReport::findOrFail($id);
 
         $request->validate([
-            'report_type' => 'required|in:previo,final',
+            'description' => 'nullable|string|max:255',
             'file'        => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:4096',
         ]);
 
-        $report->report_type = $request->report_type;
+        $report->description = $request->description;
 
         if ($request->hasFile('file')) {
 

@@ -39,11 +39,16 @@ class StudentPanelController extends Controller
      * Ver asesorías donde el alumno está inscrito
      */
     public function advisories()
-    {
-        $student = Auth::user()->student;
-        $studentEnrollment = $student->enrollment;
+{
+    $student = Auth::user()->student;
 
-        $advisories = Advisories::whereHas('advisoryDetail.students', function ($q) use ($studentEnrollment) {
+    if (!$student) {
+        abort(403);
+    }
+
+    $studentEnrollment = $student->enrollment;
+
+    $advisories = Advisories::whereHas('advisoryDetail.students', function ($q) use ($studentEnrollment) {
             $q->where('advisory_detail_student.enrollment', $studentEnrollment);
         })
         ->with([
@@ -51,11 +56,14 @@ class StudentPanelController extends Controller
             'teacherSubject.teacher',
             'advisoryDetail'
         ])
-        ->orderBy('schedule', 'ASC')
+        ->orderBy('start_date', 'ASC')   // 📌 ORDENAR POR FECHA DE INICIO
+        ->orderBy('day_of_week', 'ASC')  // 📌 SEGUNDO ORDEN POR DÍA
+        ->orderBy('start_time', 'ASC')   // 📌 TERCERO POR HORA DE INICIO
         ->get();
 
-        return view('students.panel.advisories', compact('student', 'advisories'));
-    }
+    return view('students.panel.advisories', compact('student', 'advisories'));
+}
+
 
     /**
      * 📘 Manuales con buscador + filtros avanzados

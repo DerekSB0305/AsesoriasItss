@@ -9,92 +9,111 @@
 <body class="bg-gray-100 min-h-screen flex flex-col">
     <x-teachers-navbar/>
 
-     <div class="flex-grow p-6">
+    <div class="flex-grow p-6">
 
-<div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
+        <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
 
-    <h2 class="text-2xl font-bold mb-4">
-        📘 Reportes — {{ $advisory->teacherSubject->subject->name }}
-    </h2>
+            {{-- Encabezado --}}
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">
+                📘 Reportes — {{ $advisory->teacherSubject->subject->name }}
+            </h2>
 
-    <p class="mb-4 text-gray-600">
-        Fecha/Hora: <strong>{{ $advisory->schedule }}</strong>
-    </p>
+            {{-- Información de la asesoría --}}
+            <p class="mb-4 text-gray-600">
+                <strong>Fecha:</strong>
+                {{ \Carbon\Carbon::parse($advisory->start_date)->format('d/m/Y') }}
+                —
+                {{ \Carbon\Carbon::parse($advisory->end_date)->format('d/m/Y') }}
+                <br>
+                <strong>Horario:</strong>
+                {{ ucfirst($advisory->day_of_week) }} 
+                {{ \Carbon\Carbon::parse($advisory->start_time)->format('H:i') }}
+                -
+                {{ \Carbon\Carbon::parse($advisory->end_time)->format('H:i') }}
+            </p>
 
-    <a href="{{ route('teachers.advisories.index') }}"
-       class="text-green-600 hover:text-green-800 mb-6 inline-block">
-        ← Volver
-    </a>
+            <a href="{{ route('teachers.advisories.index') }}"
+                class="text-green-600 hover:text-green-800 mb-6 inline-block font-semibold">
+                ← Volver
+            </a>
 
-    @if ($reports->count() == 0)
-        <p class="text-gray-500">No hay reportes subidos para esta asesoría.</p>
-    @else
+            {{-- Si no hay reportes --}}
+            @if ($reports->count() == 0)
 
-    <table class="w-full border-collapse">
-        <thead class="bg-gray-200 text-gray-700">
-            <tr>
-                <th class="px-4 py-2">Tipo</th>
-                <th class="px-4 py-2">Archivo</th>
-                <th class="px-4 py-2">Fecha subida</th>
-                <th class="px-4 py-2 text-center">Acciones</th>
-            </tr>
-        </thead>
+                <p class="text-gray-500 text-lg">
+                    No hay reportes subidos para esta asesoría.
+                </p>
 
-        <tbody>
-            @foreach ($reports as $r)
-            <tr class="border-b hover:bg-gray-50">
+            @else
 
-                {{-- Tipo --}}
-                <td class="px-4 py-2">
-                    {{ ucfirst($r->report_type) }}
-                </td>
+                <table class="w-full border-collapse rounded-lg overflow-hidden">
+                    <thead class="bg-gray-200 text-gray-700 text-sm uppercase">
+                        <tr>
+                            <th class="px-4 py-2">Descripción</th>
+                            <th class="px-4 py-2">Archivo</th>
+                            <th class="px-4 py-2">Fecha subida</th>
+                            <th class="px-4 py-2 text-center">Acciones</th>
+                        </tr>
+                    </thead>
 
-                {{-- Archivo --}}
-                <td class="px-4 py-2">
-                    <a href="{{ asset('storage/'.$r->file_path) }}" 
-                       download 
-                       class="text-blue-600 hover:underline">
-                        📄 Descargar
-                    </a>
-                </td>
+                    <tbody class="text-gray-700">
+                        @foreach ($reports as $r)
+                        <tr class="border-b hover:bg-gray-50 transition">
 
-                {{-- Fecha --}}
-                <td class="px-4 py-2">
-                    {{ $r->created_at->format('Y-m-d H:i') }}
-                </td>
+                            {{-- Descripción --}}
+                            <td class="px-4 py-2">
+                                {{ $r->description ? $r->description : '---' }}
+                            </td>
 
-                {{-- ACCIONES --}}
-                <td class="px-4 py-2 text-center flex gap-3 justify-center">
+                            {{-- Archivo --}}
+                            <td class="px-4 py-2">
+                                <a href="{{ asset('storage/'.$r->file_path) }}"
+                                    download
+                                    class="text-blue-600 hover:underline">
+                                    📄 Descargar
+                                </a>
+                            </td>
 
-                    {{-- EDITAR --}}
-                    <a href="{{ route('teachers.advisories.reports.edit', $r->id) }}"
-                       class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 text-sm">
-                        ✏️ Editar
-                    </a>
+                            {{-- Fecha --}}
+                            <td class="px-4 py-2">
+                                {{ $r->created_at->format('d/m/Y H:i') }}
+                            </td>
 
-                    {{-- ELIMINAR --}}
-                    <form action="{{ route('teachers.advisories.reports.destroy', $r->id) }}"
-                          method="POST"
-                          onsubmit="return confirm('¿Eliminar este reporte?')" >
-                        @csrf
-                        @method('DELETE')
+                            {{-- Acciones --}}
+                            <td class="px-4 py-2 text-center flex gap-3 justify-center">
 
-                        <button class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm">
-                            🗑️ Eliminar
-                        </button>
-                    </form>
+                                {{-- EDITAR --}}
+                                <a href="{{ route('teachers.advisories.reports.edit', $r->id) }}"
+                                    class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 text-sm">
+                                    ✏️ Editar
+                                </a>
 
-                </td>
+                                {{-- ELIMINAR --}}
+                                <form action="{{ route('teachers.advisories.reports.destroy', $r->id) }}"
+                                      method="POST"
+                                      onsubmit="return confirm('¿Eliminar este reporte?');">
+                                    @csrf
+                                    @method('DELETE')
 
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+                                    <button class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm">
+                                        🗑️ Eliminar
+                                    </button>
+                                </form>
 
-    @endif
+                            </td>
 
-</div>
-</div>
+                        </tr>
+                        @endforeach
+                    </tbody>
+
+                </table>
+
+            @endif
+
+        </div>
+
+    </div>
+
     <x-basic-sciences-footer />
 </body>
 </html>

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('advisory_reports', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('advisory_id');
-            $table->enum('report_type', ['previo', 'final'])->default('previo');
+            $table->string('description')->nullable();
             $table->string('file_path');
             $table->timestamps();
 
