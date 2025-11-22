@@ -43,7 +43,7 @@ class StudentPanelController extends Controller
         $student = Auth::user()->student;
         $studentEnrollment = $student->enrollment;
 
-        $advisories = \App\Models\Advisories::whereHas('advisoryDetail.students', function ($q) use ($studentEnrollment) {
+        $advisories = Advisories::whereHas('advisoryDetail.students', function ($q) use ($studentEnrollment) {
             $q->where('advisory_detail_student.enrollment', $studentEnrollment);
         })
         ->with([
@@ -58,21 +58,78 @@ class StudentPanelController extends Controller
     }
 
     /**
-     * Ver manuales según su carrera
+     * 📘 Manuales con buscador + filtros avanzados
      */
-    public function manuals()
+    public function manuals(Request $request)
     {
         $student = Auth::user()->student;
-
         if (!$student) abort(403);
 
-        $manuals = Manual::whereHas('teacherSubject', function ($q) use ($student) {
+        // 🔎 Parámetros del filtro
+        $search        = $request->q;
+        $filterSubject = $request->subject;
+        $filterTeacher = $request->teacher;
+
+        // Query base — manuales solo de su carrera
+        $query = Manual::with(['teacherSubject.subject', 'teacherSubject.teacher'])
+            ->whereHas('teacherSubject', function ($q) use ($student) {
+                $q->where('career_id', $student->career_id);
+            });
+
+        // 🔎 Buscador general
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'LIKE', "%$search%")
+                  ->orWhereHas('teacherSubject.subject', function ($s) use ($search) {
+                      $s->where('name', 'LIKE', "%$search%");
+                  });
+            });
+        }
+
+        // 📘 Filtro por materia
+        if ($filterSubject) {
+            $query->whereHas('teacherSubject', function ($q) use ($filterSubject) {
+                $q->where('subject_id', $filterSubject);
+            });
+        }
+
+        // 👨‍🏫 Filtro por maestro
+        if ($filterTeacher) {
+            $query->whereHas('teacherSubject', function ($q) use ($filterTeacher) {
+                $q->where('teacher_user', $filterTeacher);
+            });
+        }
+
+        // Resultado final
+        $manuals = $query->orderBy('created_at', 'desc')->get();
+
+        // Materias disponibles para filtros
+        $availableSubjects = Manual::whereHas('teacherSubject', function ($q) use ($student) {
             $q->where('career_id', $student->career_id);
         })
-        ->with(['teacherSubject.subject', 'teacherSubject.teacher'])
-        ->get();
+        ->with('teacherSubject.subject')
+        ->get()
+        ->pluck('teacherSubject.subject')
+        ->unique('subject_id');
 
-        return view('students.panel.manuals', compact('student', 'manuals'));
+        // Maestros disponibles para filtros
+        $availableTeachers = Manual::whereHas('teacherSubject', function ($q) use ($student) {
+            $q->where('career_id', $student->career_id);
+        })
+        ->with('teacherSubject.teacher')
+        ->get()
+        ->pluck('teacherSubject.teacher')
+        ->unique('teacher_user');
+
+        return view('students.panel.manuals', compact(
+            'student',
+            'manuals',
+            'availableSubjects',
+            'availableTeachers',
+            'search',
+            'filterSubject',
+            'filterTeacher'
+        ));
     }
 
     /**

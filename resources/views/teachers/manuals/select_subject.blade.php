@@ -32,23 +32,35 @@
         {{-- Materias --}}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-            @forelse ($subjects as $sub)
+        @forelse ($subjects as $sub)
 
+            @php
+                $yaTieneManual = \App\Models\Manual::where('teacher_subject_id', $sub->teacher_subject_id)->exists();
+            @endphp
+
+            @if (!$yaTieneManual)
                 <a href="{{ route('teachers.manuals.create', $sub->teacher_subject_id) }}"
-                    class="p-5 bg-indigo-50 rounded-lg shadow hover:bg-indigo-100 transition block">
-
+                class="p-5 bg-indigo-50 rounded-lg shadow hover:bg-indigo-100 transition block">
                     <h2 class="text-xl font-semibold text-indigo-700 mb-1">
                         {{ $sub->subject->name }}
                     </h2>
-
                     <p class="text-gray-600 text-sm">
                         Carrera: {{ $sub->subject->career->name }}
                     </p>
                 </a>
+            @else
+                <div class="p-5 bg-gray-200 rounded-lg shadow opacity-60">
+                    <h2 class="text-xl font-semibold text-gray-500 mb-1">
+                        {{ $sub->subject->name }}
+                    </h2>
+                    <p class="text-gray-500 text-sm">Ya tiene un manual registrado</p>
+                </div>
+            @endif
 
-            @empty
-                <p class="text-gray-600">No tienes materias asignadas.</p>
-            @endforelse
+        @empty
+            <p class="text-gray-600">No tienes materias asignadas.</p>
+        @endforelse
+
 
         </div>
 

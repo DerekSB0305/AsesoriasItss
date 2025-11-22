@@ -17,7 +17,7 @@ class ManualController extends Controller
     {
         $teacherUser = Auth::user()->teacher->teacher_user;
 
-        // Solo las materias del maestro
+        // Solo manuales de materias del maestro
         $manuals = Manual::whereHas('teacherSubject', function ($q) use ($teacherUser) {
             $q->where('teacher_user', $teacherUser);
         })->get();
@@ -25,18 +25,20 @@ class ManualController extends Controller
         return view('teachers.manuals.index', compact('manuals'));
     }
 
+    /**
+     * Seleccionar materia para subir manual
+     */
     public function selectSubject()
     {
         $teacherUser = Auth::user()->teacher->teacher_user;
 
-        // Ver materias del maestro
-        $subjects = \App\Models\TeacherSubject::with(['subject', 'subject.career'])
+        // Todas las materias del maestro
+        $subjects = TeacherSubject::with(['subject', 'subject.career'])
             ->where('teacher_user', $teacherUser)
             ->get();
 
         return view('teachers.manuals.select_subject', compact('subjects'));
     }
-
 
     /**
      * Formulario para subir manual
@@ -45,8 +47,17 @@ class ManualController extends Controller
     {
         $teacherSubject = TeacherSubject::findOrFail($teacher_subject_id);
 
-        // Validar acceso del maestro a la materia
+        // Validar que pertenece al maestro
         $this->authorizeTeacherSubject($teacherSubject);
+
+        // RESTRICCIÓN: Solo permitir 1 manual por materia
+        $manualExiste = Manual::where('teacher_subject_id', $teacher_subject_id)->exists();
+
+        if ($manualExiste) {
+            return redirect()
+                ->route('teachers.manuals.index')
+                ->with('error', 'Ya existe un manual para esta materia. Solo puedes subir uno.');
+        }
 
         return view('teachers.manuals.create', compact('teacherSubject'));
     }
@@ -61,18 +72,27 @@ class ManualController extends Controller
         // Validar que la materia pertenece al maestro
         $this->authorizeTeacherSubject($teacherSubject);
 
+        // RESTRICCIÓN: Solo 1 manual por materia
+        $manualExiste = Manual::where('teacher_subject_id', $teacher_subject_id)->exists();
+
+        if ($manualExiste) {
+            return redirect()
+                ->route('teachers.manuals.index')
+                ->with('error', 'Esta materia ya tiene un manual registrado.');
+        }
+
         $request->validate([
             'title' => 'required|string|max:150',
-            'file'  => 'required|file|mimes:pdf,doc,docx,ppt,pptx|max:5120', // 5MB
+            'file'  => 'required|file|mimes:pdf,doc,docx,ppt,pptx|max:5120',
         ]);
 
-        // Subida del archivo
+        // Subir archivo con nombre original
         $file = $request->file('file');
         $origName = $file->getClientOriginalName();
         $filename = $origName;
         $dir = "manuals";
 
-        // Evitar conflictos de nombres
+        // Evitar duplicados en el storage
         $counter = 1;
         while (Storage::disk('public')->exists("$dir/$filename")) {
             $filename = pathinfo($origName, PATHINFO_FILENAME)
@@ -115,26 +135,29 @@ class ManualController extends Controller
     }
 
     /**
-     * Función para validar que el maestro de ciencias básicas tenga acceso
+     * Validar que el maestro pueda acceder
      */
     private function authorizeTeacherSubject($teacherSubject)
     {
         $teacher = Auth::user()->teacher;
 
-        // 1. Verificar que es de ciencias básicas
+        // 1. Debe ser docente de ciencias básicas
         if (!$teacher->science_department) {
             abort(403, 'No tienes permisos para subir manuales.');
         }
 
-        // 2. Verificar que la materia sí pertenece al maestro logueado
+        // 2. Debe impartir esa materia
         if ($teacherSubject->teacher_user !== $teacher->teacher_user) {
             abort(403, 'No puedes subir manuales de materias que no impartes.');
         }
     }
 
+    /**
+     * Vista para Ciencias Básicas (admin)
+     */
     public function listManuals()
     {
-        $manuals = \App\Models\Manual::with([
+        $manuals = Manual::with([
             'teacherSubject.teacher',
             'teacherSubject.subject.career'
         ])
@@ -144,23 +167,25 @@ class ManualController extends Controller
         return view('basic_sciences.manuals.index', compact('manuals'));
     }
 
+    /**
+     * Vista para Jefes de Carrera
+     */
     public function indexCareerHead()
-{
-    $admin = Auth::user()->administrative;
+    {
+        $admin = Auth::user()->administrative;
 
-    if (!$admin) {
-        return back()->withErrors(['error' => 'Tu cuenta no está registrada como Jefe de Carrera.']);
+        if (!$admin) {
+            return back()->withErrors(['error' => 'Tu cuenta no está registrada como Jefe de Carrera.']);
+        }
+
+        $careerId = $admin->career_id;
+
+        $manuals = Manual::with(['teacherSubject.teacher', 'teacherSubject.subject'])
+            ->whereHas('teacherSubject', function ($q) use ($careerId) {
+                $q->where('career_id', $careerId);
+            })
+            ->get();
+
+        return view('career_head.manuals.index', compact('manuals'));
     }
-
-    $careerId = $admin->career_id;
-
-    $manuals = Manual::with(['teacherSubject.teacher', 'teacherSubject.subject'])
-        ->whereHas('teacherSubject', function ($q) use ($careerId) {
-            $q->where('career_id', $careerId);
-        })
-        ->get();
-
-    return view('career_head.manuals.index', compact('manuals'));
-}
-
 }
