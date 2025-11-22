@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Advisories;
 use App\Models\Advisory_details;
-use App\Models\TeacherSubject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -43,8 +42,8 @@ class AdvisoriesController extends Controller
             'enrollment',
             $detail->students->pluck('enrollment')
         )
-            ->pluck('teacher_user')
-            ->toArray();
+        ->pluck('teacher_user')
+        ->toArray();
 
         $teacherSubjects = \App\Models\TeacherSubject::with(['teacher', 'subject', 'career'])
             ->whereNotIn('teacher_user', $tutorUsers)
@@ -58,27 +57,29 @@ class AdvisoriesController extends Controller
         $request->validate([
             'advisory_detail_id' => 'required|exists:advisory_details,advisory_detail_id',
             'teacher_subject_id' => 'required|exists:teacher_subjects,teacher_subject_id',
+
+            'start_date'         => 'required|date',
+            'end_date'           => 'required|date|after_or_equal:start_date',
+
             'day_of_week'        => 'required|string',
+
             'start_time'         => 'required|date_format:H:i',
             'end_time'           => 'required|date_format:H:i|after:start_time',
+
             'classroom'          => 'nullable|string|max:10',
             'building'           => 'nullable|string|max:10',
+
             'assignment_file'    => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:4096',
         ]);
 
-        // ---------------------------
-        // VALIDAR HORARIO PERMITIDO
-        // ---------------------------
+        // Rango válido
         if ($request->start_time < "07:00" || $request->end_time > "16:00") {
             return back()->withErrors([
                 'start_time' => 'Las asesorías solo pueden ser entre 7:00 AM y 4:00 PM.'
             ])->withInput();
         }
 
-        // -------------------------------------
-        // VALIDACIÓN: MAESTRO NO PUEDE TENER DOS
-        // ASESORÍAS MISMO DÍA NI HORAS CRUZADAS
-        // -------------------------------------
+        // Validar maestro — mismo día y horas cruzadas
         $conflictoMaestro = Advisories::where('teacher_subject_id', $request->teacher_subject_id)
             ->where('day_of_week', $request->day_of_week)
             ->where(function ($q) use ($request) {
@@ -89,13 +90,11 @@ class AdvisoriesController extends Controller
 
         if ($conflictoMaestro) {
             return back()->withErrors([
-                'start_time' => 'El maestro ya tiene una asesoría ese día y en ese horario.'
+                'start_time' => 'El maestro ya tiene una asesoría ese día y horario.'
             ])->withInput();
         }
 
-        // -------------------------------------
-        // VALIDACIÓN: AULA OCUPADA
-        // -------------------------------------
+        // Validar aula
         if ($request->classroom) {
             $conflictoAula = Advisories::where('classroom', $request->classroom)
                 ->where('day_of_week', $request->day_of_week)
@@ -112,48 +111,50 @@ class AdvisoriesController extends Controller
             }
         }
 
-        // -------------------------------------
-        // VALIDACIÓN: ALUMNO SOLO UNA A LA VEZ
-        // -------------------------------------
+        // Validar alumno
         $detail = Advisory_details::with('students')->find($request->advisory_detail_id);
 
         foreach ($detail->students as $student) {
-            $asignado = Advisories::whereHas('advisoryDetail.students', function ($q) use ($student) {
-                    $q->where('students.enrollment', $student->enrollment);
-                })
-                ->whereHas('advisoryDetail', function ($q) {
-                    $q->where('status', 'Aprobado');
-                })
-                ->exists();
 
-            if ($asignado) {
+            $yaTiene = Advisories::whereHas('advisoryDetail.students', function ($q) use ($student) {
+                $q->where('students.enrollment', $student->enrollment);
+            })
+            ->whereHas('advisoryDetail', function ($q) {
+                $q->where('status', 'Aprobado');
+            })
+            ->exists();
+
+            if ($yaTiene) {
                 return back()->withErrors([
                     'start_time' => "El alumno {$student->name} ({$student->enrollment}) ya tiene una asesoría activa."
                 ])->withInput();
             }
         }
 
-        // Guardar archivo con nombre original
+        // Archivo
         $path = null;
         if ($request->hasFile('assignment_file')) {
             $file = $request->file('assignment_file');
-            $originalName = $file->getClientOriginalName();
-            $path = $file->storeAs('assignments', $originalName, 'public');
+            $path = $file->storeAs('assignments', $file->getClientOriginalName(), 'public');
         }
 
         // Crear asesoría
         $advisory = Advisories::create([
             'advisory_detail_id' => $request->advisory_detail_id,
             'teacher_subject_id' => $request->teacher_subject_id,
+
+            'start_date'         => $request->start_date,
+            'end_date'           => $request->end_date,
             'day_of_week'        => $request->day_of_week,
+
             'start_time'         => $request->start_time,
             'end_time'           => $request->end_time,
+
             'classroom'          => $request->classroom,
             'building'           => $request->building,
             'assignment_file'    => $path,
         ]);
 
-        // Cambiar estado del detalle
         $detail->update(['status' => 'Aprobado']);
 
         return redirect()->route('basic_sciences.advisories.index')
@@ -177,21 +178,26 @@ class AdvisoriesController extends Controller
         $advisory = Advisories::findOrFail($id);
 
         $request->validate([
+            'start_date'   => 'required|date',
+            'end_date'     => 'required|date|after_or_equal:start_date',
             'day_of_week'  => 'required|string',
+
             'start_time'   => 'required|date_format:H:i',
             'end_time'     => 'required|date_format:H:i|after:start_time',
+
             'classroom'    => 'nullable|string|max:10',
             'building'     => 'nullable|string|max:10',
+
             'assignment_file' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:4096',
             'status'       => 'nullable|string|in:Aprobado,Finalizado'
         ]);
 
-        // Horario válido
+        // Validar horario
         if ($request->start_time < "07:00" || $request->end_time > "16:00") {
-            return back()->withErrors(['start_time' => 'Horario fuera de rango.'])->withInput();
+            return back()->withErrors(['start_time' => 'Horario fuera de rango.']);
         }
 
-        // Validar choque maestro
+        // Validación maestro
         $conflictoMaestro = Advisories::where('teacher_subject_id', $advisory->teacher_subject_id)
             ->where('day_of_week', $request->day_of_week)
             ->where('advisory_id', '!=', $id)
@@ -202,7 +208,9 @@ class AdvisoriesController extends Controller
             ->exists();
 
         if ($conflictoMaestro) {
-            return back()->withErrors(['start_time' => 'El maestro ya tiene una asesoría ese día/hora.'])->withInput();
+            return back()->withErrors([
+                'start_time' => 'El maestro ya tiene otra asesoría ese día/hora.'
+            ]);
         }
 
         // Validar aula
@@ -217,24 +225,27 @@ class AdvisoriesController extends Controller
                 ->exists();
 
             if ($conflictoAula) {
-                return back()->withErrors(['classroom' => 'El aula ya está ocupada.'])->withInput();
+                return back()->withErrors(['classroom' => 'El aula ya está ocupada.']);
             }
         }
 
         // Archivo
         if ($request->hasFile('assignment_file')) {
-            if ($advisory->assignment_file && Storage::disk('public')->exists($advisory->assignment_file)) {
+
+            if ($advisory->assignment_file &&
+                Storage::disk('public')->exists($advisory->assignment_file)) {
                 Storage::disk('public')->delete($advisory->assignment_file);
             }
 
             $file = $request->file('assignment_file');
-            $originalName = $file->getClientOriginalName();
-            $path = $file->storeAs('assignments', $originalName, 'public');
+            $path = $file->storeAs('assignments', $file->getClientOriginalName(), 'public');
             $advisory->assignment_file = $path;
         }
 
-        // Actualizar
+        // Guardar cambios
         $advisory->update([
+            'start_date'  => $request->start_date,
+            'end_date'    => $request->end_date,
             'day_of_week' => $request->day_of_week,
             'start_time'  => $request->start_time,
             'end_time'    => $request->end_time,
