@@ -63,6 +63,32 @@ return [
         'user' => [
             'unique' => 'Este usuario ya está siendo usado.',
         ],
+         'start_date' => [
+        'required' => 'La fecha de inicio es obligatoria.',
+        'date' => 'La fecha de inicio no es válida.',
+    ],
+
+    'end_date' => [
+        'required' => 'La fecha de fin es obligatoria.',
+        'date' => 'La fecha de fin no es válida.',
+        'after_or_equal' => 'La fecha de fin debe ser posterior o igual a la fecha de inicio.',
+    ],
+
+    'day_of_week' => [
+        'required' => 'Seleccione un día de la semana.',
+    ],
+
+    'start_time' => [
+        'required' => 'La hora de inicio es obligatoria.',
+        'date_format' => 'La hora de inicio debe estar en formato HH:mm.',
+        'after' => 'La hora de inicio debe ser antes de la hora de fin.',
+    ],
+
+    'end_time' => [
+        'required' => 'La hora de fin es obligatoria.',
+        'date_format' => 'La hora de fin debe estar en formato HH:mm.',
+        'after' => 'La hora de fin debe ser posterior a la hora de inicio.',
+    ],
     ],
 
 
