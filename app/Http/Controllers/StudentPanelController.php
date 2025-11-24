@@ -40,6 +40,21 @@ class StudentPanelController extends Controller
      */
     public function advisories()
 {
+    // 🔥 Actualizar asesorías vencidas ANTES de ver las del estudiante
+    $hoy = now()->toDateString();
+
+    $asesoriasVencidas = Advisories::where('end_date', '<', $hoy)
+        ->whereHas('advisoryDetail', function ($q) {
+            $q->where('status', 'Aprobado');
+        })
+        ->get();
+
+    foreach ($asesoriasVencidas as $item) {
+        $item->advisoryDetail->update([
+            'status' => 'Finalizado'
+        ]);
+    }
+
     $student = Auth::user()->student;
 
     if (!$student) {

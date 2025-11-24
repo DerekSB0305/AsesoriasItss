@@ -150,6 +150,21 @@ class TeacherController extends Controller
 
     public function myAdvisories()
     {
+        // 🔥 Actualizar asesorías vencidas ANTES de mostrar las del maestro
+    $hoy = now()->toDateString();
+
+    $asesoriasVencidas = Advisories::where('end_date', '<', $hoy)
+        ->whereHas('advisoryDetail', function ($q) {
+            $q->where('status', 'Aprobado');
+        })
+        ->get();
+
+    foreach ($asesoriasVencidas as $item) {
+        $item->advisoryDetail->update([
+            'status' => 'Finalizado'
+        ]);
+    }
+
            $teacherUser = auth()->user()->user;
 
     $advisories = \App\Models\Advisories::with([
