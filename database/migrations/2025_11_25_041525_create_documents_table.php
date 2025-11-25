@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('advisory_details', function (Blueprint $table) {
-            $table->id('advisory_detail_id');
-            $table->string('status', 10)->default('Pending');
-            $table->string('observations', 100)->nullable();
-            $table->timestamps(); 
+        Schema::create('documents', function (Blueprint $table) {
+            $table->id('document_id');
+            $table->string('name');
+            $table->string('file_path');
+            $table->timestamps();
         });
     }
 
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('advisory_details');
+        Schema::dropIfExists('documents');
     }
 };

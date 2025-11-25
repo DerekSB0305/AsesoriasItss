@@ -11,6 +11,8 @@
     {{-- NAVBAR --}}
     <x-basic-sciences-navbar />
 
+<main class="flex-grow">
+
 <div class="w-[95%] max-w-7xl mx-auto bg-white shadow-lg rounded-xl p-8 my-12">
 
     {{-- Título --}}
@@ -149,22 +151,22 @@
                 Cancelar
             </button>
 
-            <form id="deleteForm" method="POST" class="inline">
-                @csrf
+                <form id="deleteForm" method="POST" class="inline">
+                  @csrf
                 @method('DELETE')
 
-                <button type="submit"
+                    <button type="submit"
                         class="px-4 py-2 rounded text-white font-bold shadow"
                         style="background-color:#E74C3C;">
                     Eliminar
-                </button>
-            </form>
+                 </button>
+                </form>
+
+         </div>
 
         </div>
-
     </div>
-</div>
-
+</main>
 <x-basic-sciences-footer />
 
 <script>

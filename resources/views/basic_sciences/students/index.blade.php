@@ -25,6 +25,19 @@
                 </a>
             </div>
 
+            {{-- BUSCADOR --}}
+        <form method="GET" class="flex flex-col md:flex-row gap-3 mb-6">
+            <input type="text"
+            name="buscar"
+            value="{{ request('buscar') }}"
+            placeholder="Buscar por matrícula o carrera..."
+            class="px-4 py-2 border rounded-lg w-full md:w-80 focus:ring-2 focus:ring-[#0B3D7E]">
+                <button class="px-4 py-2 bg-[#159a82] text-white rounded-lg shadow hover:bg-[#0f7a62]">
+                    🔍 Buscar
+                </button>
+        </form>
+
+
             <div class="overflow-x-auto">
                 <table class="w-full border-collapse rounded-lg overflow-hidden shadow">
 

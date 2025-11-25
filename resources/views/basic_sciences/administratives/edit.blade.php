@@ -10,6 +10,8 @@
 
     <x-basic-sciences-navbar />
 
+<main class="flex-grow">
+
     <div class="w-full max-w-3xl mx-auto bg-white shadow-xl rounded-xl p-8 mt-8 mb-8">
 
         <h1 class="text-3xl font-bold text-[#0B3D7E] mb-6 flex items-center gap-2">
@@ -112,6 +114,7 @@
 
         </form>
     </div>
+</main>
 
     <x-basic-sciences-footer/>
 

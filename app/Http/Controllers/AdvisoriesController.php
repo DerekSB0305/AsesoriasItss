@@ -21,13 +21,13 @@ class AdvisoriesController extends Controller
                 $q->where('status', 'Aprobado');
             })
             ->get();
-            //  Actualizar su estado a Finalizado
+        //  Actualizar su estado a Finalizado
         foreach ($asesoriasVencidas as $item) {
             $item->advisoryDetail->update([
                 'status' => 'Finalizado'
             ]);
         }
-        
+
         $query = Advisories::with(['teacherSubject.teacher', 'teacherSubject.subject', 'advisoryDetail']);
 
         if ($request->q) {
@@ -330,16 +330,53 @@ class AdvisoriesController extends Controller
 
         $careerId = $admin->career_id;
 
-        $advisories = Advisories::with([
+        $query = Advisories::with([
             'teacherSubject.teacher',
             'teacherSubject.subject',
             'advisoryDetail.students'
         ])
-            ->whereHas('teacherSubject', function ($q) use ($careerId) {
-                $q->where('career_id', $careerId);
-            })
-            ->get();
+            ->whereHas('teacherSubject.teacher', function ($q) use ($careerId) {
+                $q->where('career_id', $careerId);   // Maestro pertenece a MI carrera
+            });
+
+
+        // Filtro por maestro
+        if (request('maestro')) {
+            $search = request('maestro');
+            $query->whereHas('teacherSubject.teacher', function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                    ->orWhere('last_name_f', 'like', "%$search%");
+            });
+        }
+
+        // Filtro por estado
+        if (request('estado')) {
+            $query->whereHas('advisoryDetail', function ($q) {
+                $q->where('status', request('estado'));
+            });
+        }
+
+        $advisories = $query->orderBy('start_date')->get();
 
         return view('career_head.advisories.index', compact('advisories'));
+    }
+
+    public function detailsCareerHead($id)
+    {
+        $advisory = Advisories::with([
+            'teacherSubject.teacher',
+            'teacherSubject.subject',
+            'advisoryDetail.students',
+            'reports'
+        ])->findOrFail($id);
+
+        return view('career_head.advisories.individual_details', [
+            'advisory' => $advisory,
+            'students' => $advisory->advisoryDetail->students,
+            'total'    => $advisory->advisoryDetail->students->count(),
+            'hombres'  => $advisory->advisoryDetail->students->where('gender', 'Masculino')->count(),
+            'mujeres'  => $advisory->advisoryDetail->students->where('gender', 'Femenino')->count(),
+            'reports'  => $advisory->reports // ← AQUI SE ARREGLA TODO
+        ]);
     }
 }

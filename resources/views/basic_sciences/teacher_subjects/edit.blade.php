@@ -10,6 +10,8 @@
 <body class="bg-gray-100 min-h-screen flex flex-col">
     <x-basic-sciences-navbar />
 
+    <main class="flex-grow">
+
 <div  class="w-full max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8 mt-8">
 
     <h1 class="text-3xl font-bold text-gray-800 mb-6">✏ Editar Asignación</h1>
@@ -104,6 +106,9 @@
 
 
 </div>
+
+    </main>
+    
     <x-basic-sciences-footer />
 
 </body>

@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('position', 50);
             $table->unsignedBigInteger('career_id')->nullable();
             $table->foreign('career_id')->references('career_id')->on('careers')->onDelete('cascade');
-            $table->string('canalization_file', 45)->nullable();
             $table->timestamps();
         });
     }

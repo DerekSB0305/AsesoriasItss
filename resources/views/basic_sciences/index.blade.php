@@ -15,6 +15,9 @@
     {{-- NAVBAR --}}
     <x-basic-sciences-navbar />
 
+    
+     {{-- CONTENIDO PRINCIPAL --}}
+
     <div class="py-8 px-4">
         <div class="max-w-6xl mx-auto">
 
@@ -110,6 +113,16 @@
 
                     <h2 class="text-center font-bold text-base text-gray-700">
                         📘 Ver Manuales
+                    </h2>
+                </a>
+
+                <a href="{{ route('basic_sciences.documents.index') }}"
+                   class="bg-white shadow-md rounded-xl p-4 hover:shadow-xl transition transform hover:-translate-y-0.5 flex flex-col items-center gap-2">
+
+                    <span class="material-icons text-pink-700" style="font-size:64px;">folder_shared</span>
+
+                    <h2 class="text-center font-bold text-base text-gray-700">
+                        📁 Gestionar Documentos
                     </h2>
                 </a>
 

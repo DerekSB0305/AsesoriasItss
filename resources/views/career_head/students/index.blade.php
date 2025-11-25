@@ -8,111 +8,172 @@
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-<x-basic-sciences-navbar />
+<x-career-head-navbar />
 
-<div class="max-w-6xl mx-auto bg-white shadow-lg rounded-xl p-8 my-10">
+<div class="flex-grow">
 
-    <h1 class="text-3xl font-bold text-[#0B3D7E] mb-6">
-        🎓 Estudiantes de mi Carrera
-    </h1>
+    <div class="max-w-[95%] mx-auto bg-white shadow-xl rounded-xl p-8 my-10">
 
-    <div class="overflow-x-auto">
-        <table class="w-full border-collapse shadow">
+        <h1 class="text-4xl font-extrabold text-[#0B3D7E] mb-6 text-center">
+            🎓 Estudiantes de mi Carrera
+        </h1>
 
-            <thead style="background-color:#0B3D7E;" class="text-white font-bold">
-                <tr>
-                    <th class="px-4 py-3 text-left">Matrícula</th>
-                    <th class="px-4 py-3 text-left">Nombre</th>
-                    <th class="px-4 py-3 text-left">Apellido Paterno</th>
-                    <th class="px-4 py-3 text-left">Apellido Materno</th>
-                    <th class="px-4 py-3 text-left">Carrera</th>
-                    <th class="px-4 py-3 text-left">Semestre</th>
-                    <th class="px-4 py-3 text-left">Grupo</th>
-                    <th class="px-4 py-3 text-left">Género</th>
-                    <th class="px-4 py-3 text-left">Edad</th>
-                    <th class="px-4 py-3 text-left">Maestro tutor</th>
-                    <th class="px-4 py-3 text-left">Horario</th>
-                    <th class="px-4 py-3 text-left">Horario de asesoría</th>
-                </tr>
-            </thead>
+        {{-- BOTÓN VOLVER Y BUSCADOR --}}
+        <div class="flex flex-col md:flex-row md:justify-between gap-4 mb-6">
 
-            <tbody class="text-gray-700">
+            <a href="{{ route('career_head.index') }}"
+            class="px-4 py-2 w-full md:w-auto rounded-lg bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold text-center">
+                ← Volver al inicio
+            </a>
 
-                @foreach ($students as $s)
-                    @php
-                        // colección de detalles de asesoría (si algo fallara, caemos a collect())
-                        $details = $s->advisoryDetails ?? collect();
-                        $lastDetail = $details->last();
-                    @endphp
+            <form class="flex gap-3 w-full md:w-auto" method="GET">
+                <input type="text"
+                    name="matricula"
+                    value="{{ request('matricula') }}"
+                    placeholder="Buscar por matrícula..."
+                    class="px-4 py-2 border rounded-lg w-full md:w-72 focus:ring-2 focus:ring-[#0B3D7E]">
+                <button class="px-4 py-2 bg-[#1ABC9C] text-white rounded-lg">
+                    🔍 Buscar
+                </button>
+            </form>
 
-                    <tr class="border-b hover:bg-gray-50 transition">
+        </div>
 
-                        <td class="px-4 py-3">{{ $s->enrollment }}</td>
-                        <td class="px-4 py-3">{{ $s->name }}</td>
-                        <td class="px-4 py-3">{{ $s->last_name_f }}</td>
-                        <td class="px-4 py-3">{{ $s->last_name_m }}</td>
+        {{-- TABLA SIN SCROLL HORIZONTAL --}}
+        <div class="rounded-xl border shadow">
+            <table class="w-full table-auto text-sm">
 
-                        <td class="px-4 py-3">
-                            {{ $s->career->name ?? 'Sin carrera' }}
-                        </td>
+                <thead class="text-white uppercase font-semibold" style="background-color:#0B3D7E;">
+                    <tr>
+                        <th class="px-4 py-3">Matrícula</th>
+                        <th class="px-4 py-3">Alumno</th>
+                        <th class="px-4 py-3 whitespace-nowrap">Semestre</th>
+                        <th class="px-4 py-3">Grupo</th>
+                        <th class="px-4 py-3">Género</th>
+                        <th class="px-4 py-3">Edad</th>
+                        <th class="px-4 py-3">Tutor</th>
+                        <th class="px-4 py-3 whitespace-nowrap">Horario Escolar</th>
 
-                        <td class="px-4 py-3">{{ $s->semester }}</td>
-                        <td class="px-4 py-3">{{ $s->group }}</td>
-                        <td class="px-4 py-3">{{ $s->gender }}</td>
-                        <td class="px-4 py-3">{{ $s->age ?? 'N/D' }}</td>
-
-                        {{-- Maestro tutor --}}
-                        <td class="px-4 py-3">
-                            @if ($s->teacher)
-                                {{ $s->teacher->name }} {{ $s->teacher->last_name_f }}
-                            @else
-                                <span class="text-gray-500">Sin tutor</span>
-                            @endif
-                        </td>
-
-                        {{-- Horario escolar --}}
-                        <td class="px-4 py-3">
-                            @if ($s->schedule_file)
-                                <a href="{{ asset('storage/' . $s->schedule_file) }}"
-                                   target="_blank"
-                                   class="text-blue-600 hover:underline">
-                                    Ver horario
-                                </a>
-                            @else
-                                <span class="text-gray-500">No disponible</span>
-                            @endif
-                        </td>
-
-                        {{-- Horario de asesoría (última asesoría si existe) --}}
-                        <td class="px-4 py-3">
-                            @if ($lastDetail && $lastDetail->advisories && $lastDetail->advisories->count())
-                                {{-- por si un detalle tiene varias asesorías, tomamos la última --}}
-                                @php
-                                    $lastAdvisory = $lastDetail->advisories->last();
-                                @endphp
-
-                                @if ($lastAdvisory && $lastAdvisory->schedule)
-                                    {{ $lastAdvisory->schedule }}
-                                @else
-                                    <span class="text-gray-500">Sin horario registrado</span>
-                                @endif
-                            @else
-                                <span class="text-gray-500">Sin asesorías</span>
-                            @endif
-                        </td>
-
+                        {{-- Nuevas columnas --}}
+                        <th class="px-4 py-3 whitespace-nowrap">Periodo asesoria</th>
+                        <th class="px-4 py-3 whitespace-nowrap">Horario Asesoría</th>
+                        <th class="px-4 py-3">Maestro Asesor</th>
+                        <th class="px-4 py-3">Materia Asesoría</th>
                     </tr>
-                @endforeach
+                </thead>
 
-            </tbody>
+                <tbody class="text-gray-800">
 
-        </table>
+                    @foreach ($students as $s)
+
+                        @php
+                            $advisory = null;
+                            foreach ($s->advisoryDetails as $detail) {
+                                if ($detail->status === 'Aprobado' && $detail->advisories->count()) {
+                                    $advisory = $detail->advisories->first();
+                                }
+                            }
+                        @endphp
+
+                        <tr class="border-b hover:bg-gray-50 transition">
+
+                            <td class="px-4 py-3 font-medium">{{ $s->enrollment }}</td>
+
+                            <td class="px-4 py-3">
+                                {{ $s->name }} {{ $s->last_name_f }} {{ $s->last_name_m }}
+                            </td>
+
+                            <td class="px-4 py-3">{{ $s->semester }}</td>
+                            <td class="px-4 py-3">{{ $s->group }}</td>
+                            <td class="px-4 py-3">{{ $s->gender }}</td>
+                            <td class="px-4 py-3">{{ $s->age ?? 'N/D' }}</td>
+
+                            {{-- Tutor --}}
+                            <td class="px-4 py-3">
+                                @if($s->teacher)
+                                    {{ $s->teacher->name }} {{ $s->teacher->last_name_f }}
+                                @else
+                                    <span class="text-gray-500">Sin tutor</span>
+                                @endif
+                            </td>
+
+                            {{-- Horario escolar --}}
+                            <td class="px-4 py-3">
+                                @if ($s->schedule_file)
+                                    <a href="{{ asset('storage/'.$s->schedule_file) }}"
+                                    target="_blank"
+                                    class="text-blue-600 hover:underline">
+                                        Ver horario
+                                    </a>
+                                @else
+                                    <span class="text-gray-500">No disponible</span>
+                                @endif
+                            </td>
+
+                            {{-- Fecha inicio --}}
+                            <td class="px-4 py-3">
+                                inicio
+                                @if($advisory)
+                                    {{ \Carbon\Carbon::parse($advisory->start_date)->format('d/m/Y') }}
+                                @else
+                                    <span class="text-gray-500">—</span>
+                                @endif
+                                -
+                                <br>
+                                fin
+                                  @if($advisory)
+                                    {{ \Carbon\Carbon::parse($advisory->end_date)->format('d/m/Y') }}
+                                @else
+                                    <span class="text-gray-500">—</span>
+                                @endif
+                            </td>
+
+
+                            {{-- Horario asesoría --}}
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                @if($advisory)
+                                    {{ ucfirst($advisory->day_of_week) }}
+                                    <br>
+                                    {{ \Carbon\Carbon::parse($advisory->start_time)->format('H:i') }}
+                                    –
+                                    {{ \Carbon\Carbon::parse($advisory->end_time)->format('H:i') }}
+                                @else
+                                    <span class="text-gray-500">—</span>
+                                @endif
+                            </td>
+
+                            {{-- Maestro asesor --}}
+                            <td class="px-4 py-3">
+                                @if($advisory)
+                                    {{ $advisory->teacherSubject->teacher->name }}
+                                    {{ $advisory->teacherSubject->teacher->last_name_f }}
+                                @else
+                                    <span class="text-gray-500">—</span>
+                                @endif
+                            </td>
+
+                            {{-- Materia --}}
+                            <td class="px-4 py-3">
+                                @if($advisory)
+                                    {{ $advisory->teacherSubject->subject->name }}
+                                @else
+                                    <span class="text-gray-500">—</span>
+                                @endif
+                            </td>
+
+                        </tr>
+
+                    @endforeach
+
+                </tbody>
+
+            </table>
+        </div>
     </div>
+
 </div>
 
 <x-basic-sciences-footer />
 
 </body>
 </html>
-
-

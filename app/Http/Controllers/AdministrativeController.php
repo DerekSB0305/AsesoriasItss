@@ -7,6 +7,8 @@ use App\Models\Career;
 use App\Models\Department;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AdministrativeController extends Controller
 {
@@ -77,7 +79,7 @@ class AdministrativeController extends Controller
     public function update(Request $request, Administrative $administrative)
     {
         $oldUser = $administrative->administrative_user;
-        
+
         $validated = $request->validate([
             'administrative_user' => 'required|string|max:50|unique:administratives,administrative_user,' . $administrative->administrative_user . ',administrative_user',
             'name' => 'required|string|max:50',
@@ -111,5 +113,61 @@ class AdministrativeController extends Controller
     {
         $administrative->delete();
         return redirect()->route('basic_sciences.administratives.index')->with('success', 'Administrativo eliminado exitosamente.');
+    }
+
+    public function indexCareerHead()
+    {
+        // Obtener al administrativo del usuario logueado
+        $admin = Auth::user()->administrative;
+
+        if (!$admin) {
+            return back()->withErrors(['error' => 'Tu cuenta no está registrada como Jefe de Carrera.']);
+        }
+
+        //  Verificar si contraseña es igual a usuario
+        $passwordIgual = Hash::check($admin->administrative_user, Auth::user()->password);
+
+        // Enviar variable a la vista
+        return view('career_head.index', compact('admin', 'passwordIgual'));
+    }
+
+
+    /**
+     * Verificar si el administrativo debe cambiar su contraseña
+     */
+    public function checkPasswordStatus()
+    {
+        $user = Auth::user();
+
+        // Si no es administrativo, no hacemos nada
+        if (!$user || !$user->administrative) {
+            return null;
+        }
+
+        $admin = $user->administrative;
+
+        // Comparar contraseña con su usuario
+        $passwordDefault = Hash::check($admin->administrative_user, $user->password);
+
+        return $passwordDefault;
+    }
+
+    public function changePasswordForm()
+    {
+        return view('career_head.change_password');
+    }
+
+    public function changePasswordUpdate(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|min:8|confirmed'
+        ]);
+
+        $user = Auth::user();
+        $user->password = bcrypt($request->password);
+        $user->save();
+
+        return redirect()->route('career_head.index')
+            ->with('success', 'Contraseña actualizada correctamente.');
     }
 }

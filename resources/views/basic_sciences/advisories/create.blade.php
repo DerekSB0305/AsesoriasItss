@@ -10,6 +10,8 @@
 
 <x-basic-sciences-navbar />
 
+<main class="flex-grow">
+
 <div class="max-w-4xl mx-auto bg-white mt-8 p-8 rounded-xl shadow">
 
     <h1 class="text-3xl font-bold text-[#0B3D7E] mb-6">➕ Crear Asesoría</h1>
@@ -133,6 +135,8 @@
 
     </form>
 </div>
+
+</main>
 
 <x-basic-sciences-footer />
 

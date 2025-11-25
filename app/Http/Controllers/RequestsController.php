@@ -11,9 +11,34 @@ use Illuminate\Support\Facades\Storage;
 
 class RequestsController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $requests = Requests::all();
+        $query = Requests::with(['student.career', 'subject', 'teacher']);
+
+        // Si hay búsqueda
+        if ($request->filled('buscar')) {
+
+            $buscar = $request->buscar;
+
+            $query->whereHas('student', function ($q) use ($buscar) {
+                $q->where('enrollment', 'like', "%$buscar%")
+                    ->orWhere('name', 'like', "%$buscar%")
+                    ->orWhere('last_name_f', 'like', "%$buscar%");
+            });
+
+            // Buscar por materia
+            $query->orWhereHas('subject', function ($q) use ($buscar) {
+                $q->where('name', 'like', "%$buscar%");
+            });
+
+            // Buscar por carrera
+            $query->orWhereHas('student.career', function ($q) use ($buscar) {
+                $q->where('name', 'like', "%$buscar%");
+            });
+        }
+
+        $requests = $query->get();
+
         return view('basic_sciences.requests.index', compact('requests'));
     }
 
@@ -22,7 +47,7 @@ class RequestsController extends Controller
         $teacher_user = Auth::user()->teacher->teacher_user;
 
         $requests = Requests::where('teacher_user', $teacher_user)
-            ->with(['student','subject'])
+            ->with(['student', 'subject'])
             ->get();
 
         return view('teachers.requests.index', compact('requests'));
@@ -35,7 +60,7 @@ class RequestsController extends Controller
         $students = Student::where('teacher_user', $teacher_user)->get();
         $subjects = Subject::all();
 
-        return view('teachers.requests.create', compact('students','subjects'));
+        return view('teachers.requests.create', compact('students', 'subjects'));
     }
 
 
@@ -53,7 +78,7 @@ class RequestsController extends Controller
             'subject_id'    => ['required', 'integer', 'exists:subjects,subject_id'],
             'reason'        => ['nullable', 'string', 'max:500'],
 
-            'canalization_file' => ['nullable','file','mimes:pdf,doc,docx,jpg,jpeg,png','max:2048'],
+            'canalization_file' => ['nullable', 'file', 'mimes:pdf,doc,docx,jpg,jpeg,png', 'max:2048'],
         ]);
 
         $teacher = Auth::user()->teacher;

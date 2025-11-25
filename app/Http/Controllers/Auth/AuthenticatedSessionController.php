@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -24,67 +25,72 @@ class AuthenticatedSessionController extends Controller
      * Handle an incoming authentication request.
      */
     public function store(LoginRequest $request): RedirectResponse
-    {
-        $request->validate([
-            'user' => ['required', 'string'],
-            'password' => ['required', 'string'],
+{
+    $request->validate([
+        'user' => ['required', 'string'],
+        'password' => ['required', 'string'],
+    ]);
+
+    // Buscar usuario por nombre de usuario
+    $usuario = \App\Models\User::where('user', $request->user)->first();
+
+    // Usuario NO existe
+    if (!$usuario) {
+        return back()->withErrors([
+            'user' => 'El usuario ingresado no existe.',
+        ])->withInput();
+    }
+
+    // Usuario SÍ existe, pero contraseña incorrecta
+    if (!Hash::check($request->password, $usuario->password)) {
+        return back()->withErrors([
+            'password' => 'La contraseña es incorrecta.',
+        ])->withInput();
+    }
+
+    // Intentar login usando Auth::login()
+    Auth::login($usuario, $request->boolean('remember'));
+    $request->session()->regenerate();
+
+    $user = Auth::user();
+
+    //  Usuario sin rol asignado
+    $role = strtolower(trim($user->role->role_type ?? ''));
+    if (!$role) {
+        Auth::logout();
+        return redirect()->route('login')->withErrors([
+            'user' => 'Tu cuenta no tiene un rol asignado. Contacta al administrador.',
         ]);
+    }
 
-        // Intentar autenticación con campo 'user' en lugar de 'email'
-        if (!Auth::attempt($request->only('user', 'password'), $request->boolean('remember'))) {
-            return back()->withErrors([
-                'user' => 'Las credenciales no coinciden con nuestros registros.',
-            ]);
-        }
+    //  Redirección según rol
+    switch ($role) {
+        case 'ciencias básicas':
+        case 'ciencias basicas':
+            return redirect()->route('basic_sciences.index');
 
-        $request->session()->regenerate();
-        $user = Auth::user();
+        case 'jefatura de division':
+            return redirect()->route('career_head.index');
 
-    //      dd([
-    //     'auth' => Auth::check(),
-    //     'user' => Auth::user(),
-    //     'role' => Auth::user()?->role?->role_type,
-    // ]);
+        case 'docente':
+        case 'maestro':
+        case 'profesor':
+            return redirect()->route('teachers.index');
 
-        // Detectar el tipo de rol
-        $role = strtolower(trim($user->role->role_type ?? ''));
+        case 'alumno':
+        case 'alumnos':
+        case 'estudiante':
+        case 'student':
+            return redirect()->route('students.panel.index');
 
-        if (!$role) {
+        default:
             Auth::logout();
             return redirect()->route('login')->withErrors([
-                'user' => 'Tu cuenta no tiene un rol asignado, contacta al administrador.',
+                'user' => 'Tu rol no está reconocido por el sistema.',
             ]);
-        }
-
-        // ✅ Redirección manual (anula el dashboard)
-        switch ($role) {
-            case 'ciencias básicas':
-            case 'ciencias basicas':
-                return redirect()->route('basic_sciences.index');
-
-            case 'jefatura de division':
-                return redirect()->route('career_head.index');
-
-
-            case 'docente':
-            case 'maestro':
-            case 'profesor':
-                return redirect()->route('teachers.index');
-
-            case 'alumno':
-            case 'alumnos':
-            case 'estudiante':
-            case 'student':
-                return redirect()->route('students.panel.index');
-
-
-            default:
-                Auth::logout();
-                return redirect()->route('login')->withErrors([
-                    'user' => 'Rol desconocido. Contacta al administrador.',
-                ]);
-        }
     }
+}
+
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();

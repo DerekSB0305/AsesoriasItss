@@ -25,6 +25,18 @@
                 </a>
             </div>
 
+            {{-- BUSCADOR --}}
+            <form method="GET" class="flex flex-col md:flex-row gap-3 mb-6">
+                <input type="text"name="buscar"
+                value="{{ request('buscar') }}"
+                placeholder="Buscar por matrícula, materia o carrera..."
+                class="px-4 py-2 border rounded-lg w-full md:w-96 focus:ring-2 focus:ring-[#0B3D7E]">
+                <button class="px-4 py-2 bg-[#159a82] text-white rounded-lg shadow hover:bg-[#107a68]">
+                    🔍 Buscar
+                </button>
+            </form>
+
+
             <div class="overflow-x-auto">
                 <table class="w-full border-collapse shadow rounded-lg overflow-hidden">
 
@@ -81,7 +93,7 @@
 
                             <td class="px-4 py-3 text-center">
                                 <a href="{{ route('basic_sciences.advisory_details.create', ['subject_id' => $request->subject_id]) }}"
-                                class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                                class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 font-semibold">
                                     Crear asesoría
                                 </a>
                             </td>
