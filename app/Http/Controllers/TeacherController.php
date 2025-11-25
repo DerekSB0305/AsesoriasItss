@@ -81,12 +81,6 @@ class TeacherController extends Controller
     public function update(Request $request, Teacher $teacher)
     {
         $validated = $request->validate([
-            'teacher_user' => [
-                'required',
-                'string',
-                'max:50',
-                Rule::unique('teachers', 'teacher_user')->ignore($teacher->teacher_user, 'teacher_user')
-            ],
             'name' => 'required|string|max:50',
             'last_name_f' => 'required|string|max:50',
             'last_name_m' => 'required|string|max:50',
@@ -97,35 +91,27 @@ class TeacherController extends Controller
             'schedule' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
         ]);
 
+        // si se sube un archivo
         if ($request->hasFile('schedule')) {
-
             if ($teacher->schedule && Storage::disk('public')->exists($teacher->schedule)) {
                 Storage::disk('public')->delete($teacher->schedule);
             }
 
             $file = $request->file('schedule');
-            $originalName = $file->getClientOriginalName();
-
-            $validated['schedule'] = $file->storeAs('teacher_schedules', $originalName, 'public');
+            $validated['schedule'] = $file->storeAs(
+                'teacher_schedules',
+                $file->getClientOriginalName(),
+                'public'
+            );
         }
 
-        $oldUser = $teacher->teacher_user;
-        $teacher->update($validated);
-
-        //Actualiza el usuario maestro si el usuario cambia 
-        $user = User::where('user', $oldUser)->first();
-
-        if ($user) {
-            $user->update([
-                'user'     => $request->teacher_user,
-            ]);
-        }
-
+        // actualizar maestro
         $teacher->update($validated);
 
         return redirect()->route('basic_sciences.teachers.index')
             ->with('success', 'Profesor actualizado correctamente.');
     }
+
 
     public function destroy(Teacher $teacher)
     {
@@ -151,35 +137,35 @@ class TeacherController extends Controller
     public function myAdvisories()
     {
         // 🔥 Actualizar asesorías vencidas ANTES de mostrar las del maestro
-    $hoy = now()->toDateString();
+        $hoy = now()->toDateString();
 
-    $asesoriasVencidas = Advisories::where('end_date', '<', $hoy)
-        ->whereHas('advisoryDetail', function ($q) {
-            $q->where('status', 'Aprobado');
-        })
-        ->get();
+        $asesoriasVencidas = Advisories::where('end_date', '<', $hoy)
+            ->whereHas('advisoryDetail', function ($q) {
+                $q->where('status', 'Aprobado');
+            })
+            ->get();
 
-    foreach ($asesoriasVencidas as $item) {
-        $item->advisoryDetail->update([
-            'status' => 'Finalizado'
-        ]);
-    }
+        foreach ($asesoriasVencidas as $item) {
+            $item->advisoryDetail->update([
+                'status' => 'Finalizado'
+            ]);
+        }
 
-           $teacherUser = auth()->user()->user;
+        $teacherUser = auth()->user()->user;
 
-    $advisories = \App\Models\Advisories::with([
-        'teacherSubject.teacher',
-        'teacherSubject.subject.career',
-        'advisoryDetail.students'
-    ])
-        ->whereHas('teacherSubject', function ($q) use ($teacherUser) {
-            $q->where('teacher_user', $teacherUser);
-        })
-        ->orderBy('start_date', 'ASC')
-        ->orderBy('start_time', 'ASC')
-        ->get();
+        $advisories = \App\Models\Advisories::with([
+            'teacherSubject.teacher',
+            'teacherSubject.subject.career',
+            'advisoryDetail.students'
+        ])
+            ->whereHas('teacherSubject', function ($q) use ($teacherUser) {
+                $q->where('teacher_user', $teacherUser);
+            })
+            ->orderBy('start_date', 'ASC')
+            ->orderBy('start_time', 'ASC')
+            ->get();
 
-    return view('teachers.advisories.index', compact('advisories'));
+        return view('teachers.advisories.index', compact('advisories'));
     }
 
     public function showChangePasswordForm()
@@ -202,7 +188,7 @@ class TeacherController extends Controller
             ->with('success', 'Contraseña actualizada correctamente.');
     }
 
-    public function indexCareerHead()
+  public function indexCareerHead()
 {
     $admin = Auth::user()->administrative;
 
@@ -212,11 +198,32 @@ class TeacherController extends Controller
 
     $careerId = $admin->career_id;
 
-    $teachers = Teacher::where('career_id', $careerId)
-        ->with('career')
-        ->get();
+    $query = Advisories::with([
+        'teacherSubject.teacher',
+        'teacherSubject.subject',
+        'advisoryDetail.students'
+    ])
+    ->whereHas('teacherSubject.teacher', function ($q) use ($careerId) {
+        $q->where('career_id', $careerId); // 🔥 Maestro pertenezca a mi carrera
+    });
 
-    return view('career_head.teachers.index', compact('teachers'));
+    if (request('maestro')) {
+        $search = request('maestro');
+        $query->whereHas('teacherSubject.teacher', function ($q) use ($search) {
+            $q->where('name', 'like', "%$search%")
+              ->orWhere('last_name_f', 'like', "%$search%");
+        });
+    }
+
+    if (request('estado')) {
+        $query->whereHas('advisoryDetail', function ($q) {
+            $q->where('status', request('estado'));
+        });
+    }
+
+    $advisories = $query->orderBy('start_date')->get();
+
+    return view('career_head.advisories.index', compact('advisories'));
 }
 
 }

@@ -14,9 +14,29 @@ use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $students = Student::with(['career', 'teacher'])->get();
+        $query = Student::with(['career', 'teacher']);
+
+        // Si el usuario escribe algo
+        if ($request->filled('buscar')) {
+
+            $buscar = $request->buscar;
+
+            $query->where(function ($q) use ($buscar) {
+
+                // Buscar por matrícula
+                $q->where('enrollment', 'like', "%$buscar%")
+
+                    // Buscar por nombre de carrera
+                    ->orWhereHas('career', function ($c) use ($buscar) {
+                        $c->where('name', 'like', "%$buscar%");
+                    });
+            });
+        }
+
+        $students = $query->get();
+
         return view('basic_sciences.students.index', compact('students'));
     }
 
@@ -183,30 +203,33 @@ class StudentController extends Controller
         return $filename;
     }
 
-    public function indexCareerHead()
+    public function indexCareerHead(Request $request)
     {
-        // Obtener el administrativo logueado
         $admin = Auth::user()->administrative;
 
-        // Validar que realmente sea jefe de carrera
-        $admin = Auth::user()->administrative;
+        if (!$admin || !$admin->career_id) {
+            return back()->withErrors([
+                'error' => 'No tienes carrera asignada, contacta al administrador.'
+            ]);
+        }
 
-    if (!$admin || !$admin->career_id) {
-        return back()->withErrors([
-            'error' => 'No tienes carrera asignada, contacta al administrador.'
-        ]);
-    }
+        $careerId = $admin->career_id;
 
-    $careerId = $admin->career_id;
+        $query = Student::where('career_id', $careerId)
+            ->with([
+                'career',
+                'teacher',
+                'advisoryDetails.advisories.teacherSubject.teacher',
+                'advisoryDetails.advisories.teacherSubject.subject',
+            ]);
 
-    $students = Student::where('career_id', $careerId)
-        ->with([
-            'career',
-            'teacher',           
-            'advisoryDetails',   
-        ])
-        ->get();
+        // FILTRO DE BÚSQUEDA
+        if ($request->matricula) {
+            $query->where('enrollment', 'LIKE', '%' . $request->matricula . '%');
+        }
 
-    return view('career_head.students.index', compact('students'));
+        $students = $query->get();
+
+        return view('career_head.students.index', compact('students'));
     }
 }

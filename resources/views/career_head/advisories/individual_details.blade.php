@@ -9,14 +9,15 @@
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
     {{-- NAVBAR --}}
-    <x-basic-sciences-navbar />
+<x-career-head-navbar />
+
 
     <div class="flex-1 p-8">
 
         <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-xl p-6">
 
             {{-- BOTÓN VOLVER --}}
-            <a href="{{ route('basic_sciences.advisories.index') }}"
+            <a href="{{ route('career_head.advisories.index') }}"
                class="inline-flex items-center bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition mb-4">
                 <span class="mr-1">←</span> Volver
             </a>
@@ -233,5 +234,3 @@
 
 </body>
 </html>
-
-

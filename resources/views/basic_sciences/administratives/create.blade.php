@@ -11,6 +11,8 @@
     {{-- NAVBAR --}}
     <x-basic-sciences-navbar />
 
+<main class="flex-grow">
+
     {{-- CONTENEDOR --}}
     <div class="w-full max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8 mt-8">
 
@@ -113,8 +115,12 @@
 
     </div>
 
+</main>
+
     {{-- FOOTER --}}
     <x-basic-sciences-footer />
+
+
 
 </body>
 </html>

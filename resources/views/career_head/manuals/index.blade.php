@@ -8,13 +8,21 @@
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-<x-basic-sciences-navbar />
+<x-career-head-navbar />
 
 <div class="max-w-6xl mx-auto bg-white shadow-lg rounded-xl p-8 my-10">
 
     <h1 class="text-3xl font-bold text-[#0B3D7E] mb-6">
         📘 Manuales de Maestros de mi Carrera
     </h1>
+
+    <div class="flex justify-between mb-4">
+
+        <a href="{{ route('career_head.index') }}"
+           class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold">
+            ← Volver al inicio
+        </a>
+    </div>
 
     <div class="overflow-x-auto">
         <table class="w-full border-collapse shadow">

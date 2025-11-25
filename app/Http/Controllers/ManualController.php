@@ -170,22 +170,23 @@ class ManualController extends Controller
     /**
      * Vista para Jefes de Carrera
      */
-    public function indexCareerHead()
-    {
-        $admin = Auth::user()->administrative;
+   public function indexCareerHead()
+{
+    $admin = Auth::user()->administrative;
 
-        if (!$admin) {
-            return back()->withErrors(['error' => 'Tu cuenta no está registrada como Jefe de Carrera.']);
-        }
-
-        $careerId = $admin->career_id;
-
-        $manuals = Manual::with(['teacherSubject.teacher', 'teacherSubject.subject'])
-            ->whereHas('teacherSubject', function ($q) use ($careerId) {
-                $q->where('career_id', $careerId);
-            })
-            ->get();
-
-        return view('career_head.manuals.index', compact('manuals'));
+    if (!$admin) {
+        return back()->withErrors(['error' => 'Tu cuenta no está registrada como Jefe de Carrera.']);
     }
+
+    $careerId = $admin->career_id;
+
+    $manuals = Manual::with(['teacherSubject.teacher', 'teacherSubject.subject'])
+        ->whereHas('teacherSubject.teacher', function ($q) use ($careerId) {
+            $q->where('career_id', $careerId);  // 🔥 Maestro pertenece a mi carrera
+        })
+        ->get();
+
+    return view('career_head.manuals.index', compact('manuals'));
+}
+
 }
