@@ -19,7 +19,9 @@
             <h1 class="text-3xl font-bold text-gray-800">👨‍🏫 Mis Alumnos</h1>
 
             <a href="{{ route('teachers.students.create') }}"
-               class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+               class="px-4 py-2 rounded text-white font-semibold shadow"
+           style="background-color:#28A745;"">
+           
                 Registrar Alumno
             </a>
         </div>

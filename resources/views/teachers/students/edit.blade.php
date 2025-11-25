@@ -93,14 +93,16 @@
 
 
         <button type="submit"
-                class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                class="w-1/2 py-3 text-white font-bold rounded-lg shadow hover:opacity-90"
+                        style="background-color:#28A745;">
             Guardar Cambios
         </button>
 
     </form>
 
     <a href="{{ route('teachers.students.index') }}"
-       class="block mt-4 text-blue-600">
+       class="w-1/2 py-3 text-center text-white font-bold rounded-lg shadow hover:opacity-90"
+                   style="background-color:#6C757D;">
        ← Volver al listado
     </a>
 

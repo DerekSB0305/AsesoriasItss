@@ -139,7 +139,8 @@
         {{-- Botón --}}
         <div class="col-span-2 flex justify-end">
             <button type="submit"
-                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                class="w-1/2 py-3 text-white font-bold rounded-lg shadow hover:opacity-90"
+                        style="background-color:#28A745;">
                 Guardar Alumno
             </button>
         </div>
@@ -148,7 +149,8 @@
     {{-- Volver --}}
     <div class="mt-6">
         <a href="{{ route('teachers.students.index') }}" 
-           class="text-blue-600 hover:text-blue-800 font-medium">
+           class="w-1/2 py-3 text-center text-white font-bold rounded-lg shadow hover:opacity-90"
+                   style="background-color:#6C757D;">
             ← Volver
         </a>
     </div>
