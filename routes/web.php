@@ -15,6 +15,7 @@ use App\Http\Controllers\{
     TeacherController
 };
 use Dom\Document;
+use Illuminate\Support\Facades\Auth;
 
 // Página principal
 Route::get('/', fn() => view('welcome'));
@@ -103,7 +104,7 @@ Route::prefix('career_head')
 
 
 // --------------------------------------------------------------------------
-// 📌 RUTAS DEL MAESTRO
+//  RUTAS DEL MAESTRO
 // --------------------------------------------------------------------------
 Route::prefix('teachers')
     ->name('teachers.')
@@ -197,6 +198,22 @@ Route::prefix('teachers')
 
         Route::get('manuals/select/subject', [ManualController::class, 'selectSubject'])
             ->name('manuals.select_subject');
+
+        Route::get('documents', [DocumentController::class, 'teachersIndex'])
+            ->name('documents.index');
+
+            Route::get('/notifications', function () {
+            return view('teachers.notifications.index', [
+                'notifications' => Auth::user()->notifications
+            ]);
+        })->name('notifications');
+        Route::post('/notifications/{id}/mark', function ($id) {
+        $n = Auth::user()->notifications()->findOrFail($id);
+        $n->markAsRead();
+            return back();
+        })->name('notifications.mark');
+
+
     });
 
 //Cambiar contraseña
@@ -237,4 +254,8 @@ Route::prefix('students')
 
         Route::post('/change-password', [StudentPanelController::class, 'changePassword'])
             ->name('panel.change_password');
+
+        Route::get('/notifications', [StudentPanelController::class, 'notifications'])
+            ->name('panel.notifications');
+
     });

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Advisories;
 use App\Models\Advisory_details;
+use App\Notifications\AdvisoryCreated;
+use App\Notifications\AdvisoryStudentNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -160,7 +162,7 @@ class AdvisoriesController extends Controller
         }
 
         // Crear asesoría
-        Advisories::create([
+        $advisory = Advisories::create([
             'advisory_detail_id' => $request->advisory_detail_id,
             'teacher_subject_id' => $request->teacher_subject_id,
             'start_date'         => $request->start_date,
@@ -174,6 +176,18 @@ class AdvisoriesController extends Controller
         ]);
 
         $detail->update(['status' => 'Aprobado']);
+
+        $user = $advisory->teacherSubject->teacher->userRelation; 
+        $user->notify(new AdvisoryCreated($advisory));
+
+        // Notificación para los alumnos
+        foreach ($detail->students as $student) {
+            $studentUser = $student->userRelation;
+            if ($studentUser) {
+                $studentUser->notify(new AdvisoryStudentNotification($advisory));
+            }
+        }
+
 
         return redirect()->route('basic_sciences.advisories.index')
             ->with('success', 'Asesoría creada correctamente.');

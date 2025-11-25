@@ -56,6 +56,12 @@ class Student extends Model
         );
     }
 
+    public function userRelation()
+{
+    return $this->belongsTo(User::class, 'enrollment', 'user');
+}
+
+
     protected static function boot()
     {
         parent::boot();

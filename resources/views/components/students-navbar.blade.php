@@ -9,35 +9,40 @@
         {{-- MENÚ DEL ALUMNO --}}
         <div class="flex space-x-8 text-sm font-medium">
 
-            {{-- Panel principal --}}
-            <a href="{{ route('students.panel.index') }}" 
-               class="hover:text-gray-300">
+            <a href="{{ route('students.panel.index') }}" class="hover:text-gray-300">
                 Inicio
             </a>
 
-                        {{-- Horarios --}}
-            <a href="{{ route('students.panel.schedule') }}" 
-               class="hover:text-gray-300">
+            <a href="{{ route('students.panel.schedule') }}" class="hover:text-gray-300">
                 Mi horario
             </a>
 
-            {{-- Ver asesorías disponibles --}}
-            <a href="{{ route('students.panel.advisories') }}" 
-               class="hover:text-gray-300">
+            <a href="{{ route('students.panel.advisories') }}" class="hover:text-gray-300">
                 Asesorías
             </a>
 
-            {{-- Manuales de materias disponibles --}}
-            <a href="{{ route('students.panel.manuals') }}" 
-               class="hover:text-gray-300">
+            <a href="{{ route('students.panel.manuals') }}" class="hover:text-gray-300">
                 Manuales
             </a>
         </div>
 
-        {{-- PERFIL + LOGOUT --}}
-        <div class="flex items-center space-x-3">
+        {{-- NOTIFICACIONES + PERFIL --}}
+        <div class="flex items-center space-x-6">
 
-            {{-- Avatar / icono usuario --}}
+            {{-- CAMPANITA --}}
+            <div class="relative">
+                <a href="{{ route('students.panel.notifications') }}" 
+                   class="relative text-2xl hover:text-gray-300">
+                    🔔
+                    @if(Auth::user()->unreadNotifications->count() > 0)
+                        <span class="absolute -top-2 -right-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">
+                            {{ Auth::user()->unreadNotifications->count() }}
+                        </span>
+                    @endif
+                </a>
+            </div>
+
+            {{-- AVATAR --}}
             <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg"
                     class="h-6 w-6 text-gray-700" fill="none"
@@ -47,7 +52,7 @@
                 </svg>
             </div>
 
-            {{-- Logout --}}
+            {{-- LOGOUT --}}
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="text-xs hover:text-gray-300">

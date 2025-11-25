@@ -4,6 +4,7 @@
 
     $tutor = $teacher->tutor;
     $basic = $teacher->science_department;
+    $notifications = Auth::user()->unreadNotifications;
 @endphp
 
 <nav class="bg-[#0B3D7E] text-white shadow-md py-3 w-full">
@@ -17,12 +18,10 @@
         {{-- MENÚ DINÁMICO --}}
         <div class="flex space-x-8 text-sm font-medium">
 
-            {{-- INICIO --}}
             <a href="{{ route('teachers.index') }}" class="hover:text-gray-300">
                 Inicio
             </a>
 
-            {{-- ----------- OPCIONES SOLO PARA TUTORES ------------- --}}
             @if ($tutor)
                 <a href="{{ route('teachers.students.index') }}" class="hover:text-gray-300">
                     Alumnos
@@ -31,16 +30,12 @@
                 <a href="{{ route('teachers.requests.index') }}" class="hover:text-gray-300">
                     Solicitudes
                 </a>
-            @endif
 
-            {{-- ----------- OPCIÓN PARA SOLICITAR ASESORÍA (solo tutor) ------------- --}}
-            @if ($tutor)
                 <a href="{{ route('teachers.requests.create') }}" class="hover:text-gray-300">
                     Pedir asesoría
                 </a>
             @endif
 
-            {{-- ----------- OPCIONES SOLO PARA CIENCIAS BÁSICAS ------------- --}}
             @if ($basic)
                 <a href="{{ route('teachers.advisories.index') }}" class="hover:text-gray-300">
                     Asesorías
@@ -51,14 +46,32 @@
                 </a>
             @endif
 
+            <a href="{{ route('teachers.documents.index') }}" class="hover:text-gray-300">
+                Documentos
+            </a>
+
         </div>
 
-        {{-- PERFIL + LOGOUT --}}
-        <div class="flex items-center space-x-3">
+        {{-- NOTIFICACIONES + PERFIL --}}
+        <div class="flex items-center space-x-6">
 
-            {{-- ICONO PERFIL --}}
+            {{-- CAMPANITA --}}
+            <div class="relative">
+                <a href="{{ route('teachers.notifications') }}" class="relative text-2xl hover:text-gray-300">
+                    🔔
+
+                    {{-- BURBUJA DE NOTIFICACIONES --}}
+                    @if($notifications->count() > 0)
+                        <span class="absolute -top-2 -right-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full">
+                            {{ $notifications->count() }}
+                        </span>
+                    @endif
+                </a>
+            </div>
+
+            {{-- PERFIL --}}
             <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" 
+                <svg xmlns="http://www.w3.org/2000/svg"
                     class="h-6 w-6 text-gray-700" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -66,7 +79,7 @@
                 </svg>
             </div>
 
-            {{-- BOTÓN LOGOUT --}}
+            {{-- LOGOUT --}}
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="text-xs hover:text-gray-300">

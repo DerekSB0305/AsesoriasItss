@@ -78,6 +78,8 @@
             <label class="block text-sm font-medium text-gray-700">Semestre:</label>
             <input type="number" 
                    name="semester" 
+                   min="1"
+                    max="12"
                    value="{{ old('semester') }}" 
                    required
                    class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
@@ -109,6 +111,8 @@
             <label class="block text-sm font-medium text-gray-700">Edad:</label>
             <input type="number" 
                    name="age" 
+                   min="17"
+                    max="80"
                    value="{{ old('age') }}" 
                    required
                    class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
@@ -131,7 +135,7 @@
 
         <div>
             <label>Horario del alumno (PDF / Imagen):</label>
-<input type="file" name="schedule_file" class="border rounded p-2 mb-4 w-full">
+<input type="file" name="schedule_file" class="border rounded p-2 mb-4 w-full" required>
 <br><br>
 
         </div>

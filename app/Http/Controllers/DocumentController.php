@@ -19,6 +19,14 @@ class DocumentController extends Controller
         return view('basic_sciences.documents.index', compact('documents'));
     }
 
+    public function teachersIndex()
+{
+    $documents = Document::all();
+
+    return view('teachers.documents.index', compact('documents'));
+}
+
+
     /**
      * Show the form for creating a new resource.
      */
