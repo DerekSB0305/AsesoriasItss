@@ -2,57 +2,97 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Maestros</title>
     @vite('resources/css/app.css')
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    {{-- NAVBAR --}}
-    <x-basic-sciences-navbar />
+<x-basic-sciences-navbar />
 
 <main class="flex-grow">
 
-<div class="w-[95%] max-w-7xl mx-auto bg-white shadow-lg rounded-xl p-8 my-12">
+<div class="w-[95%] max-w-7xl mx-auto bg-white shadow-lg rounded-xl p-6 sm:p-8 my-10">
 
-    {{-- Título --}}
-    <h1 class="text-3xl font-bold text-[#0B3D7E] mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-[#0B3D7E] mb-6">
         👨‍🏫 Lista de Maestros
     </h1>
+    
+    <form method="GET"
+      class="bg-gray-50 p-4 rounded-lg shadow mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div>
+            <label class="text-sm font-semibold">Nombre del maestro</label>
+            <input type="text" name="search" value="{{ request('search') }}"
+               class="w-full px-3 py-2 border rounded-lg focus:ring-[#0B3D7E]"
+               placeholder="Ej. Juan Pérez">
+        </div>
 
-    <div class="flex justify-between mb-4">
+        <div>
+            <label class="text-sm font-semibold">¿Es tutor?</label>
+            <select name="tutor"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-[#0B3D7E]">
+            <option value="">Todos</option>
+            <option value="1" {{ request('tutor') == '1' ? 'selected' : '' }}>Sí</option>
+            <option value="0" {{ request('tutor') == '0' ? 'selected' : '' }}>No</option>
+            </select>
+        </div>
 
-        {{-- Botón crear --}}
+         <div>
+            <label class="text-sm font-semibold">Ciencias Básicas</label>
+            <select name="science"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-[#0B3D7E]">
+                <option value="">Todos</option>
+                <option value="1" {{ request('science') == '1' ? 'selected' : '' }}>Sí</option>
+                <option value="0" {{ request('science') == '0' ? 'selected' : '' }}>No</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="text-sm font-semibold">Grado de estudio</label>
+            <input type="text" name="degree" value="{{ request('degree') }}"
+               class="w-full px-3 py-2 border rounded-lg focus:ring-[#0B3D7E]"
+               placeholder="Ej. Maestría, Doctorado">
+         </div>
+
+        <div class="sm:col-span-2 lg:col-span-4 flex justify-end">
+            <button class="px-6 py-2 bg-[#1ABC9C] text-white rounded-lg shadow hover:bg-[#159a82] font-semibold">
+                🔍 Buscar
+            </button>
+        </div>
+    </form>
+
+
+    <div class="flex flex-col sm:flex-row justify-between gap-3 mb-4">
+
         <a href="{{ route('basic_sciences.teachers.create') }}"
-           class="px-4 py-2 rounded text-white font-semibold shadow"
+           class="px-4 py-2 rounded text-white font-semibold shadow text-center"
            style="background-color:#28A745;">
             ➕ Agregar Maestro
         </a>
 
-        {{-- Botón volver --}}
         <a href="{{ route('basic_sciences.index') }}"
-           class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold">
+           class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold text-center">
             ← Volver al inicio
         </a>
     </div>
 
-    {{-- Éxito --}}
     @if(session('success'))
         <div class="bg-green-100 border border-green-300 text-green-700 p-3 rounded mb-4">
             ✔ {{ session('success') }}
         </div>
     @endif
 
-    {{-- Tabla sin scroll --}}
     <div class="overflow-x-auto">
-        <table class="w-full border-collapse shadow table-auto">
+
+        <table class="w-full border-collapse shadow text-sm sm:text-base">
 
             <thead style="background-color:#0B3D7E;" class="text-white font-bold">
                 <tr>
                     <th class="px-2 py-2 text-left">Usuario</th>
                     <th class="px-2 py-2 text-left">Nombre</th>
-                    <th class="px-2 py-2 text-left">Apellido Paterno</th>
-                    <th class="px-2 py-2 text-left">Apellido Materno</th>
+                    <th class="px-2 py-2 text-left">Apellido P.</th>
+                    <th class="px-2 py-2 text-left">Apellido M.</th>
                     <th class="px-2 py-2 text-left">Grado</th>
                     <th class="px-2 py-2 text-left">Tutor</th>
                     <th class="px-2 py-2 text-left">Ciencias Básicas</th>
@@ -77,7 +117,6 @@
                         <td class="px-2 py-2">{{ $t->science_department ? 'Sí' : 'No' }}</td>
                         <td class="px-2 py-2">{{ $t->career->name ?? 'Sin carrera' }}</td>
 
-                        {{-- Horario --}}
                         <td class="px-2 py-2 text-center">
                             @if($t->schedule)
                                 <a href="{{ asset('storage/'.$t->schedule) }}"
@@ -88,7 +127,6 @@
                             @endif
                         </td>
 
-                        {{-- Asesoría --}}
                         <td class="px-2 py-2 text-center">
                             @if($t->advisory)
                                 <a href="{{ route('basic_sciences.advisories.show', $t->advisory) }}"
@@ -100,23 +138,22 @@
                             @endif
                         </td>
 
-                        {{-- Acciones --}}
-                        <td class="px-2 py-2 text-center flex justify-center gap-2">
+                        <td class="px-2 py-2 text-center">
+                            <div class="flex flex-col sm:flex-row justify-center gap-2">
 
-                            {{-- Editar --}}
-                            <a href="{{ route('basic_sciences.teachers.edit', $t) }}"
-                               class="px-3 py-1 rounded text-white font-semibold"
-                               style="background-color:#F39C12;">
-                                ✏ Editar
-                            </a>
+                                <a href="{{ route('basic_sciences.teachers.edit', $t) }}"
+                                   class="px-3 py-1 rounded text-white font-semibold text-center"
+                                   style="background-color:#F39C12;">
+                                    ✏ Editar
+                                </a>
 
-                            {{-- Eliminar --}}
-                            <button onclick="openDeleteModal('{{ $t->teacher_user }}')"
-                                    class="px-3 py-1 rounded text-white font-semibold"
-                                    style="background-color:#E74C3C;">
-                                🗑 Eliminar
-                            </button>
+                                <button onclick="openDeleteModal('{{ $t->teacher_user }}')"
+                                        class="px-3 py-1 rounded text-white font-semibold text-center"
+                                        style="background-color:#E74C3C;">
+                                    🗑 Eliminar
+                                </button>
 
+                            </div>
                         </td>
 
                     </tr>
@@ -125,10 +162,11 @@
             </tbody>
 
         </table>
+
     </div>
 </div>
 
-{{-- Modal --}}
+
 <div id="deleteModal"
      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 
@@ -151,29 +189,28 @@
                 Cancelar
             </button>
 
-                <form id="deleteForm" method="POST" class="inline">
+            <form id="deleteForm" method="POST" class="inline">
                   @csrf
                 @method('DELETE')
 
-                    <button type="submit"
+                <button type="submit"
                         class="px-4 py-2 rounded text-white font-bold shadow"
                         style="background-color:#E74C3C;">
                     Eliminar
-                 </button>
-                </form>
-
-         </div>
-
+                </button>
+            </form>
         </div>
     </div>
+
+</div>
 </main>
+
 <x-basic-sciences-footer />
 
 <script>
     function openDeleteModal(username) {
         document.getElementById('deleteModal').classList.remove('hidden');
         document.getElementById('teacherName').innerText = username;
-
         document.getElementById('deleteForm').action =
             "/basic_sciences/teachers/" + encodeURIComponent(username);
     }

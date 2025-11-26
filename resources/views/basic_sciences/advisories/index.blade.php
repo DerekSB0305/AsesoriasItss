@@ -2,46 +2,42 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asesorías</title>
     @vite('resources/css/app.css')
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <!-- NAVBAR FIJO -->
     <div class="fixed top-0 left-0 w-full z-50 shadow">
         <x-basic-sciences-navbar />
     </div>
 
     <main class="flex-1 mt-28 mb-24 px-4">
 
-        <div class="max-w-7xl mx-auto bg-white shadow-xl rounded-xl p-8">
+        <div class="max-w-7xl mx-auto bg-white shadow-xl rounded-xl p-6 sm:p-8">
 
-            <!-- ENCABEZADO -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
 
-                <h1 class="text-3xl font-extrabold text-gray-800">
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800">
                     📚 Asesorías Registradas
                 </h1>
 
-                <div class="flex flex-col sm:flex-row gap-3 mt-4 sm:mt-0">
+                <div class="flex flex-col sm:flex-row gap-3 text-sm">
 
-                    <!-- Botón Crear Detalle -->
                     <a href="{{ route('basic_sciences.advisory_details.create') }}"
                        class="px-4 py-2 rounded-lg text-white font-semibold text-center hover:opacity-90"
                        style="background-color:#28A745;">
                         ➕ Crear Detalle Asesoría
                     </a>
 
-                    <!-- Botón Ver Detalles -->
                     <a href="{{ route('basic_sciences.advisory_details.index') }}"
-                       class="px-4 py-2 bg-white border border-green-600 text-green-700 rounded-lg font-semibold hover:bg-green-600 hover:text-white shadow-sm transition">
-                        📄 Ver Todos Los Detalles
+                       class="px-4 py-2 bg-white border border-green-600 text-green-700 rounded-lg font-semibold hover:bg-green-600 hover:text-white shadow-md transition">
+                        📄 Ver Detalles
                     </a>
 
-                    <!-- Botón Volver -->
                     <a href="{{ route('basic_sciences.index') }}"
-                       class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold text-center">
+                       class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg font-semibold text-center">
                         ← Volver
                     </a>
 
@@ -49,41 +45,40 @@
 
             </div>
 
-            <!-- BUSCADOR -->
-            <form method="GET" class="mb-6 flex gap-3">
+            <form method="GET" class="flex flex-col sm:flex-row gap-3 mb-6">
                 <input 
                     type="text"
                     name="q"
                     placeholder="Buscar por maestro o materia..."
                     value="{{ request('q') }}"
-                    class="border border-gray-300 rounded-lg px-4 py-2 w-72 focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                    class="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-72 focus:ring-2 focus:ring-blue-600"
                 >
                 
-                <button class="mt-4 px-4 py-2 bg-[#1ABC9C] text-white font-semibold rounded-lg hover:bg-blue-900 shadow">
+                <button class="px-4 py-2 bg-[#1ABC9C] text-white font-semibold rounded-lg hover:bg-[#0d8a74] shadow">
                     🔍 Buscar
                 </button>
             </form>
 
-            <!-- TABLA -->
-            <div class="overflow-x-auto rounded-xl border border-gray-300 shadow">
-                <table class="min-w-full border-collapse text-sm">
+            <div class="overflow-x-auto rounded-xl border border-gray-200 shadow">
 
-                    <thead class="text-white uppercase text-xs font-semibold" style="background-color:#0B3D7E;">
-                        <tr class="border-b">
-                            <th class="px-4 py-3">Maestro</th>
-                            <th class="px-4 py-3">Carrera</th>
-                            <th class="px-4 py-3">Materia</th>
-                            <th class="px4 py-3" >Fecha inicio</th>
-                            <th class="px-4 py-3">Fecha fin</th>
-                            <th class="px-4 py-3">Fecha y Hora</th>
-                            <th class="px-4 py-3 text-center">Total</th>
+                <table class="min-w-full text-xs sm:text-sm">
+
+                    <thead class="text-white uppercase font-semibold" style="background-color:#0B3D7E;">
+                        <tr>
+                            <th class="px-4 py-3 whitespace-nowrap">Maestro</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Carrera</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Materia</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Inicio</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Fin</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Día & Hora</th>
+                            <th class="px-4 py-3 text-center whitespace-nowrap">Total</th>
                             <th class="px-4 py-3 text-center">H</th>
                             <th class="px-4 py-3 text-center">M</th>
-                            <th class="px-4 py-3">Aula</th>
-                            <th class="px-4 py-3">Edificio</th>
-                            <th class="px-4 py-3">Archivo</th>
-                            <th class="px-4 py-3">Detalles</th>
-                            <th class="px-4 py-3 text-center">Acciones</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Aula</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Edificio</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Archivo</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Detalles</th>
+                            <th class="px-4 py-3 text-center whitespace-nowrap">Acciones</th>
                         </tr>
                     </thead>
 
@@ -93,38 +88,27 @@
                             @php
                                 $students = $adv->advisoryDetail->students ?? collect();
 
-                                // Formato de fechas
                                 $startDate = \Carbon\Carbon::parse($adv->start_date)->format('d/m/Y');
-                                $endDate = \Carbon\Carbon::parse($adv->end_date)->format('d/m/Y');
-
-                                // Formato de horas
+                                $endDate   = \Carbon\Carbon::parse($adv->end_date)->format('d/m/Y');
                                 $startTime = \Carbon\Carbon::parse($adv->start_time)->format('H:i');
-                                $endTime = \Carbon\Carbon::parse($adv->end_time)->format('H:i');
+                                $endTime   = \Carbon\Carbon::parse($adv->end_time)->format('H:i');
                             @endphp
 
                             <tr class="border-b hover:bg-gray-100 transition">
 
-                                <td class="px-4 py-3">
-                                    {{ $adv->teacherSubject->teacher->name }}
-                                </td>
+                                <td class="px-4 py-3">{{ $adv->teacherSubject->teacher->name }}</td>
 
-                                <td class="px-4 py-3">
-                                    {{ $adv->teacherSubject->subject->career->name }}
-                                </td>
+                                <td class="px-4 py-3">{{ $adv->teacherSubject->subject->career->name }}</td>
 
-                                <td class="px-4 py-3">
-                                    {{ $adv->teacherSubject->subject->name }}
-                                </td>
+                                <td class="px-4 py-3">{{ $adv->teacherSubject->subject->name }}</td>
 
                                 <td class="px-4 py-3 font-semibold">{{ $startDate }}</td>
 
                                 <td class="px-4 py-3 font-semibold">{{ $endDate }}</td>
-                                
-                                 <td class="px-4 py-3 font-semibold">
-                                    
-                                    <strong>{{ $adv->day_of_week }}</strong>
-                                        {{ $startTime }} - {{ $endTime }}
 
+                                <td class="px-4 py-3 font-semibold whitespace-nowrap">
+                                    <strong>{{ $adv->day_of_week }}</strong>
+                                    {{ $startTime }} - {{ $endTime }}
                                 </td>
 
                                 <td class="px-4 py-3 text-center font-bold">{{ $students->count() }}</td>
@@ -145,8 +129,8 @@
                                     @if($adv->assignment_file)
                                         <a href="{{ asset('storage/' . $adv->assignment_file) }}"
                                            target="_blank"
-                                           class="text-blue-600 underline hover:text-blue-800">
-                                            Ver archivo
+                                           class="text-blue-600 hover:underline">
+                                           Ver archivo
                                         </a>
                                     @else
                                         <span class="text-gray-500">Sin archivo</span>
@@ -155,23 +139,22 @@
 
                                 <td class="px-4 py-3 text-center">
                                     <a href="{{ route('basic_sciences.advisories.details', $adv->advisory_id) }}"
-                                       class="text-indigo-600 font-medium hover:text-indigo-800">
-                                        Ver detalles</a>
+                                       class="text-indigo-600 font-semibold hover:underline">
+                                        Ver detalles
+                                    </a>
                                 </td>
 
-                                <td class="px-4 py-3 flex gap-3 justify-center">
+                                <td class="px-4 py-3 flex flex-col sm:flex-row gap-2 justify-center">
 
-                                    <!-- Editar -->
                                     <a href="{{ route('basic_sciences.advisories.edit', $adv->advisory_id) }}"
-                                       class="text-white font-semibold px-3 py-1 rounded hover:opacity-90"
+                                       class="px-3 py-1 text-white rounded font-semibold hover:opacity-90"
                                        style="background-color:#F39C12;">
                                         Editar
                                     </a>
 
-                                    <!-- ELIMINAR CON MODAL -->
                                     <button 
                                         onclick="openDeleteModal('{{ $adv->teacherSubject->subject->name }}', '{{ $adv->advisory_id }}')"
-                                        class="text-white font-semibold px-3 py-1 rounded hover:opacity-90"
+                                        class="px-3 py-1 text-white rounded font-semibold hover:opacity-90"
                                         style="background-color:#E74C3C;">
                                         Eliminar
                                     </button>
@@ -182,32 +165,29 @@
                         @endforeach
 
                     </tbody>
-
                 </table>
+
             </div>
 
         </div>
 
     </main>
 
-    <!-- FOOTER -->
-    <div class="fixed bottom-0 left-0 w-full z-40 shadow">
-        <x-basic-sciences-footer />
-    </div>
+    <div class="w-full mt-10">
+    <x-basic-sciences-footer />
+</div>
 
 
-    <!-- MODAL ELIMINACIÓN -->
     <div id="deleteModal"
-         class="hidden fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50">
+         class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 
-        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+        <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-2xl">
 
-            <h2 class="text-xl font-bold text-red-600 mb-3">⚠ Confirmar eliminación</h2>
+            <h2 class="text-xl font-bold text-red-600 mb-4">⚠ Confirmar eliminación</h2>
 
-            <p class="text-gray-700 mb-4">
-                ¿Seguro que deseas eliminar la asesoría de:
-                <strong id="advisoryName"></strong>?
-                <br>Esta acción no se puede deshacer.
+            <p class="text-gray-700">
+                ¿Eliminar la asesoría de <strong id="advisoryName"></strong>?
+                <br>Esta acción es irreversible.
             </p>
 
             <form id="deleteForm" method="POST">
@@ -217,18 +197,20 @@
                 <div class="flex justify-end gap-3 mt-6">
 
                     <button type="button"
-                            onclick="closeDeleteModal()"
-                            class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
+                        onclick="closeDeleteModal()"
+                        class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
                         Cancelar
                     </button>
 
                     <button type="submit"
-                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                        Sí, eliminar
+                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                        Eliminar
                     </button>
 
                 </div>
+
             </form>
+
         </div>
 
     </div>
@@ -248,4 +230,5 @@
 
 </body>
 </html>
+
 

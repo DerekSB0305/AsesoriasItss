@@ -17,11 +17,35 @@ class TeacherController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $teachers = Teacher::with('career')->get();
+        $search = $request->search;
+        $tutor = $request->tutor;
+        $science = $request->science;
+        $degree = $request->degree;
+
+        $teachers = Teacher::with('career')
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($q2) use ($search) {
+                    $q2->where('name', 'like', "%$search%")
+                        ->orWhere('last_name_f', 'like', "%$search%")
+                        ->orWhere('last_name_m', 'like', "%$search%");
+                });
+            })
+            ->when($tutor !== null && $tutor !== '', function ($q) use ($tutor) {
+                $q->where('tutor', $tutor);
+            })
+            ->when($science !== null && $science !== '', function ($q) use ($science) {
+                $q->where('science_department', $science);
+            })
+            ->when($degree, function ($q) use ($degree) {
+                $q->where('degree', 'like', "%$degree%");
+            })
+            ->get();
+
         return view('basic_sciences.teachers.index', compact('teachers'));
     }
+
 
     public function create()
     {
@@ -188,42 +212,41 @@ class TeacherController extends Controller
             ->with('success', 'Contraseña actualizada correctamente.');
     }
 
-  public function indexCareerHead()
-{
-    $admin = Auth::user()->administrative;
+    public function indexCareerHead()
+    {
+        $admin = Auth::user()->administrative;
 
-    if (!$admin) {
-        return back()->withErrors(['error' => 'Tu cuenta no está registrada como Jefe de Carrera.']);
+        if (!$admin) {
+            return back()->withErrors(['error' => 'Tu cuenta no está registrada como Jefe de Carrera.']);
+        }
+
+        $careerId = $admin->career_id;
+
+        $query = Advisories::with([
+            'teacherSubject.teacher',
+            'teacherSubject.subject',
+            'advisoryDetail.students'
+        ])
+            ->whereHas('teacherSubject.teacher', function ($q) use ($careerId) {
+                $q->where('career_id', $careerId); // 🔥 Maestro pertenezca a mi carrera
+            });
+
+        if (request('maestro')) {
+            $search = request('maestro');
+            $query->whereHas('teacherSubject.teacher', function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                    ->orWhere('last_name_f', 'like', "%$search%");
+            });
+        }
+
+        if (request('estado')) {
+            $query->whereHas('advisoryDetail', function ($q) {
+                $q->where('status', request('estado'));
+            });
+        }
+
+        $advisories = $query->orderBy('start_date')->get();
+
+        return view('career_head.advisories.index', compact('advisories'));
     }
-
-    $careerId = $admin->career_id;
-
-    $query = Advisories::with([
-        'teacherSubject.teacher',
-        'teacherSubject.subject',
-        'advisoryDetail.students'
-    ])
-    ->whereHas('teacherSubject.teacher', function ($q) use ($careerId) {
-        $q->where('career_id', $careerId); // 🔥 Maestro pertenezca a mi carrera
-    });
-
-    if (request('maestro')) {
-        $search = request('maestro');
-        $query->whereHas('teacherSubject.teacher', function ($q) use ($search) {
-            $q->where('name', 'like', "%$search%")
-              ->orWhere('last_name_f', 'like', "%$search%");
-        });
-    }
-
-    if (request('estado')) {
-        $query->whereHas('advisoryDetail', function ($q) {
-            $q->where('status', request('estado'));
-        });
-    }
-
-    $advisories = $query->orderBy('start_date')->get();
-
-    return view('career_head.advisories.index', compact('advisories'));
-}
-
 }

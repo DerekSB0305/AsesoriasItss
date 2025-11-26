@@ -2,98 +2,97 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Administrativo</title>
     @vite('resources/css/app.css')
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <x-basic-sciences-navbar />
+<x-basic-sciences-navbar />
 
 <main class="flex-grow">
 
-    <div class="w-full max-w-3xl mx-auto bg-white shadow-xl rounded-xl p-8 mt-8 mb-8">
+    {{-- CONTENEDOR RESPONSIVE --}}
+    <div class="w-full mx-auto bg-white shadow-lg rounded-lg p-6 sm:p-8 mt-6 
+                max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl">
 
-        <h1 class="text-3xl font-bold text-[#0B3D7E] mb-6 flex items-center gap-2">
+        {{-- TÍTULO --}}
+        <h1 class="text-2xl sm:text-3xl font-bold text-[#0B3D7E] mb-6 flex items-center gap-2">
             ✏️ Editar Administrativo
         </h1>
 
-        <a href="{{ route('basic_sciences.administratives.index') }}"
-           class="inline-block mb-6 text-gray-700 font-semibold px-4 py-2 rounded-lg 
-                  bg-gray-200 hover:bg-gray-300 transition">
-            ← Volver a la lista
-        </a>
-
+        {{-- ERRORES --}}
         @if ($errors->any())
-            <div class="bg-red-100 border border-red-300 text-red-700 p-4 rounded-lg mb-4">
-                <strong class="block mb-2">⚠️ Se encontraron errores:</strong>
-                <ul class="list-disc ml-6 text-sm">
-                    @foreach ($errors->all() as $e)
-                        <li>{{ $e }}</li>
+            <div class="mb-6 bg-red-100 border border-red-300 text-red-700 p-4 rounded-lg text-sm">
+                <p class="font-semibold mb-2">Se encontraron los siguientes errores:</p>
+                <ul class="list-disc ml-6">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
                     @endforeach
                 </ul>
             </div>
         @endif
 
+        {{-- FORMULARIO RESPONSIVE --}}
         <form action="{{ route('basic_sciences.administratives.update', $administrative) }}"
               method="POST"
-              class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
             @csrf
             @method('PUT')
 
-            <div class="col-span-2">
-                <label class="font-semibold mb-1 block text-[#0B3D7E]">Usuario Administrativo</label>
+            {{-- Usuario --}}
+            <div>
+                <label class="block font-semibold mb-1 text-[#0B3D7E]">Usuario Administrativo</label>
                 <input type="text"
                        name="administrative_user"
                        value="{{ $administrative->administrative_user }}"
-                       class="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-[#0B3D7E]"
-                       required>
+                       class="w-full border rounded-lg p-3 focus:ring-2 focus:ring-[#0B3D7E]">
             </div>
 
+            {{-- Nombre --}}
             <div>
-                <label class="font-semibold mb-1 block text-[#0B3D7E]">Nombre</label>
+                <label class="block font-semibold mb-1 text-[#0B3D7E]">Nombre</label>
                 <input type="text"
                        name="name"
                        value="{{ $administrative->name }}"
-                       class="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-[#0B3D7E]"
-                       required>
+                       class="w-full border rounded-lg p-3 focus:ring-2 focus:ring-[#0B3D7E]">
             </div>
 
+            {{-- Apellido Paterno --}}
             <div>
-                <label class="font-semibold mb-1 block text-[#0B3D7E]">Apellido Paterno</label>
+                <label class="block font-semibold mb-1 text-[#0B3D7E]">Apellido Paterno</label>
                 <input type="text"
                        name="last_name_f"
                        value="{{ $administrative->last_name_f }}"
-                       class="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-[#0B3D7E]"
-                       required>
+                       class="w-full border rounded-lg p-3 focus:ring-2 focus:ring-[#0B3D7E]">
             </div>
 
+            {{-- Apellido Materno --}}
             <div>
-                <label class="font-semibold mb-1 block text-[#0B3D7E]">Apellido Materno</label>
+                <label class="block font-semibold mb-1 text-[#0B3D7E]">Apellido Materno</label>
                 <input type="text"
                        name="last_name_m"
                        value="{{ $administrative->last_name_m }}"
-                       class="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-[#0B3D7E]"
-                       required>
+                       class="w-full border rounded-lg p-3 focus:ring-2 focus:ring-[#0B3D7E]">
             </div>
 
+            {{-- Puesto --}}
             <div>
-                <label class="font-semibold mb-1 block text-[#0B3D7E]">Puesto</label>
+                <label class="block font-semibold mb-1 text-[#0B3D7E]">Puesto</label>
                 <input type="text"
                        name="position"
                        value="{{ $administrative->position }}"
-                       class="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-[#0B3D7E]"
-                       required>
+                       class="w-full border rounded-lg p-3 focus:ring-2 focus:ring-[#0B3D7E]">
             </div>
 
-            
-            <div class="col-span-2">
-                <label class="font-semibold mb-1 block text-[#0B3D7E]">Carrera (opcional)</label>
+            {{-- Carrera --}}
+            <div>
+                <label class="block font-semibold mb-1 text-[#0B3D7E]">Carrera (opcional)</label>
                 <select name="career_id"
-                        class="w-full p-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-[#0B3D7E]">
+                        class="w-full border rounded-lg p-3 focus:ring-2 focus:ring-[#0B3D7E]">
                     <option value="">Sin carrera</option>
-
                     @foreach($careers as $c)
                         <option value="{{ $c->career_id }}"
                             {{ $administrative->career_id == $c->career_id ? 'selected' : '' }}>
@@ -103,21 +102,33 @@
                 </select>
             </div>
 
-            <div class="col-span-2 mt-4">
+            {{-- BOTONES RESPONSIVE --}}
+            <div class="col-span-1 md:col-span-2 flex flex-col sm:flex-row justify-between mt-6 gap-3">
+
+                <a href="{{ route('basic_sciences.administratives.index') }}"
+                   class="px-4 py-2 text-center rounded text-white font-semibold bg-gray-600 hover:bg-gray-700">
+                    ← Cancelar
+                </a>
+
                 <button type="submit"
-                        class="w-full py-3 text-white font-bold rounded-lg shadow-lg transition 
-                               hover:opacity-90"
+                        class="px-6 py-2 rounded text-white font-semibold shadow hover:opacity-90"
                         style="background-color:#28A745;">
                     Actualizar Administrativo
                 </button>
+
             </div>
 
         </form>
+
     </div>
+
 </main>
 
-    <x-basic-sciences-footer/>
+<x-basic-sciences-footer/>
 
 </body>
 </html>
+
+
+
 

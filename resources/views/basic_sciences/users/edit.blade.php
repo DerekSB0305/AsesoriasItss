@@ -2,27 +2,28 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Contraseña</title>
     @vite('resources/css/app.css')
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <x-basic-sciences-navbar />
+    <div class="fixed top-0 left-0 w-full z-50 shadow">
+        <x-basic-sciences-navbar />
+    </div>
 
-    {{-- CONTENIDO --}}
-    <div class="flex-grow flex items-center justify-center p-6">
+    <main class="flex-1 mt-32 mb-20 px-4 flex items-center justify-center">
 
-        <div class="bg-white w-full max-w-lg shadow-xl p-8 rounded-xl border-t-4 border-[#0B3D7E]">
+        <div class="bg-white w-full max-w-lg shadow-xl p-6 sm:p-8 rounded-xl border-t-4 border-[#0B3D7E]">
 
-            <h1 class="text-3xl font-extrabold text-[#0B3D7E] mb-6 text-center flex items-center justify-center gap-2">
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#0B3D7E] mb-6 text-center flex items-center justify-center gap-2">
                 🔐 Editar Contraseña
             </h1>
 
-            {{-- BOTÓN VOLVER --}}
             <div class="mb-6">
                 <a href="{{ route('basic_sciences.users.index') }}"
-                   class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold">
+                   class="inline-block px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg font-semibold transition">
                     ← Volver
                 </a>
             </div>
@@ -31,53 +32,53 @@
                 @csrf
                 @method('PUT')
 
-                {{-- ERRORES --}}
                 @if ($errors->any())
-                <div class="bg-red-100 border border-red-300 text-red-700 p-3 rounded">
-                    <ul class="list-disc ml-5 text-sm">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
+                    <div class="bg-red-100 border border-red-300 text-red-700 p-3 rounded">
+                        <ul class="list-disc ml-5 text-sm">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
                 @endif
 
-                {{-- EXITO --}}
                 @if (session('success'))
-                <div class="bg-green-100 border border-green-300 text-green-700 p-3 rounded">
-                    {{ session('success') }}
-                </div>
+                    <div class="bg-green-100 border border-green-300 text-green-700 p-3 rounded">
+                        {{ session('success') }}
+                    </div>
                 @endif
 
-                <div class="mb-4">
+                <div>
                     <label class="block mb-1 font-semibold text-gray-700">Usuario</label>
                     <input type="text" value="{{ $user->user }}" disabled
-                           class="w-full border-gray-300 border rounded-lg p-3 bg-gray-100 cursor-not-allowed">
+                           class="w-full border border-gray-300 rounded-lg p-3 bg-gray-100 text-gray-600 cursor-not-allowed">
                 </div>
 
-                {{-- NUEVA CONTRASEÑA --}}
                 <div>
                     <label class="block mb-1 font-semibold text-gray-700">Nueva contraseña</label>
-                    <input type="password" name="password" id="password"
-                           class="w-full border-gray-300 border rounded-lg p-3 focus:ring-[#007BFF] focus:border-[#007BFF]"
-                           minlength="8" required>
+                    <input type="password"
+                           id="password"
+                           name="password"
+                           minlength="8"
+                           required
+                           class="w-full border border-gray-300 rounded-lg p-3 focus:ring-[#007BFF] focus:border-[#007BFF]">
 
-                    <small id="msg" class="text-red-600 hidden text-sm">
-                        ⚠️ La contraseña debe tener mínimo 8 caracteres.
+                    <small id="msg"
+                           class="text-red-600 text-sm hidden">
+                        ⚠️ La contraseña debe tener al menos 8 caracteres.
                     </small>
                 </div>
 
-                {{-- CONFIRMAR --}}
                 <div>
                     <label class="block mb-1 font-semibold text-gray-700">Confirmar contraseña</label>
-                    <input type="password" name="password_confirmation"
-                           class="w-full border-gray-300 border rounded-lg p-3 focus:ring-[#007BFF] focus:border-[#007BFF]"
-                           required>
+                    <input type="password"
+                           name="password_confirmation"
+                           required
+                           class="w-full border border-gray-300 rounded-lg p-3 focus:ring-[#007BFF] focus:border-[#007BFF]">
                 </div>
 
-                {{-- BOTÓN --}}
                 <button type="submit"
-                    class="w-full bg-[#28A745] text-white font-semibold py-3 rounded-lg shadow hover:bg-[#16A085] transition">
+                        class="w-full bg-[#28A745] text-white font-semibold py-3 rounded-lg shadow hover:bg-[#1e8d39] transition">
                     💾 Actualizar contraseña
                 </button>
 
@@ -85,20 +86,20 @@
 
         </div>
 
+    </main>
+
+    <div class="mt-auto">
+        <x-basic-sciences-footer />
     </div>
 
-    <x-basic-sciences-footer />
+    <script>
+        const pass = document.getElementById('password');
+        const msg = document.getElementById('msg');
+
+        pass.addEventListener('input', () => {
+            msg.classList.toggle('hidden', pass.value.length >= 8);
+        });
+    </script>
 
 </body>
-
-<script>
-    const pass = document.getElementById('password');
-    const msg = document.getElementById('msg');
-
-    pass.addEventListener('input', () => {
-        msg.classList.toggle('hidden', pass.value.length >= 8);
-    });
-</script>
-
 </html>
-

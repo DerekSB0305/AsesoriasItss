@@ -155,38 +155,53 @@ class ManualController extends Controller
     /**
      * Vista para Ciencias Básicas (admin)
      */
-    public function listManuals()
+    public function listManuals(Request $request)
     {
+        $maestro = $request->maestro;
+        $materia = $request->materia;
+
         $manuals = Manual::with([
             'teacherSubject.teacher',
             'teacherSubject.subject.career'
         ])
+            ->when($maestro, function ($q) use ($maestro) {
+                $q->whereHas('teacherSubject.teacher', function ($t) use ($maestro) {
+                    $t->where('name', 'like', "%$maestro%")
+                        ->orWhere('last_name_f', 'like', "%$maestro%")
+                        ->orWhere('last_name_m', 'like', "%$maestro%");
+                });
+            })
+            ->when($materia, function ($q) use ($materia) {
+                $q->whereHas('teacherSubject.subject', function ($s) use ($materia) {
+                    $s->where('name', 'like', "%$materia%");
+                });
+            })
             ->orderBy('created_at', 'desc')
             ->get();
 
         return view('basic_sciences.manuals.index', compact('manuals'));
     }
 
+
     /**
      * Vista para Jefes de Carrera
      */
-   public function indexCareerHead()
-{
-    $admin = Auth::user()->administrative;
+    public function indexCareerHead()
+    {
+        $admin = Auth::user()->administrative;
 
-    if (!$admin) {
-        return back()->withErrors(['error' => 'Tu cuenta no está registrada como Jefe de Carrera.']);
+        if (!$admin) {
+            return back()->withErrors(['error' => 'Tu cuenta no está registrada como Jefe de Carrera.']);
+        }
+
+        $careerId = $admin->career_id;
+
+        $manuals = Manual::with(['teacherSubject.teacher', 'teacherSubject.subject'])
+            ->whereHas('teacherSubject.teacher', function ($q) use ($careerId) {
+                $q->where('career_id', $careerId);  // 🔥 Maestro pertenece a mi carrera
+            })
+            ->get();
+
+        return view('career_head.manuals.index', compact('manuals'));
     }
-
-    $careerId = $admin->career_id;
-
-    $manuals = Manual::with(['teacherSubject.teacher', 'teacherSubject.subject'])
-        ->whereHas('teacherSubject.teacher', function ($q) use ($careerId) {
-            $q->where('career_id', $careerId);  // 🔥 Maestro pertenece a mi carrera
-        })
-        ->get();
-
-    return view('career_head.manuals.index', compact('manuals'));
-}
-
 }

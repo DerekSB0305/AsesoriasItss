@@ -2,30 +2,31 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear Administrativo</title>
     @vite('resources/css/app.css')
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    {{-- NAVBAR --}}
-    <x-basic-sciences-navbar />
+<x-basic-sciences-navbar />
 
 <main class="flex-grow">
 
-    {{-- CONTENEDOR --}}
-    <div class="w-full max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8 mt-8">
+    {{-- CONTENEDOR RESPONSIVE --}}
+    <div class="w-full mx-auto bg-white shadow-lg rounded-lg p-6 sm:p-8 mt-6 
+                max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl">
 
         {{-- TÍTULO --}}
-        <h1 class="text-3xl font-bold text-[#0B3D7E] mb-6 flex items-center gap-2">
+        <h1 class="text-2xl sm:text-3xl font-bold text-[#0B3D7E] mb-6 flex items-center gap-2">
             ➕ Nuevo Administrativo
         </h1>
 
-        {{-- ERRORES DETALLADOS --}}
+        {{-- ERRORES --}}
         @if ($errors->any())
-            <div class="mb-6 bg-red-100 border border-red-300 text-red-700 p-4 rounded-lg">
+            <div class="mb-6 bg-red-100 border border-red-300 text-red-700 p-4 rounded-lg text-sm">
                 <p class="font-semibold mb-2">Se encontraron los siguientes errores:</p>
-                <ul class="list-disc ml-6 text-sm">
+                <ul class="list-disc ml-6">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
@@ -33,14 +34,13 @@
             </div>
         @endif
 
-        {{-- FORMULARIO EN 2 COLUMNAS --}}
+        {{-- FORMULARIO RESPONSIVE (1 → 2 columnas) --}}
         <form action="{{ route('basic_sciences.administratives.store') }}"
               method="POST"
-              class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
             @csrf
 
-            {{-- USUARIO --}}
             <div>
                 <label class="block font-semibold mb-1 text-[#0B3D7E]">Usuario Administrativo</label>
                 <input type="text" name="administrative_user" 
@@ -48,7 +48,6 @@
                        class="w-full border rounded-lg p-3 focus:ring-2 focus:ring-[#0B3D7E]">
             </div>
 
-            {{-- NOMBRE --}}
             <div>
                 <label class="block font-semibold mb-1 text-[#0B3D7E]">Nombre</label>
                 <input type="text" name="name" 
@@ -56,7 +55,6 @@
                        class="w-full border rounded-lg p-3 focus:ring-2 focus:ring-[#0B3D7E]">
             </div>
 
-            {{-- APELLIDO PATERNO --}}
             <div>
                 <label class="block font-semibold mb-1 text-[#0B3D7E]">Apellido Paterno</label>
                 <input type="text" name="last_name_f" 
@@ -64,7 +62,6 @@
                        class="w-full border rounded-lg p-3 focus:ring-2 focus:ring-[#0B3D7E]">
             </div>
 
-            {{-- APELLIDO MATERNO --}}
             <div>
                 <label class="block font-semibold mb-1 text-[#0B3D7E]">Apellido Materno</label>
                 <input type="text" name="last_name_m" 
@@ -72,7 +69,6 @@
                        class="w-full border rounded-lg p-3 focus:ring-2 focus:ring-[#0B3D7E]">
             </div>
 
-            {{-- PUESTO --}}
             <div>
                 <label class="block font-semibold mb-1 text-[#0B3D7E]">Puesto</label>
                 <input type="text" name="position" 
@@ -80,7 +76,6 @@
                        class="w-full border rounded-lg p-3 focus:ring-2 focus:ring-[#0B3D7E]">
             </div>
 
-            {{-- CARRERA --}}
             <div>
                 <label class="block font-semibold mb-1 text-[#0B3D7E]">Carrera</label>
                 <select name="career_id"
@@ -95,11 +90,11 @@
                 </select>
             </div>
 
-            {{-- BOTONES --}}
-            <div class="col-span-1 md:col-span-2 flex justify-between mt-6">
+            {{-- BOTONES RESPONSIVE --}}
+            <div class="col-span-1 md:col-span-2 flex flex-col sm:flex-row justify-between mt-6 gap-3">
 
                 <a href="{{ route('basic_sciences.administratives.index') }}"
-                   class="px-4 py-2 rounded text-white font-semibold bg-gray-600 hover:bg-gray-700">
+                   class="px-4 py-2 text-center rounded text-white font-semibold bg-gray-600 hover:bg-gray-700">
                     ← Cancelar
                 </a>
 
@@ -117,12 +112,10 @@
 
 </main>
 
-    {{-- FOOTER --}}
-    <x-basic-sciences-footer />
-
-
+<x-basic-sciences-footer />
 
 </body>
 </html>
+
 
 
