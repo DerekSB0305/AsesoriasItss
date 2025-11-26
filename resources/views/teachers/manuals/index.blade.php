@@ -27,7 +27,8 @@
         {{-- Botón para subir manual --}}
         <div class="flex justify-end mb-4">
             <a href="{{ route('teachers.manuals.select_subject') }}"
-               class="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700">
+               class="py-3 text-white font-bold rounded-lg shadow hover:opacity-90"
+                        style="background-color:#28A745;">
                 ➕ Subir manual
             </a>
         </div>

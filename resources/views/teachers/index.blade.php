@@ -62,7 +62,8 @@
                 $basic = $teacher->science_department;
             @endphp
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
 
                 {{-- TUTOR NO BÁSICAS --}}
                 @if ($tutor && !$basic)
@@ -95,6 +96,14 @@
                         <span class="text-xl font-semibold text-gray-800">Solicitar asesoría</span>
                     </a>
 
+                    <a href="{{ route('teachers.documents.index') }}"
+   class="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl shadow-md 
+          hover:shadow-2xl transition bg-white border border-gray-200 hover:bg-orange-50">
+    <span class="text-5xl">📂</span>
+    <span class="text-xl font-semibold text-gray-800">Documentos descargables</span>
+</a>
+
+
                 @endif
 
                 {{-- NO TUTOR, SÍ BÁSICAS --}}
@@ -113,6 +122,14 @@
                         <span class="text-5xl">📘</span>
                         <span class="text-xl font-semibold text-gray-800">Manuales de materias</span>
                     </a>
+
+                    <a href="{{ route('teachers.documents.index') }}"
+   class="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl shadow-md 
+          hover:shadow-2xl transition bg-white border border-gray-200 hover:bg-orange-50">
+    <span class="text-5xl">📂</span>
+    <span class="text-xl font-semibold text-gray-800">Documentos descargables</span>
+</a>
+
 
                 @endif
 
@@ -160,6 +177,14 @@
                         <span class="text-5xl">📘</span>
                         <span class="text-xl font-semibold text-gray-800">Manuales de materias</span>
                     </a>
+
+                    <a href="{{ route('teachers.documents.index') }}"
+   class="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl shadow-md 
+          hover:shadow-2xl transition bg-white border border-gray-200 hover:bg-orange-50">
+    <span class="text-5xl">📂</span>
+    <span class="text-xl font-semibold text-gray-800">Documentos descargables</span>
+</a>
+
 
                 @endif
 

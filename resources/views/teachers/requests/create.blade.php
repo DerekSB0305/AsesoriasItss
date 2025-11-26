@@ -59,7 +59,7 @@
         <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">Motivo / detalle de la asesoría:</label>
 
-            <textarea name="reason" rows="4"
+            <textarea name="reason" required rows="4"
                 placeholder="Explica por qué solicitas esta asesoría"
                 class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">{{ old('reason') }}</textarea>
 
@@ -74,7 +74,7 @@
                 Hoja de canalización (DOC/DOCX/PDF/JPG/PNG, máx. 2MB)
             </label>
 
-            <input type="file" name="canalization_file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+            <input type="file" name="canalization_file" required accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                 class="w-full p-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500">
 
             @error('canalization_file')
@@ -85,7 +85,8 @@
         {{-- Botón --}}
         <div class="flex justify-end">
             <button type="submit"
-                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                class="w-1/2 py-3 text-white font-bold rounded-lg shadow hover:opacity-90"
+                        style="background-color:#28A745;">
                 Enviar Solicitud
             </button>
         </div>

@@ -155,6 +155,16 @@ class StudentPanelController extends Controller
         ));
     }
 
+        public function notifications()
+    {
+        $user = Auth::user();
+
+        $user->unreadNotifications->markAsRead();
+
+        return view('students.notifications.index');
+    }
+
+
     /**
      * Form para cambiar contraseña
      */

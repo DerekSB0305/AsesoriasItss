@@ -78,6 +78,8 @@
             <label class="block text-sm font-medium text-gray-700">Semestre:</label>
             <input type="number" 
                    name="semester" 
+                   min="1"
+                    max="12"
                    value="{{ old('semester') }}" 
                    required
                    class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
@@ -109,6 +111,8 @@
             <label class="block text-sm font-medium text-gray-700">Edad:</label>
             <input type="number" 
                    name="age" 
+                   min="17"
+                    max="80"
                    value="{{ old('age') }}" 
                    required
                    class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
@@ -131,7 +135,7 @@
 
         <div>
             <label>Horario del alumno (PDF / Imagen):</label>
-<input type="file" name="schedule_file" class="border rounded p-2 mb-4 w-full">
+<input type="file" name="schedule_file" class="border rounded p-2 mb-4 w-full" required>
 <br><br>
 
         </div>
@@ -139,7 +143,8 @@
         {{-- Botón --}}
         <div class="col-span-2 flex justify-end">
             <button type="submit"
-                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                class="w-1/2 py-3 text-white font-bold rounded-lg shadow hover:opacity-90"
+                        style="background-color:#28A745;">
                 Guardar Alumno
             </button>
         </div>
@@ -148,7 +153,8 @@
     {{-- Volver --}}
     <div class="mt-6">
         <a href="{{ route('teachers.students.index') }}" 
-           class="text-blue-600 hover:text-blue-800 font-medium">
+           class="w-1/2 py-3 text-center text-white font-bold rounded-lg shadow hover:opacity-90"
+                   style="background-color:#6C757D;">
             ← Volver
         </a>
     </div>
