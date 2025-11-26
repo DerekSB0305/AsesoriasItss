@@ -222,31 +222,41 @@ class TeacherController extends Controller
 
         $careerId = $admin->career_id;
 
-        $query = Advisories::with([
-            'teacherSubject.teacher',
-            'teacherSubject.subject',
-            'advisoryDetail.students'
+        $query = Teacher::with([
+            'career',
+            'teacherSubjects.advisories',
+            'manuals'
         ])
-            ->whereHas('teacherSubject.teacher', function ($q) use ($careerId) {
-                $q->where('career_id', $careerId); // 🔥 Maestro pertenezca a mi carrera
-            });
+            ->where('career_id', $careerId);
 
-        if (request('maestro')) {
-            $search = request('maestro');
-            $query->whereHas('teacherSubject.teacher', function ($q) use ($search) {
+        if (request('nombre')) {
+            $search = request('nombre');
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%$search%")
-                    ->orWhere('last_name_f', 'like', "%$search%");
+                    ->orWhere('last_name_f', 'like', "%$search%")
+                    ->orWhere('last_name_m', 'like', "%$search%");
             });
         }
 
-        if (request('estado')) {
-            $query->whereHas('advisoryDetail', function ($q) {
-                $q->where('status', request('estado'));
-            });
+        if (request('tutor') !== null && request('tutor') !== '') {
+            $query->where('tutor', request('tutor'));
         }
 
-        $advisories = $query->orderBy('start_date')->get();
+        if (request('cb') !== null && request('cb') !== '') {
+            $query->where('science_department', request('cb'));
+        }
 
-        return view('career_head.advisories.index', compact('advisories'));
+        $teachers = $query->get();
+
+        foreach ($teachers as $t) {
+
+            $t->total_advisories = $t->teacherSubjects
+                ->flatMap(fn($ts) => $ts->advisories)
+                ->count();
+
+            $t->has_manuals = $t->manuals->count() > 0;
+        }
+
+        return view('career_head.teachers.index', compact('teachers'));
     }
 }

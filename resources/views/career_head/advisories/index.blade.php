@@ -2,66 +2,67 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asesorías de mi Carrera</title>
     @vite('resources/css/app.css')
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-{{-- NAVBAR --}}
 <x-career-head-navbar />
 
-<div class="max-w-7xl mx-auto bg-white shadow-xl rounded-xl p-8 my-10 flex-1 w-full">
+<main class="flex-grow">
 
-    <h1 class="text-4xl font-extrabold text-[#0B3D7E] mb-8 text-center">
+<div class="w-[95%] max-w-7xl mx-auto bg-white shadow-lg rounded-xl p-4 sm:p-6 md:p-8 my-8">
+
+    <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#0B3D7E] mb-6 text-center">
         🧩 Asesorías de Maestros de mi Carrera
     </h1>
 
-    {{-- 🔙 Botón volver + buscador --}}
-    <div class="flex flex-col md:flex-row md:justify-between gap-4 mb-8">
+    <div class="flex flex-col md:flex-row md:justify-between gap-4 mb-6">
 
         <a href="{{ route('career_head.index') }}"
            class="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold text-center">
             ← Volver al inicio
         </a>
 
-        <form method="GET" class="flex gap-3 w-full md:w-auto">
+        <form method="GET" class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
 
             <input type="text" name="maestro" value="{{ request('maestro') }}"
                    placeholder="Buscar por maestro..."
-                   class="px-4 py-2 border rounded-lg w-full md:w-72 focus:ring-2 focus:ring-[#0B3D7E]">
+                   class="px-3 py-2 border rounded-lg w-full sm:w-64 md:w-72 focus:ring-2 focus:ring-[#0B3D7E]">
 
             <select name="estado"
-                    class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#0B3D7E]">
+                    class="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#0B3D7E] w-full sm:w-auto">
                 <option value="">Estado</option>
                 <option value="Pendiente" {{ request('estado')=='Pendiente'?'selected':'' }}>Pendiente</option>
                 <option value="Aprobado" {{ request('estado')=='Aprobado'?'selected':'' }}>Aprobado</option>
                 <option value="Finalizado" {{ request('estado')=='Finalizado'?'selected':'' }}>Finalizado</option>
             </select>
 
-            <button class="px-4 py-2 bg-[#1ABC9C] text-white rounded-lg shadow">
+            <button class="px-4 py-2 bg-[#1ABC9C] text-white rounded-lg shadow w-full sm:w-auto">
                 🔍 Buscar
             </button>
 
         </form>
     </div>
 
-    {{-- 📋 TABLA DE ASESORÍAS --}}
     <div class="overflow-x-auto rounded-xl border shadow">
-        <table class="w-full border-collapse text-sm">
+
+        <table class="min-w-max w-full border-collapse text-sm sm:text-base">
 
             <thead class="text-white uppercase font-semibold" style="background-color:#0B3D7E;">
                 <tr>
-                    <th class="px-4 py-3">Maestro</th>
-                    <th class="px-4 py-3">Carrera</th>
-                    <th class="px-4 py-3">Materia</th>
-                    <th class="px-4 py-3">Fechas</th>
-                    <th class="px-4 py-3">Día & Horario</th>
-                    <th class="px-4 py-3">Aula</th>
-                    <th class="px-4 py-3">Edificio</th>
-                    <th class="px-4 py-3">Alumnos</th>
-                    <th class="px-4 py-3">Estado</th>
-                    <th class="px-4 py-3 text-center">Acciones</th>
+                    <th class="px-4 py-3 whitespace-nowrap">Maestro</th>
+                    <th class="px-4 py-3 whitespace-nowrap">Carrera</th>
+                    <th class="px-4 py-3 whitespace-nowrap">Materia</th>
+                    <th class="px-4 py-3 whitespace-nowrap">Fechas</th>
+                    <th class="px-4 py-3 whitespace-nowrap">Día & Horario</th>
+                    <th class="px-4 py-3 whitespace-nowrap">Aula</th>
+                    <th class="px-4 py-3 whitespace-nowrap">Edificio</th>
+                    <th class="px-4 py-3 whitespace-nowrap">Alumnos</th>
+                    <th class="px-4 py-3 whitespace-nowrap">Estado</th>
+                    <th class="px-4 py-3 text-center whitespace-nowrap">Detalles</th>
                 </tr>
             </thead>
 
@@ -78,53 +79,43 @@
 
                     <tr class="border-b hover:bg-gray-50 transition">
 
-                        {{-- Maestro --}}
-                        <td class="px-4 py-3 font-semibold">
+                        <td class="px-4 py-3 font-semibold whitespace-nowrap">
                             {{ $teacher->name }} {{ $teacher->last_name_f }}
                         </td>
 
-                        {{-- Carrera --}}
-                        <td class="px-4 py-3">
+                        <td class="px-4 py-3 whitespace-nowrap">
                             {{ $career->name }}
                         </td>
 
-                        {{-- Materia --}}
-                        <td class="px-4 py-3">
+                        <td class="px-4 py-3 whitespace-nowrap">
                             {{ $subject->name }}
                         </td>
 
-                        {{-- Fechas inicio/fin --}}
-                        <td class="px-4 py-3">
+                        <td class="px-4 py-3 whitespace-nowrap">
                             {{ \Carbon\Carbon::parse($a->start_date)->format('d/m/Y') }} <br>
                             <span class="text-gray-500">a</span> <br>
                             {{ \Carbon\Carbon::parse($a->end_date)->format('d/m/Y') }}
                         </td>
 
-                        {{-- Día y horario --}}
-                        <td class="px-4 py-3">
+                        <td class="px-4 py-3 whitespace-nowrap">
                             {{ ucfirst($a->day_of_week) }}<br>
                             {{ \Carbon\Carbon::parse($a->start_time)->format('H:i') }} -
                             {{ \Carbon\Carbon::parse($a->end_time)->format('H:i') }}
                         </td>
 
-                        {{-- Aula --}}
-                        <td class="px-4 py-3">
+                        <td class="px-4 py-3 whitespace-nowrap">
                             {{ $a->classroom ?? 'N/A' }}
                         </td>
 
-                        {{-- Edificio --}}
-                        <td class="px-4 py-3">
+                        <td class="px-4 py-3 whitespace-nowrap">
                             {{ $a->building ?? 'N/A' }}
                         </td>
 
-                        {{-- Total de alumnos --}}
-                        <td class="px-4 py-3 text-center font-bold">
+                        <td class="px-4 py-3 text-center font-bold whitespace-nowrap">
                             {{ $detail->students->count() }}
                         </td>
 
-                        {{-- Estado --}}
-                        <td class="px-4 py-3 font-semibold">
-
+                        <td class="px-4 py-3 font-semibold whitespace-nowrap">
                             @if($detail->status == 'Pendiente')
                                 <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded">Pendiente</span>
                             @elseif($detail->status == 'Aprobado')
@@ -132,11 +123,9 @@
                             @else
                                 <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded">Finalizado</span>
                             @endif
-
                         </td>
 
-                        {{-- Acciones --}}
-                        <td class="px-4 py-3 text-center">
+                        <td class="px-4 py-3 text-center whitespace-nowrap">
                            <a href="{{ route('career_head.advisories.details', $a->advisory_id) }}"
                                class="text-indigo-600 hover:text-indigo-800 font-semibold">
                                 📄 Ver detalles
@@ -150,12 +139,15 @@
             </tbody>
 
         </table>
+
     </div>
 
 </div>
 
-{{-- FOOTER --}}
+</main>
+
 <x-basic-sciences-footer />
 
 </body>
 </html>
+

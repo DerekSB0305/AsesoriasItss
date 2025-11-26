@@ -14,8 +14,15 @@ class Teacher extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'teacher_user', 'name', 'last_name_f', 'last_name_m',
-        'career_id', 'degree', 'tutor', 'science_department', 'schedule'
+        'teacher_user',
+        'name',
+        'last_name_f',
+        'last_name_m',
+        'career_id',
+        'degree',
+        'tutor',
+        'science_department',
+        'schedule'
     ];
 
     // Carrera del maestro
@@ -24,28 +31,28 @@ class Teacher extends Model
         return $this->belongsTo(Career::class, 'career_id', 'career_id');
     }
 
-    // Relación con materias (N:M)
-    public function subjects()
-    {
-        return $this->belongsToMany(Subject::class, 'teacher_subjects', 'teacher_user', 'subject_id');
-    }
-
-    // Relación correcta con teacher_subjects
+    // Relación con TeacherSubject
     public function teacherSubjects()
     {
         return $this->hasMany(\App\Models\TeacherSubject::class, 'teacher_user', 'teacher_user');
     }
 
-    // Relación con alumnos
-    public function students()
-    {
-        return $this->hasMany(Student::class, 'teacher_user', 'teacher_user');
-    }
-
-    // Relación con asesorías
+    // Relación con asesorías directas
     public function advisories()
     {
         return $this->hasMany(Advisories::class, 'teacher_user', 'teacher_user');
+    }
+
+    public function manuals()
+    {
+        return $this->hasManyThrough(
+            Manual::class,
+            TeacherSubject::class,
+            'teacher_user',
+            'teacher_subject_id',
+            'teacher_user',
+            'teacher_subject_id'
+        );
     }
 
     // Relación con el usuario del sistema
@@ -59,7 +66,6 @@ class Teacher extends Model
         parent::boot();
 
         static::deleting(function ($teacher) {
-            // Eliminar usuario asociado
             \App\Models\User::where('user', $teacher->teacher_user)->delete();
         });
     }
