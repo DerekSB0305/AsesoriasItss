@@ -1,87 +1,64 @@
-<div>
-    <nav class="bg-[#0B3D7E] text-white shadow-lg">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+<nav class="bg-[#0B3D7E] text-white shadow-md py-3 w-full">
+    <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
 
-        {{-- LOGO / TÍTULO --}}
-        <div class="flex items-center gap-3">
-            <span class="material-icons text-3xl">account_balance</span>
-            <h1 class="text-xl font-bold tracking-wide">
-                Jefatura de División
-            </h1>
+        {{-- LOGO --}}
+        <div class="flex items-center space-x-3">
+            <img src="{{ asset('images/tecnm_logo.png') }}" class="h-10" alt="TecNM">
         </div>
 
-        {{-- ENLACES --}}
-        <ul class="hidden md:flex gap-6 text-sm font-semibold">
+        {{-- BOTÓN HAMBURGUESA (solo móvil) --}}
+        <button id="menu-btn" class="md:hidden text-3xl focus:outline-none">
+            ☰
+        </button>
 
-            <li>
-                <a href="{{ route('career_head.index') }}"
-                   class="hover:text-gray-300 transition">
-                    Inicio
-                </a>
-            </li>
+        {{-- MENÚ DESKTOP --}}
+        <div class="hidden md:flex space-x-8 text-sm font-medium">
+            <a href="{{ route('career_head.teachers.index') }}" class="hover:text-gray-300">Maestros</a>
+            <a href="{{ route('career_head.students.index') }}" class="hover:text-gray-300">Alumnos</a>
+            <a href="{{ route('career_head.advisories.index') }}" class="hover:text-gray-300">Asesorias</a>
+            <a href="{{ route('career_head.manuals.index') }}" class="hover:text-gray-300">Manuales</a>
+        </div>
 
-            <li>
-                <a href="{{ route('career_head.teachers.index') }}"
-                   class="hover:text-gray-300 transition">
-                    Maestros
-                </a>
-            </li>
+        {{-- PERFIL + LOGOUT (DESKTOP) --}}
+        <div class="hidden md:flex items-center space-x-3">
+            <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" 
+                    class="h-6 w-6 text-gray-700" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M5.121 17.804A4 4 0 0112 15a4 4 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+            </div>
 
-            <li>
-                <a href="{{ route('career_head.students.index') }}"
-                   class="hover:text-gray-300 transition">
-                    Alumnos
-                </a>
-            </li>
-
-            <li>
-                <a href="{{ route('career_head.advisories.index') }}"
-                   class="hover:text-gray-300 transition">
-                    Asesorías
-                </a>
-            </li>
-
-            <li>
-                <a href="{{ route('career_head.manuals.index') }}"
-                   class="hover:text-gray-300 transition">
-                    Manuales
-                </a>
-            </li>
-
-        </ul>
-
-        {{-- BOTÓN DE CERRAR SESIÓN --}}
-         <form method="POST" action="{{ route('logout') }}">
+            <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="text-xs hover:text-gray-300">
                     Cerrar sesión
                 </button>
             </form>
-
+        </div>
     </div>
 
-    {{-- MOBILE MENU --}}
-    <div class="md:hidden bg-[#0B3D7E] px-6 pb-4">
+    <div id="mobile-menu" class="hidden md:hidden bg-[#0B3D7E] px-6 pb-4 space-y-3 text-sm">
+        <a href="{{ route('career_head.teachers.index') }}" class="block hover:text-gray-300">Maestros</a>
+        <a href="{{ route('career_head.students.index') }}" class="block hover:text-gray-300">Alumnos</a>
+        <a href="{{ route('career_head.advisories.index') }}" class="block hover:text-gray-300">Asesorias</a>
+        <a href="{{ route('career_head.manuals.index') }}" class="block hover:text-gray-300">Manuales</a>
 
-        <a href="{{ route('career_head.index') }}"
-           class="block py-2 border-b border-gray-600">Inicio</a>
-
-        <a href="{{ route('career_head.teachers.index') }}"
-           class="block py-2 border-b border-gray-600">Maestros</a>
-
-        <a href="{{ route('career_head.students.index') }}"
-           class="block py-2 border-b border-gray-600">Alumnos</a>
-
-        <a href="{{ route('career_head.advisories.index') }}"
-           class="block py-2 border-b border-gray-600">Asesorías</a>
-
-        <a href="{{ route('career_head.manuals.index') }}"
-           class="block py-2">Manuales</a>
-
+        <div class="pt-3 border-t border-gray-300">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="w-full text-left hover:text-gray-300">
+                    Cerrar sesión
+                </button>
+            </form>
+        </div>
     </div>
 </nav>
 
-{{-- GOOGLE ICONS --}}
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-</div>
+{{-- Toggle del menú --}}
+<script>
+    document.getElementById('menu-btn').addEventListener('click', () => {
+        document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+</script>
