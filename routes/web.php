@@ -18,7 +18,7 @@ use Dom\Document;
 use Illuminate\Support\Facades\Auth;
 
 // Página principal
-Route::get('/', fn() => view('welcome'));
+Route::get('/', fn() => view('login'));
 
 // Dashboard
 Route::get('/dashboard', fn() => view('dashboard'))

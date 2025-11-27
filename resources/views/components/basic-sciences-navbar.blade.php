@@ -1,17 +1,21 @@
-<nav class="bg-[#0B3D7E] text-white shadow-md py-3 w-full">
+<nav class="bg-[#0B3D7E] text-white shadow-md py-3 w-full"> 
     <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
 
-        {{-- LOGO --}}
-        <div class="flex items-center space-x-3">
-            <img src="{{ asset('images/tecnm_logo.png') }}" class="h-10" alt="TecNM">
-        </div>
+   <div class="flex items-center space-x-4">
+    <img src="{{ asset('images/Logo_tecnm.jpg') }}"
+         class="h-16 md:h-20 w-auto object-contain" 
+         alt="TecNM">
 
-        {{-- BOTÓN HAMBURGUESA (solo móvil) --}}
+    <img src="{{ asset('images/Logo_itss.png') }}"
+         class="h-14 md:h-20 w-auto object-contain"
+         alt="ITSS">
+</div>
+
+
         <button id="menu-btn" class="md:hidden text-3xl focus:outline-none">
             ☰
         </button>
 
-        {{-- MENÚ DESKTOP --}}
         <div class="hidden md:flex space-x-8 text-sm font-medium">
             <a href="{{ route('basic_sciences.requests.index') }}" class="hover:text-gray-300">Solicitudes</a>
             <a href="{{ route('basic_sciences.teachers.index') }}" class="hover:text-gray-300">Maestro</a>
@@ -23,12 +27,11 @@
             <a href="{{ route('basic_sciences.manuals.index') }}" class="hover:text-gray-300">Manuales</a>
         </div>
 
-        {{-- PERFIL + LOGOUT (DESKTOP) --}}
         <div class="hidden md:flex items-center space-x-3">
             <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" 
-                    class="h-6 w-6 text-gray-700" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor">
+                     class="h-6 w-6 text-gray-700" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M5.121 17.804A4 4 0 0112 15a4 4 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
@@ -64,7 +67,6 @@
     </div>
 </nav>
 
-{{-- Toggle del menú --}}
 <script>
     document.getElementById('menu-btn').addEventListener('click', () => {
         document.getElementById('mobile-menu').classList.toggle('hidden');
