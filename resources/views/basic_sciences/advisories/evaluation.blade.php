@@ -72,7 +72,7 @@
 
         {{-- LISTA DE ALUMNOS QUE EVALUARON Y NO EVALUARON --}}
         <h2 class="text-lg sm:text-xl font-bold text-gray-800 mb-3">
-            🧑‍🎓 Estado de evaluaciones de los alumnos
+             Estado de evaluaciones de los alumnos
         </h2>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
