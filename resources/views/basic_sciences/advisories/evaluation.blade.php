@@ -37,7 +37,7 @@
             {{ $advisory->teacherSubject->subject->name }}
         </p>
         <p class="mt-1"><strong>Carrera:</strong>
-            {{ $advisory->teacherSubject->subject->career->name }}
+            {{ $advisory->teacherSubject->teacher->career->name }}
         </p>
         <p class="mt-1"><strong>Total de evaluaciones recibidas:</strong> {{ $total }}</p>
     </div>

@@ -57,39 +57,73 @@ class AdvisoryDetailsController extends Controller
 
     public function getStudentsBySubject(int $subject_id)
     {
-      $requests = Requests::where('subject_id', $subject_id)
-        ->with('student')
-        ->get();
+        //  Solicitudes hechas para esta materia
+        $requests = Requests::where('subject_id', $subject_id)
+            ->with('student')
+            ->get();
 
-    // 2) Obtener matrículas de alumnos que YA tienen asesoría para esta materia
-    $alumnosConAsesoria = \App\Models\Advisories::whereHas('teacherSubject', function ($q) use ($subject_id) {
+        // Alumnos con asesoría activa (Aprobado)
+        $alumnosActivos = Advisories::whereHas('advisoryDetail', function ($q) {
+            $q->where('status', 'Aprobado');
+        })
+            ->with('advisoryDetail.students')
+            ->get()
+            ->flatMap(fn($adv) => $adv->advisoryDetail->students->pluck('enrollment'))
+            ->unique()
+            ->toArray();
+
+        // Alumnos con asesoría pendiente
+        $alumnosPendientes = Advisories::whereHas('advisoryDetail', function ($q) {
+            $q->where('status', 'Pendiente');
+        })
+            ->with('advisoryDetail.students')
+            ->get()
+            ->flatMap(fn($adv) => $adv->advisoryDetail->students->pluck('enrollment'))
+            ->unique()
+            ->toArray();
+
+        // Alumnos que YA llevaron esta materia (Finalizados)
+        $alumnosRepetidores = Advisories::whereHas('teacherSubject', function ($q) use ($subject_id) {
             $q->where('subject_id', $subject_id);
         })
-        ->whereHas('advisoryDetail.students')
-        ->get()
-        ->flatMap(function ($adv) {
-            return $adv->advisoryDetail->students->pluck('enrollment');
-        })
-        ->unique()
-        ->toArray();
+            ->whereHas('advisoryDetail', function ($q) {
+                $q->where('status', 'Finalizado');
+            })
+            ->with('advisoryDetail.students')
+            ->get()
+            ->flatMap(fn($adv) => $adv->advisoryDetail->students)
+            ->keyBy('enrollment'); 
 
-    // 3) Filtrar los alumnos disponibles
-    $alumnosDisponibles = $requests->filter(function ($req) use ($alumnosConAsesoria) {
-        return !in_array($req->student->enrollment, $alumnosConAsesoria);
-    });
 
-    // 4) Respuesta limpia
-    return response()->json(
-        $alumnosDisponibles->map(function ($req) {
-            return [
-                'request_id' => $req->request_id,
-                'enrollment' => $req->student->enrollment,
-                'name'       => $req->student->name,
-                'last_name_f' => $req->student->last_name_f,
-            ];
-        })->values()
-    );
-    
+        //  Unir alumnos que NO pueden ser seleccionados
+        $bloqueados = array_unique(array_merge($alumnosActivos, $alumnosPendientes));
+
+        // Filtrar los alumnos DISPONIBLES
+        $alumnosDisponibles = $requests->filter(function ($req) use ($bloqueados) {
+            return !in_array($req->student->enrollment, $bloqueados);
+        });
+
+        // disponibles y repetidores por separado
+        return response()->json([
+            'disponibles' => $alumnosDisponibles->map(function ($req) {
+                return [
+                    'request_id' => $req->request_id,
+                    'enrollment' => $req->student->enrollment,
+                    'name'       => $req->student->name,
+                    'last_name_f' => $req->student->last_name_f,
+                    'last_name_m' => $req->student->last_name_m,
+                ];
+            })->values(),
+
+            'repetidores' => $alumnosRepetidores->map(function ($stu) {
+                return [
+                    'enrollment' => $stu->enrollment,
+                    'name'       => $stu->name,
+                    'last_name_f' => $stu->last_name_f,
+                    'last_name_m' => $stu->last_name_m,
+                ];
+            })->values(),
+        ]);
     }
     /**
      * Crea uno o varios advisory_details a partir de los request_id seleccionados.
