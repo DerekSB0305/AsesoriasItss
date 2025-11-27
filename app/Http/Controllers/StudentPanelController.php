@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Advisories;
+use App\Models\Evaluation;
 use App\Models\Manual;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -163,6 +164,63 @@ class StudentPanelController extends Controller
 
         return view('students.notifications.index');
     }
+
+        public function showEvaluationForm($id)
+    {
+        $advisory = Advisories::with(['teacherSubject.teacher', 'advisoryDetail'])
+            ->where('advisory_id', $id)
+            ->firstOrFail();
+
+        // Solo si finalizado
+        if ($advisory->advisoryDetail->status !== 'Finalizado') {
+            return back()->with('error', 'Solo puedes evaluar asesorías finalizadas.');
+        }
+
+        // Evitar evaluaciones duplicadas
+        $already = Evaluation::where('enrollment', auth()->user()->user)
+            ->where('advisory_id', $id)
+            ->exists();
+
+        if ($already) {
+            return back()->with('error', 'Ya has evaluado esta asesoría.');
+        }
+
+        return view('students.evaluations.form', compact('advisory'));
+    }
+
+    public function storeEvaluation(Request $request, $id)
+{
+    $request->validate([
+        'q1'=>'required|integer|min:1|max:5',
+        'q2'=>'required|integer|min:1|max:5',
+        'q3'=>'required|integer|min:1|max:5',
+        'q4'=>'required|integer|min:1|max:5',
+        'q5'=>'required|integer|min:1|max:5',
+        'q6'=>'required|integer|min:1|max:5',
+        'q7'=>'required|integer|min:1|max:5',
+        'q8'=>'required|integer|min:1|max:5',
+        'q9'=>'required|integer|min:1|max:5',
+        'q10'=>'required|integer|min:1|max:5',
+        'q11'=>'required|integer|min:1|max:5',
+    ]);
+
+    $advisory = Advisories::findOrFail($id);
+
+    Evaluation::create([
+        'enrollment' => auth()->user()->user,
+        'advisory_id' => $id,
+        'teacher_user' => $advisory->teacherSubject->teacher_user,
+        'q1'=>$request->q1, 'q2'=>$request->q2, 'q3'=>$request->q3,
+        'q4'=>$request->q4, 'q5'=>$request->q5, 'q6'=>$request->q6,
+        'q7'=>$request->q7, 'q8'=>$request->q8, 'q9'=>$request->q9,
+        'q10'=>$request->q10, 'q11'=>$request->q11,
+    ]);
+
+    return redirect()->route('students.panel.advisories')
+        ->with('success', 'Evaluación enviada correctamente.');
+    }
+
+
 
 
     /**

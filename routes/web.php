@@ -258,4 +258,9 @@ Route::prefix('students')
         Route::get('/notifications', [StudentPanelController::class, 'notifications'])
             ->name('panel.notifications');
 
+        Route::get('/advisories/{id}/evaluate', [StudentPanelController::class, 'showEvaluationForm'])
+            ->name('panel.evaluate');
+
+        Route::post('/advisories/{id}/evaluate', [StudentPanelController::class, 'storeEvaluation'])
+            ->name('panel.evaluate.store');
     });
