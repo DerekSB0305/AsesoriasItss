@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Advisories;
 use App\Models\Advisory_details;
+use App\Models\Evaluation;
 use App\Notifications\AdvisoryCreated;
 use App\Notifications\AdvisoryStudentNotification;
 use Illuminate\Http\Request;
@@ -177,7 +178,7 @@ class AdvisoriesController extends Controller
 
         $detail->update(['status' => 'Aprobado']);
 
-        $user = $advisory->teacherSubject->teacher->userRelation; 
+        $user = $advisory->teacherSubject->teacher->userRelation;
         $user->notify(new AdvisoryCreated($advisory));
 
         // Notificación para los alumnos
@@ -268,7 +269,6 @@ class AdvisoriesController extends Controller
             $advisory->assignment_file = $path;
         }
 
-        // GUARDAR CAMBIOS
         $advisory->update([
             'end_date'    => $request->end_date,
             'day_of_week' => $request->day_of_week,
@@ -314,6 +314,7 @@ class AdvisoriesController extends Controller
             ->with('success', 'Asesoría eliminada correctamente.');
     }
 
+    //Reporte individual
     public function details($id)
     {
         $advisory = Advisories::with([
@@ -324,15 +325,37 @@ class AdvisoriesController extends Controller
             'reports'
         ])->findOrFail($id);
 
+        
+        $evaluations = Evaluation::where('advisory_id', $advisory->advisory_id)->get();
+
+        $promedioFinal = null;
+
+        if ($evaluations->count() > 0) {
+
+            // Promedio de cada evaluación individual
+            $promediosIndividuales = $evaluations->map(function ($ev) {
+                $sum = 0;
+                for ($i = 1; $i <= 11; $i++) {
+                    $sum += $ev["q$i"];
+                }
+                return $sum / 11;
+            });
+
+            // Promedio general
+            $promedioFinal = round($promediosIndividuales->avg(), 2);
+        }
+
         return view('basic_sciences.advisories.individual_details', [
             'advisory' => $advisory,
             'students' => $advisory->advisoryDetail->students,
             'total'    => $advisory->advisoryDetail->students->count(),
             'hombres'  => $advisory->advisoryDetail->students->where('gender', 'Masculino')->count(),
             'mujeres'  => $advisory->advisoryDetail->students->where('gender', 'Femenino')->count(),
-            'reports'  => $advisory->reports
+            'reports'  => $advisory->reports,
+            'promedioFinal' => $promedioFinal
         ]);
     }
+
 
     public function indexCareerHead()
     {

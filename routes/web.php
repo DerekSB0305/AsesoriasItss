@@ -55,23 +55,21 @@ Route::prefix('basic_sciences')
         Route::resource('teacher_subjects', \App\Http\Controllers\TeacherSubjectController::class);
         Route::resource('advisory_details', AdvisoryDetailsController::class);
         Route::resource('advisories', AdvisoriesController::class);
-
         Route::get(
             '/advisory_details/students/{subject_id}',
             [AdvisoryDetailsController::class, 'getStudentsBySubject']
         )
             ->name('advisory_details.getStudents');
-
         Route::get(
             'advisories/{id}/details',
             [AdvisoriesController::class, 'details']
         )
             ->name('advisories.details');
-
         Route::get('manuals/index', [ManualController::class, 'listManuals'])
             ->name('manuals.index');
-
         Route::resource('documents', DocumentController::class);
+        Route::get('evaluation/{advisory_id}', [\App\Http\Controllers\EvaluationController::class, 'show'])
+            ->name('evaluation');
     });
 
 // Jefes de carrera

@@ -18,11 +18,11 @@
 
         <div class="hidden md:flex space-x-8 text-sm font-medium">
             <a href="{{ route('basic_sciences.requests.index') }}" class="hover:text-gray-300">Solicitudes</a>
-            <a href="{{ route('basic_sciences.teachers.index') }}" class="hover:text-gray-300">Maestro</a>
+            <a href="{{ route('basic_sciences.teachers.index') }}" class="hover:text-gray-300">Crear Maestro</a>
             <a href="{{ route('basic_sciences.students.index') }}" class="hover:text-gray-300">Alumnos</a>
             <a href="{{ route('basic_sciences.advisories.index') }}" class="hover:text-gray-300">Asesorías</a>
-            <a href="{{ route('basic_sciences.teacher_subjects.index') }}" class="hover:text-gray-300">Materias</a>
-            <a href="{{ route('basic_sciences.users.index') }}" class="hover:text-gray-300">Usuarios</a>
+            <a href="{{ route('basic_sciences.teacher_subjects.index') }}" class="hover:text-gray-300">Materias-Maestro</a>
+            <a href="{{ route('basic_sciences.users.index') }}" class="hover:text-gray-300"> Usuarios</a>
             <a href="{{ route('basic_sciences.administratives.index') }}" class="hover:text-gray-300">Administrativos</a>
             <a href="{{ route('basic_sciences.manuals.index') }}" class="hover:text-gray-300">Manuales</a>
         </div>
@@ -51,7 +51,7 @@
         <a href="{{ route('basic_sciences.teachers.index') }}" class="block hover:text-gray-300">Maestro</a>
         <a href="{{ route('basic_sciences.students.index') }}" class="block hover:text-gray-300">Alumnos</a>
         <a href="{{ route('basic_sciences.advisories.index') }}" class="block hover:text-gray-300">Asesorías</a>
-        <a href="{{ route('basic_sciences.teacher_subjects.index') }}" class="block hover:text-gray-300">Materias</a>
+        <a href="{{ route('basic_sciences.teacher_subjects.index') }}" class="block hover:text-gray-300">Materias-Maestros</a>
         <a href="{{ route('basic_sciences.users.index') }}" class="block hover:text-gray-300">Usuarios</a>
         <a href="{{ route('basic_sciences.administratives.index') }}" class="block hover:text-gray-300">Administrativos</a>
         <a href="{{ route('basic_sciences.manuals.index') }}" class="block hover:text-gray-300">Manuales</a>

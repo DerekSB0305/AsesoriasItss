@@ -79,8 +79,8 @@
                             <th class="px-4 py-3 text-center whitespace-nowrap">Horario</th>
                             <th class="px-4 py-3">Estado</th>
                             <th class="px-4 py-3">Observaciones</th>
-                            <th class="px-4 py-3 whitespace-nowrap">Completa</th>
-                            <th class="px-4 py-3 text-center">Acciones</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Detalles</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Evaluación</th>
                         </tr>
                     </thead>
 
@@ -122,15 +122,15 @@
                                     {{ $adv ? "$startT - $endT" : '—' }}
                                 </td>
 
-                                <td class="px-4 py-3">
-                                    @if($d->status == 'Aprobado')
-                                        <span class="px-2 py-1 bg-green-100 text-green-700 rounded">Aprobado</span>
-                                    @elseif($d->status == 'Pendiente')
-                                        <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded">Pendiente</span>
-                                    @else
-                                        <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded">Finalizado</span>
-                                    @endif
-                                </td>
+                                  <td class="px-3 py-3">
+                            <span class="px-3 py-1 rounded text-white text-xs sm:text-sm 
+                                @if($adv->advisoryDetail->status == 'Pendiente') bg-yellow-500
+                                @elseif($adv->advisoryDetail->status == 'Aprobado') bg-green-600
+                                @elseif($adv->advisoryDetail->status == 'Finalizado') bg-red-600
+                                @else bg-gray-500 @endif">
+                                {{ $adv->advisoryDetail->status }}
+                            </span>
+                        </td>
 
                                 <td class="px-4 py-3">{{ $d->observations }}</td>
 
@@ -144,9 +144,9 @@
                                 </td>
 
                                 <td class="px-4 py-3 text-center">
-                                    <a href="{{ route('basic_sciences.advisories.create', ['detail_id' => $d->advisory_detail_id]) }}"
-                                       class="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold text-xs sm:text-sm">
-                                        ➕ Crear
+                                    <a href="{{ route('basic_sciences.evaluation', $adv->advisory_id) }}"
+                                       class="text-green-600 font-semibold hover:underline">
+                                        Ver evaluación
                                     </a>
                                 </td>
 

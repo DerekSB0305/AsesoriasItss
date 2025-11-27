@@ -101,8 +101,9 @@
 
                         <td class="px-3 py-3 text-center">
                             <a href="{{ route('basic_sciences.advisory_details.create', ['subject_id' => $request->subject_id]) }}"
-                               class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 font-semibold text-xs sm:text-sm">
-                                Crear asesoría
+                                class="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold shadow-md text-xs sm:text-sm
+                                hover:from-green-600 hover:to-emerald-700 hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">
+                                ➕ Crear asesoría
                             </a>
                         </td>
 
@@ -119,7 +120,7 @@
 
 </main>
 
-<div class="fixed bottom-0 left-0 w-full z-40 shadow">
+ <div class="w-full mt-10">
     <x-basic-sciences-footer />
 </div>
 

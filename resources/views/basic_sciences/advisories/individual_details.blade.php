@@ -28,6 +28,31 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 mb-6 text-sm sm:text-base">
 
+                            @if($promedioFinal)
+<div class="w-full sm:col-span-2 mb-8">
+
+    <div class="bg-[#0B3D7E] text-white p-6 rounded-2xl shadow-xl border-2 border-blue-900 flex flex-col sm:flex-row items-center sm:items-start gap-4">
+
+        <!-- TEXTO -->
+        <div class="flex-1">
+            <p class="text-lg sm:text-2xl font-bold">
+                Calificación total del asesor
+            </p>
+
+            <p class="text-5xl sm:text-6xl font-extrabold mt-2 drop-shadow-md">
+                {{ $promedioFinal }}
+            </p>
+
+            <p class="text-sm opacity-80 mt-1">
+                Promedio basado en la evaluación de los estudiantes.
+            </p>
+        </div>
+
+    </div>
+
+</div>
+@endif
+
                 <div>
                     <p><strong>Maestro:</strong><br>
                         {{ $advisory->teacherSubject->teacher->name }}
@@ -213,6 +238,7 @@
             @endif
 
         </div>
+
 
     </main>
 

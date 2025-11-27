@@ -17,8 +17,8 @@
 
         <div class="max-w-7xl mx-auto bg-white shadow-xl rounded-xl p-6 sm:p-8">
 
+            {{-- Título --}}
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800">
                     📚 Asesorías Registradas
                 </h1>
@@ -42,9 +42,9 @@
                     </a>
 
                 </div>
-
             </div>
 
+            {{-- Buscar --}}
             <form method="GET" class="flex flex-col sm:flex-row gap-3 mb-6">
                 <input 
                     type="text"
@@ -58,6 +58,11 @@
                     🔍 Buscar
                 </button>
             </form>
+
+            {{-- Tabla --}}
+            @php
+                $hasFinalized = $advisories->contains(fn($a) => $a->advisoryDetail->status === 'Finalizado');
+            @endphp
 
             <div class="overflow-x-auto rounded-xl border border-gray-200 shadow">
 
@@ -78,6 +83,12 @@
                             <th class="px-4 py-3 whitespace-nowrap">Edificio</th>
                             <th class="px-4 py-3 whitespace-nowrap">Archivo</th>
                             <th class="px-4 py-3 whitespace-nowrap">Detalles</th>
+
+                            {{-- Mostrar solo si existen asesorías finalizadas --}}
+                            @if($hasFinalized)
+                                <th class="px-4 py-3 whitespace-nowrap text-center">Ver Evaluación</th>
+                            @endif
+
                             <th class="px-4 py-3 text-center whitespace-nowrap">Acciones</th>
                         </tr>
                     </thead>
@@ -87,7 +98,6 @@
                         @foreach($advisories as $adv)
                             @php
                                 $students = $adv->advisoryDetail->students ?? collect();
-
                                 $startDate = \Carbon\Carbon::parse($adv->start_date)->format('d/m/Y');
                                 $endDate   = \Carbon\Carbon::parse($adv->end_date)->format('d/m/Y');
                                 $startTime = \Carbon\Carbon::parse($adv->start_time)->format('H:i');
@@ -144,6 +154,25 @@
                                     </a>
                                 </td>
 
+                                {{-- Solo si tenemos asesorías finalizadas --}}
+                                @if($hasFinalized)
+                                    <td class="px-4 py-3 text-center">
+
+                                        {{-- Solo si esta asesoría YA finalizó --}}
+                                        @if($adv->advisoryDetail->status === 'Finalizado')
+
+                                            <a href="{{ route('basic_sciences.evaluation', $adv->advisory_id) }}"
+                                               class="text-green-600 font-semibold hover:underline">
+                                                Ver evaluación
+                                            </a>
+
+                                        @else
+                                            <span class="text-gray-400 text-xs">Asesoría en curso</span>
+                                        @endif
+
+                                    </td>
+                                @endif
+
                                 <td class="px-4 py-3 flex flex-col sm:flex-row gap-2 justify-center">
 
                                     <a href="{{ route('basic_sciences.advisories.edit', $adv->advisory_id) }}"
@@ -152,8 +181,7 @@
                                         Editar
                                     </a>
 
-                                    <button 
-                                        onclick="openDeleteModal('{{ $adv->teacherSubject->subject->name }}', '{{ $adv->advisory_id }}')"
+                                    <button onclick="openDeleteModal('{{ $adv->teacherSubject->subject->name }}', '{{ $adv->advisory_id }}')"
                                         class="px-3 py-1 text-white rounded font-semibold hover:opacity-90"
                                         style="background-color:#E74C3C;">
                                         Eliminar
@@ -174,10 +202,11 @@
     </main>
 
     <div class="w-full mt-10">
-    <x-basic-sciences-footer />
-</div>
+        <x-basic-sciences-footer />
+    </div>
 
 
+    {{-- Modal eliminar --}}
     <div id="deleteModal"
          class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 

@@ -9,7 +9,6 @@
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    {{-- NAVBAR --}}
     <nav class="bg-[#0B3D7E] text-white py-4 shadow-lg">
         <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
             <h1 class="text-lg sm:text-xl font-bold">Sistema de Asesorías</h1>
@@ -19,10 +18,8 @@
         </div>
     </nav>
 
-    {{-- CONTENIDO --}}
     <div class="flex-grow flex flex-col items-center justify-center px-4 py-10">
 
-        {{-- LOGOS EN FILA --}}
         <div class="flex items-center justify-center space-x-6 mb-8">
             <img src="{{ asset('images/Logo_tecnm.png') }}"
                  class="h-20 sm:h-28 w-auto object-contain"
@@ -33,7 +30,6 @@
                  alt="ITSS">
         </div>
 
-        {{-- TARJETA DEL LOGIN --}}
         <div class="bg-white shadow-xl rounded-xl p-8 w-full max-w-md">
 
             <h2 class="text-3xl font-bold text-center text-gray-900 mb-6">
@@ -46,21 +42,43 @@
                 </div>
             @endif
 
+            @if($errors->any() && !$errors->has('general'))
+                <div class="bg-red-100 border border-red-400 text-red-700 p-3 rounded mb-4 text-sm">
+                    <ul class="list-disc ml-5 space-y-1">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('login') }}" class="space-y-6">
                 @csrf
 
                 <div>
                     <label for="user" class="block text-sm font-medium text-gray-700">Usuario</label>
+
                     <input id="user" type="text" name="user" value="{{ old('user') }}" required
-                        class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
+                        class="mt-1 w-full px-3 py-2 border rounded-lg shadow-sm
+                               @error('user') border-red-500 @else border-gray-300 @enderror
                                focus:ring-[#0B3D7E] focus:border-[#0B3D7E]">
+
+                    @error('user')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div>
                     <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+
                     <input id="password" type="password" name="password" required
-                        class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
+                        class="mt-1 w-full px-3 py-2 border rounded-lg shadow-sm
+                               @error('password') border-red-500 @else border-gray-300 @enderror
                                focus:ring-[#0B3D7E] focus:border-[#0B3D7E]">
+
+                    @error('password')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <button type="submit"
@@ -69,7 +87,6 @@
                 </button>
             </form>
 
-            {{-- Recuperar contraseña --}}
             <div class="text-center mt-4">
                 <button onclick="openModal()"
                     class="text-sm text-gray-600 hover:text-[#0B3D7E] hover:underline">
@@ -80,12 +97,9 @@
         </div>
     </div>
 
-    {{-- FOOTER --}}
     <x-basic-sciences-footer />
 
-
-
-    {{-- MODAL PERSONALIZADO --}}
+    {{-- MODAL --}}
     <div id="modal"
          class="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm hidden flex items-center justify-center p-4">
 
@@ -96,7 +110,7 @@
             </h3>
 
             <p class="text-gray-700 text-center mb-6">
-                Para recuperar su contraseña, por favor comuníquese con el
+                Para recuperar su contraseña, comuníquese con el  
                 <span class="font-semibold text-[#0B3D7E]">Departamento de Ciencias Básicas.</span>
             </p>
 
@@ -109,8 +123,7 @@
         </div>
     </div>
 
-
-    {{-- ANIMACIONES + SCRIPT --}}
+    {{-- Animación --}}
     <style>
         .animate-fadeIn {
             animation: fadeIn .25s ease-out;
@@ -132,5 +145,6 @@
 
 </body>
 </html>
+
 
 

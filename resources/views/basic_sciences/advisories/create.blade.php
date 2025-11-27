@@ -135,11 +135,6 @@
 
                 <div class="flex flex-col sm:flex-row justify-between gap-3">
 
-                    <a href="{{ route('basic_sciences.advisories.index') }}"
-                       class="px-4 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 text-center font-semibold">
-                        Cancelar
-                    </a>
-
                     <button class="px-6 py-3 bg-[#28A745] text-white rounded-lg hover:bg-green-700 font-semibold">
                         Guardar asesoría
                     </button>
