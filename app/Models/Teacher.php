@@ -40,8 +40,16 @@ class Teacher extends Model
     // Relación con asesorías directas
     public function advisories()
     {
-        return $this->hasMany(Advisories::class, 'teacher_user', 'teacher_user');
+        return $this->hasManyThrough(
+            Advisories::class,      
+            TeacherSubject::class, 
+            'teacher_user',                  
+            'teacher_subject_id',               
+            'teacher_user',                   
+            'teacher_subject_id'                
+        );
     }
+
 
     public function manuals()
     {

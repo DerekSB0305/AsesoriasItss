@@ -227,11 +227,12 @@ class TeacherController extends Controller
 
         $query = Teacher::with([
             'career',
-            'teacherSubjects.advisories',
-            'manuals'
+            'manuals',
+            'advisories.advisoryDetail' // necesario para filtrar activas
         ])
             ->where('career_id', $careerId);
 
+        // FILTRO POR NOMBRE
         if (request('nombre')) {
             $search = request('nombre');
             $query->where(function ($q) use ($search) {
@@ -241,10 +242,12 @@ class TeacherController extends Controller
             });
         }
 
+        // FILTRO TUTOR
         if (request('tutor') !== null && request('tutor') !== '') {
             $query->where('tutor', request('tutor'));
         }
 
+        // FILTRO CB
         if (request('cb') !== null && request('cb') !== '') {
             $query->where('science_department', request('cb'));
         }
@@ -253,11 +256,15 @@ class TeacherController extends Controller
 
         foreach ($teachers as $t) {
 
-            $t->total_advisories = $t->teacherSubjects
-                ->flatMap(fn($ts) => $ts->advisories)
+            // SOLO asesorías activas (Pendiente o Aprobado)
+            $t->total_advisories = $t->advisories
+                ->filter(function ($adv) {
+                    return in_array($adv->advisoryDetail->status, ['Pendiente', 'Aprobado']);
+                })
                 ->count();
 
-            $t->has_manuals = $t->manuals->count() > 0;
+            // CANTIDAD DE MANUALES
+            $t->manuals_count = $t->manuals->count();
         }
 
         return view('career_head.teachers.index', compact('teachers'));

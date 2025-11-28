@@ -26,7 +26,6 @@
                 Detalles de Asesoría #{{ $advisory->advisory_id }}
             </h1>
 
-            {{-- =============== PROMEDIO GENERAL =============== --}}
             @if($promedioFinal)
                 <div class="w-full sm:col-span-2 mb-8">
 
@@ -61,7 +60,6 @@
                 </div>
             @endif
 
-            {{-- =============== INFORMACIÓN GENERAL =============== --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 mb-6 text-sm sm:text-base">
 
                 <div>
@@ -123,7 +121,6 @@
 
             </div>
 
-            {{-- =============== ARCHIVO =============== --}}
             <div class="p-4 bg-gray-50 border rounded-lg shadow-sm mb-8">
 
                 <p class="text-sm font-semibold text-gray-600">Archivo de asignación</p>
@@ -166,7 +163,6 @@
                 @endif
             </div>
 
-            {{-- =============== ALUMNOS =============== --}}
             <h2 class="text-lg sm:text-xl font-semibold mb-3 text-gray-800">Resumen de alumnos</h2>
 
             <div class="flex flex-wrap gap-6 mb-6 text-sm sm:text-base">
@@ -203,7 +199,6 @@
                 </table>
             </div>
 
-            {{-- =============== REPORTES =============== --}}
             <h2 class="text-lg sm:text-xl font-semibold mt-8 mb-4 text-gray-800">Reportes del Maestro</h2>
 
             @if($reports->isEmpty())

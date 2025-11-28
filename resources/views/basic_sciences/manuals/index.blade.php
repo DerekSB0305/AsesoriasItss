@@ -87,7 +87,7 @@
                                 </td>
 
                                 <td class="px-4 py-3">
-                                    {{ $m->teacherSubject->subject->career->name }}
+                                    {{ $m->teacherSubject->subject->career->name  ?? 'Materia común' }}
                                 </td>
 
                                 <td class="px-4 py-3 whitespace-nowrap">

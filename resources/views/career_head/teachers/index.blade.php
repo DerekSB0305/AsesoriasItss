@@ -9,14 +9,12 @@
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <!-- NAVBAR RESPONSIVA -->
-    <x-career-head-navbar />
+<x-career-head-navbar />
 
 <main class="flex-grow">
 
 <div class="w-[95%] max-w-7xl mx-auto bg-white shadow-lg rounded-xl p-6 sm:p-8 my-10">
 
-    <!-- TÍTULO -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <h1 class="text-2xl sm:text-3xl font-bold text-[#0B3D7E]">
             👨‍🏫 Maestros de mi Carrera
@@ -28,7 +26,7 @@
         </a>
     </div>
 
-    <!-- BUSCADOR RESPONSIVO -->
+    <!-- BUSCADOR -->
     <form method="GET"
         class="bg-gray-50 p-4 rounded-lg shadow mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
@@ -59,7 +57,7 @@
             </select>
         </div>
 
-        <div class="flex items-end justify-start sm:justify-end lg:col-span-1">
+        <div class="flex items-end justify-start sm:justify-end">
             <button class="px-6 py-2 bg-[#1ABC9C] text-white rounded-lg shadow hover:bg-[#159a82] font-semibold w-full">
                 🔍 Buscar
             </button>
@@ -67,7 +65,7 @@
 
     </form>
 
-    <!-- TABLA RESPONSIVA -->
+    <!-- TABLA -->
     <div class="overflow-x-auto">
 
         <table class="w-full border-collapse shadow text-sm sm:text-base">
@@ -80,7 +78,7 @@
                     <th class="px-2 py-2">Tutor</th>
                     <th class="px-2 py-2">Horas CB</th>
                     <th class="px-2 py-2 text-center">Horario</th>
-                    <th class="px-2 py-2 text-center">Cantidad de Asesorías</th>
+                    <th class="px-2 py-2 text-center">Asesorías Activas</th>
                     <th class="px-2 py-2 text-center">Manuales</th>
                 </tr>
             </thead>
@@ -118,7 +116,7 @@
                     </td>
 
                     <td class="px-2 py-2 text-center font-semibold">
-                        {{ $t->has_manuals ? '📘 Sí' : '—' }}
+                        {{ $t->manuals_count }}
                     </td>
 
                 </tr>
@@ -139,4 +137,5 @@
 
 </body>
 </html>
+>
 
