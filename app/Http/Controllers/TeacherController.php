@@ -160,37 +160,40 @@ class TeacherController extends Controller
 
     public function myAdvisories()
     {
-        // 🔥 Actualizar asesorías vencidas ANTES de mostrar las del maestro
+        // 🔥 Actualizar asesorías vencidas
         $hoy = now()->toDateString();
 
         $asesoriasVencidas = Advisories::where('end_date', '<', $hoy)
-            ->whereHas('advisoryDetail', function ($q) {
-                $q->where('status', 'Aprobado');
-            })
+            ->whereHas('advisoryDetail', fn($q) => $q->where('status', 'Aprobado'))
             ->get();
 
         foreach ($asesoriasVencidas as $item) {
-            $item->advisoryDetail->update([
-                'status' => 'Finalizado'
-            ]);
+            $item->advisoryDetail->update(['status' => 'Finalizado']);
         }
 
         $teacherUser = auth()->user()->user;
 
-        $advisories = \App\Models\Advisories::with([
+        $advisories = Advisories::with([
             'teacherSubject.teacher',
             'teacherSubject.subject.career',
-            'advisoryDetail.students'
+            'advisoryDetail.students',
+            'advisoryDetail.requests.subject' // << NECESARIO PARA saber la materia solicitada
         ])
-            ->whereHas('teacherSubject', function ($q) use ($teacherUser) {
-                $q->where('teacher_user', $teacherUser);
-            })
+            ->whereHas('teacherSubject', fn($q) => $q->where('teacher_user', $teacherUser))
             ->orderBy('start_date', 'ASC')
             ->orderBy('start_time', 'ASC')
             ->get();
 
+        // 🔥 AGREGAR MATERIA SOLICITADA (si existe)
+        foreach ($advisories as $adv) {
+            $solicitud = optional($adv->advisoryDetail->requests)->first();
+            $adv->materiaSolicitada = $solicitud?->subject?->name ?? 'Materia común';
+            $adv->carreraSolicitada = $solicitud?->subject?->career->name ?? 'Materia común';
+        }
+
         return view('teachers.advisories.index', compact('advisories'));
     }
+
 
     public function showChangePasswordForm()
     {

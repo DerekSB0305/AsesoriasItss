@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitar Asesoría</title>
     @vite('resources/css/app.css')
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.0/dist/cdn.min.js"></script>
+
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -39,21 +41,59 @@
         </div>
 
         {{-- Materia --}}
-        <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Materia:</label>
+        {{-- Materia --}}
+<div 
+    x-data="{
+        open: false,
+        search: '',
+        subjects: {{ json_encode($subjects) }},
+        selectSubject(sub) {
+            this.search = sub.name;
+            document.getElementById('subject_id').value = sub.subject_id;
+            this.open = false;
+        }
+    }" 
+    class="relative"
+>
+    <label class="block text-sm font-semibold text-gray-700 mb-1">Materia:</label>
 
-            <select name="subject_id" required
-                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                <option value="">Seleccione una materia</option>
-                @foreach($subjects as $sub)
-                    <option value="{{ $sub->subject_id }}">{{ $sub->name }}</option>
-                @endforeach
-            </select>
+    <input type="text"
+           x-model="search"
+           x-on:input="open = true"
+           placeholder="Escribe el nombre de la materia…"
+           class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
 
-            @error('subject_id')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-            @enderror
+    <input type="hidden" name="subject_id" id="subject_id" required>
+
+    {{-- Caja de resultados --}}
+    <div 
+        x-show="open && search.length > 0"
+        class="absolute bg-white w-full border rounded-lg mt-1 shadow-lg max-h-48 overflow-y-auto z-20"
+    >
+        <template 
+            x-for="sub in subjects.filter(s => 
+                s.name.toLowerCase().includes(search.toLowerCase())
+            )" 
+            :key="sub.subject_id"
+        >
+            <div class="p-2 hover:bg-gray-200 cursor-pointer text-sm"
+                 x-on:click="selectSubject(sub)"
+                 x-text="sub.name">
+            </div>
+        </template>
+
+        {{-- Si no hay resultados --}}
+        <div x-show="subjects.filter(s => s.name.toLowerCase().includes(search.toLowerCase())).length === 0"
+             class="p-2 text-gray-500 text-sm">
+             No se encontraron materias…
         </div>
+    </div>
+
+    @error('subject_id')
+        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+    @enderror
+</div>
+
 
         {{-- Motivo --}}
         <div>

@@ -12,35 +12,44 @@
 
 <div class="flex-grow p-4 sm:p-6">
 
-<div class="max-w-4xl mx-auto bg-white p-4 sm:p-8 shadow-xl rounded-2xl">
+<div class="max-w-4xl mx-auto bg-white p-6 sm:p-10 shadow-2xl rounded-3xl">
 
-    <!-- REGRESAR -->
+    <!-- VOLVER -->
     <a href="{{ route('students.panel.advisories') }}"
-       class="text-indigo-600 hover:text-indigo-800 text-sm block mb-4">
+       class="text-[#0B3D7E] hover:text-blue-900 text-sm font-semibold block mb-6 transition">
         ← Regresar a mis asesorías
     </a>
 
     <!-- TÍTULO -->
-    <h1 class="text-xl sm:text-3xl font-extrabold text-gray-800 mb-6 text-center">
-        🧑‍🏫 Evaluación del Desempeño del Asesor
+    <h1 class="text-3xl font-extrabold text-gray-900 mb-6 text-center tracking-tight">
+        📝 Evaluación del Asesor
     </h1>
 
-    <!-- INFO DEL ASESOR -->
-    <div class="bg-gray-50 p-4 rounded-lg border mb-6 text-base">
-        <p class="text-gray-700">
-            <strong>Asesor:</strong>
+    <!-- INFO -->
+    <div class="bg-[#F5F7FA] border border-gray-200 p-5 rounded-2xl mb-8">
+        <p class="text-gray-700 text-base">
+            <strong class="text-gray-900">Asesor:</strong>
             {{ $advisory->teacherSubject->teacher->name }}
             {{ $advisory->teacherSubject->teacher->last_name_f }}
             {{ $advisory->teacherSubject->teacher->last_name_m }}
         </p>
-
-        <p class="text-gray-700 mt-2">
-            <strong>Materia:</strong>
-            {{ $advisory->teacherSubject->subject->name }}
+        <p class="text-gray-700 mt-2 text-base">
+            <strong class="text-gray-900">Materia:</strong>
+            {{ $materiaSolicitada }}
         </p>
     </div>
 
-    <!-- FORMULARIO -->
+    <!-- ESCALA VISUAL -->
+    <div class="bg-[#0B3D7E] text-white p-4 rounded-xl mb-10 shadow-lg text-center">
+        <div class="flex flex-wrap justify-center gap-4 text-xs sm:text-sm font-semibold">
+            <span class="px-2 py-1 bg-white/10 rounded-md">1 - Insuficiente</span>
+            <span class="px-2 py-1 bg-white/10 rounded-md">2 - Regular</span>
+            <span class="px-2 py-1 bg-white/10 rounded-md">3 - Bueno</span>
+            <span class="px-2 py-1 bg-white/10 rounded-md">4 - Muy bueno</span>
+            <span class="px-2 py-1 bg-white/10 rounded-md">5 - Excelente</span>
+        </div>
+    </div>
+
     <form method="POST" action="{{ route('students.panel.evaluate.store', $advisory->advisory_id) }}">
         @csrf
 
@@ -62,26 +71,30 @@
 
         @foreach($questions as $index => $q)
 
-            <div class="mb-6 bg-gray-50 p-4 rounded-xl border">
+            <div class="mb-10 bg-white border border-gray-200 shadow-md p-6 rounded-2xl">
 
-                <!-- PREGUNTA -->
-                <p class="font-semibold text-gray-800 mb-4 text-base sm:text-lg leading-snug">
+                <p class="font-semibold text-gray-900 text-lg mb-6 leading-relaxed">
                     {{ $index + 1 }}. {{ $q }}
                 </p>
 
-                <!-- ESCALA RESPONSIVE -->
-                <div class="grid grid-cols-3 sm:grid-cols-5 gap-4 text-center">
+                <div class="grid grid-cols-5 gap-4">
 
                     @for($i = 1; $i <= 5; $i++)
-                        <label class="cursor-pointer flex flex-col items-center p-2">
-
+                        <label class="block">
                             <input type="radio"
                                    name="q{{ $index+1 }}"
                                    value="{{ $i }}"
-                                   required
-                                   class="w-5 h-5 sm:w-6 sm:h-6 text-blue-700 focus:ring-[#0B3D7E]">
+                                   class="hidden peer"
+                                   required>
 
-                            <span class="text-base sm:text-lg mt-2 font-medium">{{ $i }}</span>
+                            <div class="flex flex-col items-center p-3 rounded-xl border border-gray-300
+                                        peer-checked:border-[#0B3D7E] peer-checked:bg-[#0B3D7E]/10
+                                        transition cursor-pointer hover:bg-gray-100 shadow-sm">
+
+                                <span class="text-lg font-bold text-gray-800 peer-checked:text-[#0B3D7E]">
+                                    {{ $i }}
+                                </span>
+                            </div>
                         </label>
                     @endfor
 
@@ -92,17 +105,18 @@
         @endforeach
 
         <!-- BOTÓN -->
-        <button class="w-full bg-[#0B3D7E] text-white py-4 rounded-xl shadow-md 
-                       hover:bg-blue-900 transition font-semibold text-lg sm:text-xl">
+        <button class="w-full bg-[#28A745] text-white py-4 rounded-xl shadow-xl
+                    hover:bg-[#1F7A36] transition font-bold text-lg tracking-wide">
             Enviar evaluación
         </button>
+
 
     </form>
 
 </div>
 </div>
 
-<x-basic-sciences-footer />
+<x-basic-sciences-footer/>
 
 </body>
 </html>

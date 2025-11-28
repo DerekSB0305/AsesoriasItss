@@ -45,7 +45,8 @@
                         {{ $sub->subject->name }}
                     </h2>
                     <p class="text-gray-600 text-sm">
-                        Carrera: {{ $sub->subject->career->name }}
+                        {{ $sub->subject->career->name ?? 'Materia común' }}
+
                     </p>
                 </a>
             @else

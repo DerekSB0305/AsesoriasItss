@@ -39,9 +39,9 @@ class StudentPanelController extends Controller
     /**
      * Ver asesorías donde el alumno está inscrito
      */
-    public function advisories()
+public function advisories()
 {
-    // 🔥 Actualizar asesorías vencidas ANTES de ver las del estudiante
+    // 🔥 Actualizar asesorías vencidas
     $hoy = now()->toDateString();
 
     $asesoriasVencidas = Advisories::where('end_date', '<', $hoy)
@@ -56,107 +56,129 @@ class StudentPanelController extends Controller
         ]);
     }
 
+    // Alumno actual
     $student = Auth::user()->student;
+    if (!$student) abort(403);
 
-    if (!$student) {
-        abort(403);
-    }
+    $enrollment = $student->enrollment;
 
-    $studentEnrollment = $student->enrollment;
-
-    $advisories = Advisories::whereHas('advisoryDetail.students', function ($q) use ($studentEnrollment) {
-            $q->where('advisory_detail_student.enrollment', $studentEnrollment);
+    // 🔍 Obtener asesorías del alumno
+    $advisories = Advisories::whereHas('advisoryDetail.students', function ($q) use ($enrollment) {
+            $q->where('advisory_detail_student.enrollment', $enrollment);
         })
         ->with([
-            'teacherSubject.subject',
+            'teacherSubject.subject', // materia del maestro
             'teacherSubject.teacher',
-            'advisoryDetail'
+            'advisoryDetail.students',
+            'advisoryDetail.requests.subject' // ⭐ materia SOLICITADA
         ])
-        ->orderBy('start_date', 'ASC')   // 📌 ORDENAR POR FECHA DE INICIO
-        ->orderBy('day_of_week', 'ASC')  // 📌 SEGUNDO ORDEN POR DÍA
-        ->orderBy('start_time', 'ASC')   // 📌 TERCERO POR HORA DE INICIO
+        ->orderBy('start_date', 'ASC')
+        ->orderBy('day_of_week', 'ASC')
+        ->orderBy('start_time', 'ASC')
         ->get();
+
+    // ⭐ AGREGAR LA MATERIA SOLICITADA A CADA ASESORÍA
+    foreach ($advisories as $adv) {
+        $solicitud = $adv->advisoryDetail->requests->first();
+        $adv->materiaSolicitada = $solicitud?->subject?->name ?? 'Materia común';
+    }
 
     return view('students.panel.advisories', compact('student', 'advisories'));
 }
 
 
+
     /**
      * 📘 Manuales con buscador + filtros avanzados
      */
-    public function manuals(Request $request)
-    {
-        $student = Auth::user()->student;
-        if (!$student) abort(403);
+public function manuals(Request $request)
+{
+    $student = Auth::user()->student;
+    if (!$student) {
+        abort(403);
+    }
 
-        // 🔎 Parámetros del filtro
-        $search        = $request->q;
-        $filterSubject = $request->subject;
-        $filterTeacher = $request->teacher;
+    // Parámetros de filtros
+    $search        = $request->q;
+    $filterSubject = $request->subject;
+    $filterTeacher = $request->teacher;
 
-        // Query base — manuales solo de su carrera
-        $query = Manual::with(['teacherSubject.subject', 'teacherSubject.teacher'])
-            ->whereHas('teacherSubject', function ($q) use ($student) {
-                $q->where('career_id', $student->career_id);
-            });
+    // 🔎 Query base:
+    // Manuales cuya MATERIA (subjects) sea de la carrera del alumno
+    // o bien tenga career_id NULL (materia común)
+    $query = Manual::with(['teacherSubject.subject', 'teacherSubject.teacher'])
+        ->whereHas('teacherSubject.subject', function ($q) use ($student) {
+            $q->where('career_id', $student->career_id)
+              ->orWhereNull('career_id');   // materias comunes
+        });
 
-        // 🔎 Buscador general
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'LIKE', "%$search%")
-                  ->orWhereHas('teacherSubject.subject', function ($s) use ($search) {
-                      $s->where('name', 'LIKE', "%$search%");
-                  });
-            });
-        }
+    // Buscador general (título o nombre de materia)
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('title', 'LIKE', "%{$search}%")
+              ->orWhereHas('teacherSubject.subject', function ($s) use ($search) {
+                  $s->where('name', 'LIKE', "%{$search}%");
+              });
+        });
+    }
 
-        // 📘 Filtro por materia
-        if ($filterSubject) {
-            $query->whereHas('teacherSubject', function ($q) use ($filterSubject) {
-                $q->where('subject_id', $filterSubject);
-            });
-        }
+    // 📘 Filtro por materia
+    if ($filterSubject) {
+        $query->whereHas('teacherSubject', function ($q) use ($filterSubject) {
+            $q->where('subject_id', $filterSubject);
+        });
+    }
 
-        // 👨‍🏫 Filtro por maestro
-        if ($filterTeacher) {
-            $query->whereHas('teacherSubject', function ($q) use ($filterTeacher) {
-                $q->where('teacher_user', $filterTeacher);
-            });
-        }
+    // 👨‍🏫 Filtro por maestro
+    if ($filterTeacher) {
+        $query->whereHas('teacherSubject', function ($q) use ($filterTeacher) {
+            $q->where('teacher_user', $filterTeacher);
+        });
+    }
 
-        // Resultado final
-        $manuals = $query->orderBy('created_at', 'desc')->get();
+    // Resultado de manuales
+    $manuals = $query->orderBy('created_at', 'desc')->get();
 
-        // Materias disponibles para filtros
-        $availableSubjects = Manual::whereHas('teacherSubject', function ($q) use ($student) {
-            $q->where('career_id', $student->career_id);
+    // 📋 Materias disponibles para el filtro (de la misma carrera o comunes)
+    $availableSubjects = Manual::whereHas('teacherSubject.subject', function ($q) use ($student) {
+            $q->where('career_id', $student->career_id)
+              ->orWhereNull('career_id');
         })
         ->with('teacherSubject.subject')
         ->get()
         ->pluck('teacherSubject.subject')
-        ->unique('subject_id');
+        ->filter()                // quita posibles null
+        ->unique('subject_id')
+        ->values();
 
-        // Maestros disponibles para filtros
-        $availableTeachers = Manual::whereHas('teacherSubject', function ($q) use ($student) {
-            $q->where('career_id', $student->career_id);
+    // 📋 Maestros disponibles para el filtro (sobre esas mismas materias)
+    $availableTeachers = Manual::whereHas('teacherSubject.subject', function ($q) use ($student) {
+            $q->where('career_id', $student->career_id)
+              ->orWhereNull('career_id');
         })
         ->with('teacherSubject.teacher')
         ->get()
         ->pluck('teacherSubject.teacher')
-        ->unique('teacher_user');
+        ->filter()
+        ->unique('teacher_user')
+        ->values();
 
-        return view('students.panel.manuals', compact(
-            'student',
-            'manuals',
-            'availableSubjects',
-            'availableTeachers',
-            'search',
-            'filterSubject',
-            'filterTeacher'
-        ));
-    }
+    return view('students.panel.manuals', compact(
+        'student',
+        'manuals',
+        'availableSubjects',
+        'availableTeachers',
+        'search',
+        'filterSubject',
+        'filterTeacher'
+    ));
+}
 
-        public function notifications()
+
+
+
+
+    public function notifications()
     {
         $user = Auth::user();
 
@@ -165,60 +187,81 @@ class StudentPanelController extends Controller
         return view('students.notifications.index');
     }
 
-        public function showEvaluationForm($id)
-    {
-        $advisory = Advisories::with(['teacherSubject.teacher', 'advisoryDetail'])
-            ->where('advisory_id', $id)
-            ->firstOrFail();
+    public function showEvaluationForm($id)
+{
+    $advisory = Advisories::with([
+        'teacherSubject.teacher',
+        'advisoryDetail.students',
+        'advisoryDetail.requests.subject' // <-- IMPORTANTE
+    ])
+    ->where('advisory_id', $id)
+    ->firstOrFail();
 
-        // Solo si finalizado
-        if ($advisory->advisoryDetail->status !== 'Finalizado') {
-            return back()->with('error', 'Solo puedes evaluar asesorías finalizadas.');
-        }
-
-        // Evitar evaluaciones duplicadas
-        $already = Evaluation::where('enrollment', auth()->user()->user)
-            ->where('advisory_id', $id)
-            ->exists();
-
-        if ($already) {
-            return back()->with('error', 'Ya has evaluado esta asesoría.');
-        }
-
-        return view('students.evaluations.form', compact('advisory'));
+    // Solo si finalizado
+    if ($advisory->advisoryDetail->status !== 'Finalizado') {
+        return back()->with('error', 'Solo puedes evaluar asesorías finalizadas.');
     }
+
+    // Evitar evaluaciones duplicadas
+    $already = Evaluation::where('enrollment', auth()->user()->user)
+        ->where('advisory_id', $id)
+        ->exists();
+
+    if ($already) {
+        return back()->with('error', 'Ya has evaluado esta asesoría.');
+    }
+
+    // 👉 MATERIA SOLICITADA
+    $solicitud = $advisory->advisoryDetail->requests->first();
+    $materiaSolicitada = $solicitud?->subject?->name ?? 'Materia solicitada no disponible';
+
+    return view('students.evaluations.form', [
+        'advisory' => $advisory,
+        'materiaSolicitada' => $materiaSolicitada
+    ]);
+}
 
     public function storeEvaluation(Request $request, $id)
 {
     $request->validate([
-        'q1'=>'required|integer|min:1|max:5',
-        'q2'=>'required|integer|min:1|max:5',
-        'q3'=>'required|integer|min:1|max:5',
-        'q4'=>'required|integer|min:1|max:5',
-        'q5'=>'required|integer|min:1|max:5',
-        'q6'=>'required|integer|min:1|max:5',
-        'q7'=>'required|integer|min:1|max:5',
-        'q8'=>'required|integer|min:1|max:5',
-        'q9'=>'required|integer|min:1|max:5',
-        'q10'=>'required|integer|min:1|max:5',
-        'q11'=>'required|integer|min:1|max:5',
+        'q1' => 'required|integer|min:1|max:5',
+        'q2' => 'required|integer|min:1|max:5',
+        'q3' => 'required|integer|min:1|max:5',
+        'q4' => 'required|integer|min:1|max:5',
+        'q5' => 'required|integer|min:1|max:5',
+        'q6' => 'required|integer|min:1|max:5',
+        'q7' => 'required|integer|min:1|max:5',
+        'q8' => 'required|integer|min:1|max:5',
+        'q9' => 'required|integer|min:1|max:5',
+        'q10' => 'required|integer|min:1|max:5',
+        'q11' => 'required|integer|min:1|max:5',
     ]);
 
-    $advisory = Advisories::findOrFail($id);
+    $advisory = Advisories::with('teacherSubject')->findOrFail($id);
 
+    // Crear evaluación
     Evaluation::create([
-        'enrollment' => auth()->user()->user,
-        'advisory_id' => $id,
+        'enrollment'   => auth()->user()->user,
+        'advisory_id'  => $id,
         'teacher_user' => $advisory->teacherSubject->teacher_user,
-        'q1'=>$request->q1, 'q2'=>$request->q2, 'q3'=>$request->q3,
-        'q4'=>$request->q4, 'q5'=>$request->q5, 'q6'=>$request->q6,
-        'q7'=>$request->q7, 'q8'=>$request->q8, 'q9'=>$request->q9,
-        'q10'=>$request->q10, 'q11'=>$request->q11,
+        'q1' => $request->q1,
+        'q2' => $request->q2,
+        'q3' => $request->q3,
+        'q4' => $request->q4,
+        'q5' => $request->q5,
+        'q6' => $request->q6,
+        'q7' => $request->q7,
+        'q8' => $request->q8,
+        'q9' => $request->q9,
+        'q10' => $request->q10,
+        'q11' => $request->q11,
     ]);
 
     return redirect()->route('students.panel.advisories')
         ->with('success', 'Evaluación enviada correctamente.');
-    }
+}
+
+
 
 
 

@@ -39,7 +39,7 @@
                     <tr>
                         <th class="px-3 py-3">Periodo</th>
                         <th class="px-3 py-3">Horario</th>
-                        <th class="px-3 py-3">Materia</th>
+                        <th class="px-3 py-3">Materia (Solicitada)</th>
                         <th class="px-3 py-3">Maestro</th>
                         <th class="px-3 py-3">Estado</th>
                         <th class="px-3 py-3">Aula</th>
@@ -79,9 +79,9 @@
                             {{ $startTime }} - {{ $endTime }}
                         </td>
 
-                        <!-- MATERIA -->
+                        <!-- MATERIA SOLICITADA -->
                         <td class="px-3 py-3 font-semibold">
-                            {{ $adv->teacherSubject->subject->name }}
+                            {{ $adv->materiaSolicitada ?? 'Materia común' }}
                         </td>
 
                         <!-- MAESTRO -->
@@ -157,7 +157,7 @@
 </div>
 </div>
 
-<x-basic-sciences-footer />
+<x-basic-sciences-footer/>
 
 </body>
 </html>

@@ -55,9 +55,9 @@
             >
                 <option value="">— Todas las materias —</option>
                 @foreach ($availableSubjects as $sub)
-                    <option value="{{ $sub->subject_id }}" 
-                        {{ request('subject') == $sub->subject_id ? 'selected' : '' }}>
-                        {{ $sub->name }}
+                    <option value="{{ optional($sub)->subject_id }}" 
+                        {{ request('subject') == optional($sub)->subject_id ? 'selected' : '' }}>
+                        {{ optional($sub)->name ?? 'Materia común' }}
                     </option>
                 @endforeach
             </select>
@@ -69,9 +69,9 @@
             >
                 <option value="">— Todos los maestros —</option>
                 @foreach ($availableTeachers as $teacher)
-                    <option value="{{ $teacher->teacher_user }}"
-                        {{ request('teacher') == $teacher->teacher_user ? 'selected' : '' }}>
-                        {{ $teacher->name }} {{ $teacher->last_name_f }}
+                    <option value="{{ optional($teacher)->teacher_user }}"
+                        {{ request('teacher') == optional($teacher)->teacher_user ? 'selected' : '' }}>
+                        {{ optional($teacher)->name }} {{ optional($teacher)->last_name_f }}
                     </option>
                 @endforeach
             </select>
@@ -84,7 +84,6 @@
 
         </div>
     </form>
-
 
     {{-- SIN RESULTADOS --}}
     @if ($manuals->count() == 0)
@@ -113,7 +112,7 @@
 
                             {{-- Materia --}}
                             <td class="px-4 py-3 font-semibold">
-                                {{ $manual->teacherSubject->subject->name }}
+                                {{ optional($manual->teacherSubject->subject)->name ?? 'Materia común' }}
                             </td>
 
                             {{-- Título --}}
@@ -123,8 +122,8 @@
 
                             {{-- Maestro --}}
                             <td class="px-4 py-3">
-                                {{ $manual->teacherSubject->teacher->name }}
-                                {{ $manual->teacherSubject->teacher->last_name_f }}
+                                {{ optional($manual->teacherSubject->teacher)->name }}
+                                {{ optional($manual->teacherSubject->teacher)->last_name_f }}
                             </td>
 
                             {{-- Archivo --}}
