@@ -31,21 +31,38 @@
                             @if($promedioFinal)
 <div class="w-full sm:col-span-2 mb-8">
 
-    <div class="bg-[#0B3D7E] text-white p-6 rounded-2xl shadow-xl border-2 border-blue-900 flex flex-col sm:flex-row items-center sm:items-start gap-4">
+    <div class="
+        relative overflow-hidden rounded-3xl p-8 text-center shadow-2xl
+        bg-gradient-to-r from-[#0a3a8a] via-[#3458d1] to-[#4d3ac9]
+        text-white
+        ring-1 ring-blue-900/40
+    ">
 
-        <!-- TEXTO -->
-        <div class="flex-1">
-            <p class="text-lg sm:text-2xl font-bold">
-                Calificación total del asesor
+        <!-- Glow exterior -->
+        <div class="absolute inset-0 rounded-3xl 
+                    bg-gradient-to-r from-blue-600/20 via-purple-500/20 to-blue-900/20 
+                    blur-2xl opacity-70">
+        </div>
+
+        <!-- Contenido -->
+        <div class="relative z-10">
+
+            <h2 class="text-xl sm:text-3xl font-extrabold mb-4 drop-shadow-md">
+                Calificación general del asesor
+            </h2>
+
+            <!-- Círculo con efecto -->
+            <div class="mx-auto w-40 h-40 sm:w-48 sm:h-48 rounded-full flex items-center justify-center
+                        bg-white/10 backdrop-blur-md shadow-xl ring-2 ring-white/20">
+                <p class="text-5xl sm:text-6xl font-extrabold tracking-wide drop-shadow-lg">
+                    {{ $promedioFinal }}
+                </p>
+            </div>
+
+            <p class="text-sm sm:text-base mt-4 opacity-90">
+                Promedio basado en la evaluación de los alumnos.
             </p>
 
-            <p class="text-5xl sm:text-6xl font-extrabold mt-2 drop-shadow-md">
-                {{ $promedioFinal }}
-            </p>
-
-            <p class="text-sm opacity-80 mt-1">
-                Promedio basado en la evaluación de los estudiantes.
-            </p>
         </div>
 
     </div>
