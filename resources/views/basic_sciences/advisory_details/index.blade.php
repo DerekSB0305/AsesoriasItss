@@ -30,13 +30,14 @@
 
             </div>
 
+            {{-- FORMULARIO BUSCAR --}}
             <form method="GET" class="flex flex-col sm:flex-row gap-3 mb-6">
 
                 <input 
                     type="text"
                     name="materia"
                     value="{{ $materia }}"
-                    placeholder="Buscar materia..."
+                    placeholder="Buscar materia solicitada..."
                     class="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-64 focus:ring-2 focus:ring-blue-600"
                 >
 
@@ -65,13 +66,15 @@
                 ➕ Crear Detalle de Asesoría
             </a>
 
+            {{-- TABLA --}}
             <div class="overflow-x-auto rounded-xl border border-gray-200 shadow">
 
                 <table class="min-w-full text-xs sm:text-sm">
 
                     <thead class="text-white uppercase font-semibold" style="background-color:#0B3D7E;">
                         <tr>
-                            <th class="px-4 py-3">Materia</th>
+                            <th class="px-4 py-3">Materia solicitada</th>
+                            <th class="px-4 py-3">Carrera</th>
                             <th class="px-4 py-3">Alumnos</th>
                             <th class="px-4 py-3 text-center">Inicio</th>
                             <th class="px-4 py-3 text-center">Fin</th>
@@ -90,17 +93,24 @@
 
                             @php
                                 $adv = $d->advisories->first();
-                                $start = $adv ? \Carbon\Carbon::parse($adv->start_date)->format('d/m/Y') : '—';
-                                $end   = $adv ? \Carbon\Carbon::parse($adv->end_date)->format('d/m/Y') : '—';
+                                $req = $d->requests->first();
+
+                                $materiaSolicitada = $req?->subject?->name ?? 'N/A';
+                                $carreraSolicitada = $req?->subject?->career?->name ?? 'Materia común';
+
+                                $start  = $adv ? \Carbon\Carbon::parse($adv->start_date)->format('d/m/Y') : '—';
+                                $end    = $adv ? \Carbon\Carbon::parse($adv->end_date)->format('d/m/Y') : '—';
                                 $startT = $adv ? \Carbon\Carbon::parse($adv->start_time)->format('H:i') : '—';
                                 $endT   = $adv ? \Carbon\Carbon::parse($adv->end_time)->format('H:i') : '—';
                             @endphp
 
                             <tr class="border-b hover:bg-gray-50 transition">
 
-                                <td class="px-4 py-3 font-semibold">
-                                    {{ $d->subject->name }}
+                                <td class="px-4 py-3 font-bold">
+                                    {{ $materiaSolicitada }}
                                 </td>
+
+                                <td class="px-4 py-3">{{ $carreraSolicitada }}</td>
 
                                 <td class="px-4 py-3">
                                     <ul class="list-disc ml-6">
@@ -111,7 +121,6 @@
                                 </td>
 
                                 <td class="px-4 py-3 text-center">{{ $start }}</td>
-
                                 <td class="px-4 py-3 text-center">{{ $end }}</td>
 
                                 <td class="px-4 py-3 text-center capitalize">
@@ -122,15 +131,15 @@
                                     {{ $adv ? "$startT - $endT" : '—' }}
                                 </td>
 
-                                  <td class="px-3 py-3">
-                            <span class="px-3 py-1 rounded text-white text-xs sm:text-sm 
-                                @if($adv->advisoryDetail->status == 'Pendiente') bg-yellow-500
-                                @elseif($adv->advisoryDetail->status == 'Aprobado') bg-green-600
-                                @elseif($adv->advisoryDetail->status == 'Finalizado') bg-red-600
-                                @else bg-gray-500 @endif">
-                                {{ $adv->advisoryDetail->status }}
-                            </span>
-                        </td>
+                                <td class="px-3 py-3">
+                                    <span class="px-3 py-1 rounded text-white text-xs sm:text-sm 
+                                        @if($adv->advisoryDetail->status == 'Pendiente') bg-yellow-500
+                                        @elseif($adv->advisoryDetail->status == 'Aprobado') bg-green-600
+                                        @elseif($adv->advisoryDetail->status == 'Finalizado') bg-red-600
+                                        @else bg-gray-500 @endif">
+                                        {{ $adv->advisoryDetail->status }}
+                                    </span>
+                                </td>
 
                                 <td class="px-4 py-3">{{ $d->observations }}</td>
 
@@ -144,10 +153,12 @@
                                 </td>
 
                                 <td class="px-4 py-3 text-center">
-                                    <a href="{{ route('basic_sciences.evaluation', $adv->advisory_id) }}"
-                                       class="text-green-600 font-semibold hover:underline">
-                                        Ver evaluación
-                                    </a>
+                                    @if($adv)
+                                        <a href="{{ route('basic_sciences.evaluation', $adv->advisory_id) }}"
+                                           class="text-green-600 font-semibold hover:underline">
+                                            Ver evaluación
+                                        </a>
+                                    @endif
                                 </td>
 
                             </tr>
@@ -163,11 +174,10 @@
 
     </main>
 
-   <div class="w-full mt-10">
-    <x-basic-sciences-footer />
-</div>
+    <div class="w-full mt-10">
+        <x-basic-sciences-footer />
+    </div>
 
 </body>
 </html>
-
 

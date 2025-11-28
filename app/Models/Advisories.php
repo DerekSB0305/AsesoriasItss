@@ -88,4 +88,8 @@ class Advisories extends Model
         return $this->hasMany(AdvisoryReport::class, 'advisory_id', 'advisory_id');
     }
 
+    public function requests()
+    {
+        return $this->hasMany(Requests::class, 'enrollment', 'enrollment');
+    }
 }

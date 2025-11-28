@@ -20,18 +20,20 @@ class Requests extends Model
         return $this->belongsTo(Student::class, 'enrollment', 'enrollment');
     }
 
+      public function subject()
+    {
+        return $this->belongsTo(Subject::class, 'subject_id', 'subject_id');
+    }
+
     public function teacher()
     {
         return $this->belongsTo(Teacher::class, 'teacher_user', 'teacher_user');
-    }
-
-    public function subject()
-    {
-        return $this->belongsTo(Subject::class, 'subject_id', 'subject_id');
     }
 
     public function advisoryDetails()
     {
         return $this->hasMany(Advisory_details::class, 'request_id', 'request_id');
     }
+
+    
 }

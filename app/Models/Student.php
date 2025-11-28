@@ -57,9 +57,9 @@ class Student extends Model
     }
 
     public function userRelation()
-{
-    return $this->belongsTo(User::class, 'enrollment', 'user');
-}
+    {
+        return $this->belongsTo(User::class, 'enrollment', 'user');
+    }
 
 
     protected static function boot()
@@ -71,5 +71,10 @@ class Student extends Model
             \App\Models\User::where('user', $student->enrollment)
                 ->delete();
         });
+    }
+
+    public function requests()
+    {
+        return $this->hasMany(Requests::class, 'enrollment', 'enrollment');
     }
 }

@@ -19,12 +19,12 @@
 
             {{-- Título --}}
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800">
                     📚 Asesorías Registradas
                 </h1>
 
                 <div class="flex flex-col sm:flex-row gap-3 text-sm">
-
                     <a href="{{ route('basic_sciences.advisory_details.create') }}"
                        class="px-4 py-2 rounded-lg text-white font-semibold text-center hover:opacity-90"
                        style="background-color:#28A745;">
@@ -40,8 +40,8 @@
                        class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg font-semibold text-center">
                         ← Volver
                     </a>
-
                 </div>
+
             </div>
 
             {{-- Buscar --}}
@@ -59,11 +59,12 @@
                 </button>
             </form>
 
-            {{-- Tabla --}}
+            {{-- Validar si existen asesorías finalizadas para mostrar columna --}}
             @php
-                $hasFinalized = $advisories->contains(fn($a) => $a->advisoryDetail->status === 'Finalizado');
+                $hasFinalized = $advisories->contains(fn($a) => $a->advisoryDetail?->status === 'Finalizado');
             @endphp
 
+            {{-- Tabla --}}
             <div class="overflow-x-auto rounded-xl border border-gray-200 shadow">
 
                 <table class="min-w-full text-xs sm:text-sm">
@@ -72,7 +73,7 @@
                         <tr>
                             <th class="px-4 py-3 whitespace-nowrap">Maestro</th>
                             <th class="px-4 py-3 whitespace-nowrap">Carrera</th>
-                            <th class="px-4 py-3 whitespace-nowrap">Materia</th>
+                            <th class="px-4 py-3 whitespace-nowrap">Materia solicitada</th>
                             <th class="px-4 py-3 whitespace-nowrap">Inicio</th>
                             <th class="px-4 py-3 whitespace-nowrap">Fin</th>
                             <th class="px-4 py-3 whitespace-nowrap">Día & Hora</th>
@@ -84,9 +85,8 @@
                             <th class="px-4 py-3 whitespace-nowrap">Archivo</th>
                             <th class="px-4 py-3 whitespace-nowrap">Detalles</th>
 
-                            {{-- Mostrar solo si existen asesorías finalizadas --}}
                             @if($hasFinalized)
-                                <th class="px-4 py-3 whitespace-nowrap text-center">Ver Evaluación</th>
+                                <th class="px-4 py-3 whitespace-nowrap text-center">Evaluación</th>
                             @endif
 
                             <th class="px-4 py-3 text-center whitespace-nowrap">Acciones</th>
@@ -98,6 +98,14 @@
                         @foreach($advisories as $adv)
                             @php
                                 $students = $adv->advisoryDetail->students ?? collect();
+
+                                // MATERIA SOLICITADA
+                                $requestedSubject = $adv->advisoryDetail
+                                    ->requests
+                                    ->first()
+                                    ?->subject
+                                    ?->name ?? 'N/A';
+
                                 $startDate = \Carbon\Carbon::parse($adv->start_date)->format('d/m/Y');
                                 $endDate   = \Carbon\Carbon::parse($adv->end_date)->format('d/m/Y');
                                 $startTime = \Carbon\Carbon::parse($adv->start_time)->format('H:i');
@@ -106,22 +114,30 @@
 
                             <tr class="border-b hover:bg-gray-100 transition">
 
-                                <td class="px-4 py-3">{{ $adv->teacherSubject->teacher->name }}</td>
+                                <td class="px-4 py-3">
+                                    {{ $adv->teacherSubject->teacher->name }}
+                                </td>
 
-                                <td class="px-4 py-3">{{ $adv->teacherSubject->subject->career->name }}</td>
+                                <td class="px-4 py-3">
+                                    {{ $adv->advisoryDetail->requests->first()?->subject?->career?->name ?? 'Materia común' }}
 
-                                <td class="px-4 py-3">{{ $adv->teacherSubject->subject->name }}</td>
+                                {{-- Materia solicitada correcta --}}
+                                <td class="px-4 py-3 font-semibold text-indigo-700">
+                                    {{ $requestedSubject }}
+                                </td>
 
-                                <td class="px-4 py-3 font-semibold">{{ $startDate }}</td>
+                                <td class="px-4 py-3">{{ $startDate }}</td>
 
-                                <td class="px-4 py-3 font-semibold">{{ $endDate }}</td>
+                                <td class="px-4 py-3">{{ $endDate }}</td>
 
-                                <td class="px-4 py-3 font-semibold whitespace-nowrap">
+                                <td class="px-4 py-3 whitespace-nowrap">
                                     <strong>{{ $adv->day_of_week }}</strong>
                                     {{ $startTime }} - {{ $endTime }}
                                 </td>
 
-                                <td class="px-4 py-3 text-center font-bold">{{ $students->count() }}</td>
+                                <td class="px-4 py-3 text-center font-bold">
+                                    {{ $students->count() }}
+                                </td>
 
                                 <td class="px-4 py-3 text-center text-blue-600 font-bold">
                                     {{ $students->where('gender', 'Masculino')->count() }}
@@ -140,7 +156,7 @@
                                         <a href="{{ asset('storage/' . $adv->assignment_file) }}"
                                            target="_blank"
                                            class="text-blue-600 hover:underline">
-                                           Ver archivo
+                                            Ver archivo
                                         </a>
                                     @else
                                         <span class="text-gray-500">Sin archivo</span>
@@ -154,22 +170,17 @@
                                     </a>
                                 </td>
 
-                                {{-- Solo si tenemos asesorías finalizadas --}}
+                                {{-- Evaluación solo si está finalizada --}}
                                 @if($hasFinalized)
                                     <td class="px-4 py-3 text-center">
-
-                                        {{-- Solo si esta asesoría YA finalizó --}}
-                                        @if($adv->advisoryDetail->status === 'Finalizado')
-
+                                        @if($adv->advisoryDetail?->status === 'Finalizado')
                                             <a href="{{ route('basic_sciences.evaluation', $adv->advisory_id) }}"
                                                class="text-green-600 font-semibold hover:underline">
                                                 Ver evaluación
                                             </a>
-
                                         @else
-                                            <span class="text-gray-400 text-xs">Asesoría en curso</span>
+                                            <span class="text-gray-400 text-xs">En curso</span>
                                         @endif
-
                                     </td>
                                 @endif
 
@@ -181,7 +192,8 @@
                                         Editar
                                     </a>
 
-                                    <button onclick="openDeleteModal('{{ $adv->teacherSubject->subject->name }}', '{{ $adv->advisory_id }}')"
+                                    <button 
+                                        onclick="openDeleteModal('{{ $requestedSubject }}', '{{ $adv->advisory_id }}')"
                                         class="px-3 py-1 text-white rounded font-semibold hover:opacity-90"
                                         style="background-color:#E74C3C;">
                                         Eliminar
@@ -206,10 +218,10 @@
     </div>
 
 
-    {{-- Modal eliminar --}}
+    {{-- MODAL ELIMINAR --}}
     <div id="deleteModal"
          class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-
+        
         <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-2xl">
 
             <h2 class="text-xl font-bold text-red-600 mb-4">⚠ Confirmar eliminación</h2>
@@ -237,7 +249,6 @@
                     </button>
 
                 </div>
-
             </form>
 
         </div>
@@ -246,10 +257,10 @@
 
     <script>
         function openDeleteModal(name, id) {
-            document.getElementById('deleteModal').classList.remove('hidden');
             document.getElementById('advisoryName').innerText = name;
             document.getElementById('deleteForm').action =
                 "/basic_sciences/advisories/" + encodeURIComponent(id);
+            document.getElementById('deleteModal').classList.remove('hidden');
         }
 
         function closeDeleteModal() {
@@ -259,5 +270,3 @@
 
 </body>
 </html>
-
-

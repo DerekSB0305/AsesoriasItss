@@ -33,12 +33,15 @@
             {{ $advisory->teacherSubject->teacher->last_name_f }}
             {{ $advisory->teacherSubject->teacher->last_name_m }}
         </p>
-        <p class="mt-1"><strong>Materia:</strong>
-            {{ $advisory->teacherSubject->subject->name }}
+        
+        <p class="mt-1"><strong>Materia solicitada:</strong>
+            {{ $materiaSolicitada }}
         </p>
-        <p class="mt-1"><strong>Carrera:</strong>
-            {{ $advisory->teacherSubject->teacher->career->name }}
+        
+        <p class="mt-1"><strong>Carrera de la materia:</strong>
+            {{ $carreraSolicitada }}
         </p>
+
         <p class="mt-1"><strong>Total de evaluaciones recibidas:</strong> {{ $total }}</p>
     </div>
 

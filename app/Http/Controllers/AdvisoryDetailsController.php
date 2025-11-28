@@ -15,11 +15,17 @@ class AdvisoryDetailsController extends Controller
     public function index(Request $request)
     {
         $materia = $request->materia;
-        $estado = $request->estado;
+        $estado  = $request->estado;
 
-        $details = Advisory_details::with(['students', 'advisories.teacherSubject.subject'])
+        $details = Advisory_details::with([
+            'students',
+            'advisories',
+            'requests.subject',
+            'requests.subject.career',
+        ])
             ->when($materia, function ($q) use ($materia) {
-                $q->whereHas('advisories.teacherSubject.subject', function ($sub) use ($materia) {
+
+                $q->whereHas('requests.subject', function ($sub) use ($materia) {
                     $sub->where('name', 'LIKE', "%$materia%");
                 });
             })
@@ -29,8 +35,12 @@ class AdvisoryDetailsController extends Controller
             ->orderBy('advisory_detail_id', 'DESC')
             ->get();
 
-        return view('basic_sciences.advisory_details.index', compact('details', 'materia', 'estado'));
+        return view(
+            'basic_sciences.advisory_details.index',
+            compact('details', 'materia', 'estado')
+        );
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -92,7 +102,7 @@ class AdvisoryDetailsController extends Controller
             ->with('advisoryDetail.students')
             ->get()
             ->flatMap(fn($adv) => $adv->advisoryDetail->students)
-            ->keyBy('enrollment'); 
+            ->keyBy('enrollment');
 
 
         //  Unir alumnos que NO pueden ser seleccionados
@@ -145,12 +155,18 @@ class AdvisoryDetailsController extends Controller
         ]);
 
         foreach ($request->request_id as $reqId) {
+
+            // Guarda la solicitud asociada
+            $detail->requests()->attach($reqId);
+
+            // Agrega el alumno relacionado
             $req = Requests::find($reqId);
 
             if ($req && $req->student) {
                 $detail->students()->attach($req->student->enrollment);
             }
         }
+
 
         return redirect()->route('basic_sciences.advisories.create', [
             'detail_id' => $detail->advisory_detail_id

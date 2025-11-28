@@ -45,4 +45,14 @@ class Advisory_details extends Model
     {
         return 'advisory_detail_id';
     }
+
+    public function requests()
+    {
+        return $this->belongsToMany(
+            Requests::class,
+            'advisory_detail_request',
+            'advisory_detail_id',
+            'request_id'
+        );
+    }
 }

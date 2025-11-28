@@ -9,7 +9,6 @@
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    {{-- NAVBAR --}}
     <div class="fixed top-0 w-full z-50">
         <x-career-head-navbar />
     </div>
@@ -18,19 +17,16 @@
 
         <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-xl p-6 sm:p-8">
 
-            {{-- BOTÓN VOLVER --}}
             <a href="{{ route('career_head.advisories.index') }}"
                class="inline-flex items-center bg-gray-200 text-gray-800 px-4 py-2 rounded-md 
                       hover:bg-gray-300 transition mb-4 text-sm sm:text-base">
                 ← Volver
             </a>
 
-            {{-- TÍTULO --}}
             <h1 class="text-xl sm:text-2xl font-bold mb-4 text-gray-800">
                 Detalles de Asesoría #{{ $advisory->advisory_id }}
             </h1>
 
-            {{-- INFORMACIÓN GENERAL --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 mb-6 text-sm sm:text-base">
 
                 <div>
@@ -42,14 +38,14 @@
                 </div>
 
                 <div>
-                    <p><strong>Materia:</strong><br>
-                        {{ $advisory->teacherSubject->subject->name }}
+                    <p><strong>Materia solicitada:</strong><br>
+                        {{ $materiaSolicitada }}
                     </p>
                 </div>
 
                 <div>
-                    <p><strong>Carrera:</strong><br>
-                        {{ $advisory->teacherSubject->career->name }}
+                    <p><strong>Carrera solicitada:</strong><br>
+                        {{ $carreraSolicitada }}
                     </p>
                 </div>
 
@@ -88,7 +84,6 @@
 
             </div>
 
-            {{-- ARCHIVO ASIGNACIÓN --}}
             <div class="p-4 bg-gray-50 border rounded-lg shadow-sm mb-8">
 
                 <p class="text-sm font-semibold text-gray-600">Archivo de asignación</p>
@@ -98,29 +93,21 @@
                     @php
                         $path = asset('storage/' . $advisory->assignment_file);
                         $ext = strtolower(pathinfo($advisory->assignment_file, PATHINFO_EXTENSION));
-                        $isImage = in_array($ext, ['jpg','jpeg','png']);
-                        $isPDF = $ext === 'pdf';
-                        $isWord = in_array($ext, ['doc','docx']);
                     @endphp
 
-                    @if($isPDF)
-                        <iframe src="{{ $path }}"
-                                class="w-full h-64 mt-3 border rounded-lg"
-                                frameborder="0"></iframe>
+                    @if(in_array($ext, ['pdf']))
+                        <iframe src="{{ $path }}" class="w-full h-64 mt-3 border rounded-lg"></iframe>
                     @endif
 
-                    @if($isImage)
-                        <img src="{{ $path }}"
-                             class="w-40 h-40 sm:w-48 sm:h-48 object-cover rounded-lg mt-3 border shadow">
+                    @if(in_array($ext, ['jpg','jpeg','png']))
+                        <img src="{{ $path }}" class="w-40 h-40 sm:w-48 sm:h-48 object-cover rounded-lg mt-3 border shadow">
                     @endif
 
-                    @if($isWord)
+                    @if(in_array($ext, ['doc','docx']))
                         <div class="mt-3 flex items-center gap-3">
                             <img src="https://cdn-icons-png.flaticon.com/512/281/281760.png" width="40">
                             <a href="{{ $path }}" target="_blank"
-                               class="text-blue-600 underline font-semibold">
-                                📄 Descargar archivo Word
-                            </a>
+                               class="text-blue-600 underline font-semibold">📄 Descargar archivo Word</a>
                         </div>
                     @endif
 
@@ -134,7 +121,6 @@
                 @endif
             </div>
 
-            {{-- RESUMEN --}}
             <h2 class="text-lg sm:text-xl font-semibold mb-3 text-gray-800">Resumen de alumnos</h2>
 
             <div class="flex flex-wrap gap-6 mb-6 text-sm sm:text-base">
@@ -143,7 +129,6 @@
                 <p class="text-pink-600"><strong>Mujeres:</strong> {{ $mujeres }}</p>
             </div>
 
-            {{-- TABLA ALUMNOS --}}
             <h2 class="text-lg sm:text-xl font-semibold mb-3 text-gray-800">Lista de alumnos</h2>
 
             <div class="overflow-x-auto">
@@ -158,7 +143,7 @@
                     </thead>
 
                     <tbody>
-                    @foreach($students as $stu)
+                        @foreach($students as $stu)
                         <tr class="hover:bg-gray-50">
                             <td class="border px-3 py-2">{{ $stu->enrollment }}</td>
                             <td class="border px-3 py-2">
@@ -167,12 +152,11 @@
                             <td class="border px-3 py-2">{{ $stu->gender }}</td>
                             <td class="border px-3 py-2">{{ $stu->career->name }}</td>
                         </tr>
-                    @endforeach
+                        @endforeach
                     </tbody>
                 </table>
             </div>
 
-            {{-- REPORTES --}}
             <h2 class="text-lg sm:text-xl font-semibold mt-8 mb-4 text-gray-800">Reportes del Maestro</h2>
 
             @if($reports->isEmpty())
@@ -187,28 +171,21 @@
 
                         <div class="p-4 bg-gray-50 border rounded-lg shadow-sm">
 
-                            <p class="font-semibold text-gray-700">
-                                📘 {{ $report->description }}
-                            </p>
+                            <p class="font-semibold text-gray-700">📘 {{ $report->description }}</p>
 
                             @if($ext === 'pdf')
-                                <iframe src="{{ $path }}"
-                                        class="w-full h-64 mt-3 border rounded-lg"
-                                        frameborder="0"></iframe>
+                                <iframe src="{{ $path }}" class="w-full h-64 mt-3 border rounded-lg"></iframe>
                             @endif
 
                             @if(in_array($ext, ['jpg','jpeg','png']))
-                                <img src="{{ $path }}"
-                                     class="w-40 h-40 sm:w-48 sm:h-48 object-cover rounded-lg mt-3 border shadow">
+                                <img src="{{ $path }}" class="w-40 h-40 sm:w-48 sm:h-48 object-cover rounded-lg mt-3 border shadow">
                             @endif
 
                             @if(in_array($ext, ['doc','docx']))
                                 <div class="mt-3 flex items-center gap-3">
                                     <img src="https://cdn-icons-png.flaticon.com/512/281/281760.png" width="40">
                                     <a href="{{ $path }}" target="_blank"
-                                       class="text-blue-600 underline font-semibold">
-                                        📄 Descargar archivo Word
-                                    </a>
+                                       class="text-blue-600 underline font-semibold">📄 Descargar archivo Word</a>
                                 </div>
                             @endif
 

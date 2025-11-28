@@ -14,8 +14,14 @@ class EvaluationController extends Controller
             'teacherSubject.teacher',
             'teacherSubject.subject',
             'teacherSubject.subject.career',
-            'advisoryDetail.students'
+            'advisoryDetail.students',
+            'advisoryDetail.requests.subject.career'
         ])->findOrFail($advisory_id);
+
+        $solicitud = $advisory->advisoryDetail->requests->first();
+
+        $materiaSolicitada = $solicitud?->subject?->name ?? 'N/A';
+        $carreraSolicitada = $solicitud?->subject?->career?->name ?? 'Materia común';
 
         $evaluations = Evaluation::where('advisory_id', $advisory_id)->get();
 
@@ -25,6 +31,8 @@ class EvaluationController extends Controller
                 'advisory'             => $advisory,
                 'evaluated'            => false,
                 'total'                => 0,
+                'materiaSolicitada'    => $materiaSolicitada,
+                'carreraSolicitada'    => $carreraSolicitada,
                 'students'             => $advisory->advisoryDetail->students,
                 'evaluatedStudents'    => collect(),
                 'notEvaluatedStudents' => $advisory->advisoryDetail->students,
@@ -45,26 +53,30 @@ class EvaluationController extends Controller
             "LO RECOMENDARÍA A OTROS"
         ];
 
+        // Promedios por pregunta
         $averages = [];
         for ($i = 1; $i <= 11; $i++) {
             $averages[$i] = round($evaluations->avg("q$i"), 2);
         }
 
+        // Promedio general
         $generalAverage = round(collect($averages)->avg(), 2);
 
         $students = $advisory->advisoryDetail->students;
 
-        $evaluatedStudents = $students->filter(function ($stu) use ($advisory_id) {
-            return Evaluation::where('enrollment', $stu->enrollment)
+        $evaluatedStudents = $students->filter(
+            fn($stu) =>
+            Evaluation::where('enrollment', $stu->enrollment)
                 ->where('advisory_id', $advisory_id)
-                ->exists();
-        });
+                ->exists()
+        );
 
-        $notEvaluatedStudents = $students->filter(function ($stu) use ($advisory_id) {
-            return !Evaluation::where('enrollment', $stu->enrollment)
+        $notEvaluatedStudents = $students->filter(
+            fn($stu) =>
+            !Evaluation::where('enrollment', $stu->enrollment)
                 ->where('advisory_id', $advisory_id)
-                ->exists();
-        });
+                ->exists()
+        );
 
         return view('basic_sciences.advisories.evaluation', [
             'advisory'             => $advisory,
@@ -72,6 +84,8 @@ class EvaluationController extends Controller
             'questions'            => $questions,
             'averages'             => $averages,
             'general'              => $generalAverage,
+            'materiaSolicitada'    => $materiaSolicitada,
+            'carreraSolicitada'    => $carreraSolicitada,
             'total'                => $evaluations->count(),
             'students'             => $students,
             'evaluatedStudents'    => $evaluatedStudents,

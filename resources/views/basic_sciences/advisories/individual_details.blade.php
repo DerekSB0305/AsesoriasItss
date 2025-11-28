@@ -26,49 +26,43 @@
                 Detalles de Asesoría #{{ $advisory->advisory_id }}
             </h1>
 
+            {{-- =============== PROMEDIO GENERAL =============== --}}
+            @if($promedioFinal)
+                <div class="w-full sm:col-span-2 mb-8">
+
+                    <div class="
+                        relative overflow-hidden rounded-3xl p-8 text-center shadow-2xl
+                        bg-gradient-to-r from-[#0a3a8a] via-[#3458d1] to-[#4d3ac9]
+                        text-white ring-1 ring-blue-900/40
+                    ">
+                        <div class="absolute inset-0 rounded-3xl 
+                                    bg-gradient-to-r from-blue-600/20 via-purple-500/20 to-blue-900/20 
+                                    blur-2xl opacity-70">
+                        </div>
+
+                        <div class="relative z-10">
+                            <h2 class="text-xl sm:text-3xl font-extrabold mb-4 drop-shadow-md">
+                                Calificación general del asesor
+                            </h2>
+
+                            <div class="mx-auto w-40 h-40 sm:w-48 sm:h-48 rounded-full flex items-center justify-center
+                                        bg-white/10 backdrop-blur-md shadow-xl ring-2 ring-white/20">
+                                <p class="text-5xl sm:text-6xl font-extrabold tracking-wide drop-shadow-lg">
+                                    {{ $promedioFinal }}
+                                </p>
+                            </div>
+
+                            <p class="text-sm sm:text-base mt-4 opacity-90">
+                                Promedio basado en la evaluación de los alumnos.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            @endif
+
+            {{-- =============== INFORMACIÓN GENERAL =============== --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 mb-6 text-sm sm:text-base">
-
-                            @if($promedioFinal)
-<div class="w-full sm:col-span-2 mb-8">
-
-    <div class="
-        relative overflow-hidden rounded-3xl p-8 text-center shadow-2xl
-        bg-gradient-to-r from-[#0a3a8a] via-[#3458d1] to-[#4d3ac9]
-        text-white
-        ring-1 ring-blue-900/40
-    ">
-
-        <!-- Glow exterior -->
-        <div class="absolute inset-0 rounded-3xl 
-                    bg-gradient-to-r from-blue-600/20 via-purple-500/20 to-blue-900/20 
-                    blur-2xl opacity-70">
-        </div>
-
-        <!-- Contenido -->
-        <div class="relative z-10">
-
-            <h2 class="text-xl sm:text-3xl font-extrabold mb-4 drop-shadow-md">
-                Calificación general del asesor
-            </h2>
-
-            <!-- Círculo con efecto -->
-            <div class="mx-auto w-40 h-40 sm:w-48 sm:h-48 rounded-full flex items-center justify-center
-                        bg-white/10 backdrop-blur-md shadow-xl ring-2 ring-white/20">
-                <p class="text-5xl sm:text-6xl font-extrabold tracking-wide drop-shadow-lg">
-                    {{ $promedioFinal }}
-                </p>
-            </div>
-
-            <p class="text-sm sm:text-base mt-4 opacity-90">
-                Promedio basado en la evaluación de los alumnos.
-            </p>
-
-        </div>
-
-    </div>
-
-</div>
-@endif
 
                 <div>
                     <p><strong>Maestro:</strong><br>
@@ -79,14 +73,18 @@
                 </div>
 
                 <div>
-                    <p><strong>Materia:</strong><br>
-                        {{ $advisory->teacherSubject->subject->name }}
+                    <p><strong>Materia solicitada:</strong><br>
+                        <span class="font-semibold text-blue-700">
+                            {{ $materiaSolicitada }}
+                        </span>
                     </p>
                 </div>
 
                 <div>
-                    <p><strong>Carrera:</strong><br>
-                        {{ $advisory->teacherSubject->career->name }}
+                    <p><strong>Carrera de la materia solicitada:</strong><br>
+                        <span class="font-semibold text-green-700">
+                            {{ $carreraSolicitada }}
+                        </span>
                     </p>
                 </div>
 
@@ -125,6 +123,7 @@
 
             </div>
 
+            {{-- =============== ARCHIVO =============== --}}
             <div class="p-4 bg-gray-50 border rounded-lg shadow-sm mb-8">
 
                 <p class="text-sm font-semibold text-gray-600">Archivo de asignación</p>
@@ -134,23 +133,20 @@
                     @php
                         $path = asset('storage/' . $advisory->assignment_file);
                         $ext = strtolower(pathinfo($advisory->assignment_file, PATHINFO_EXTENSION));
-                        $isImage = in_array($ext, ['jpg','jpeg','png']);
-                        $isPDF = $ext === 'pdf';
-                        $isWord = in_array($ext, ['doc','docx']);
                     @endphp
 
-                    @if($isPDF)
+                    @if($ext === 'pdf')
                         <iframe src="{{ $path }}"
                                 class="w-full h-64 mt-3 border rounded-lg"
                                 frameborder="0"></iframe>
                     @endif
 
-                    @if($isImage)
+                    @if(in_array($ext, ['jpg','jpeg','png']))
                         <img src="{{ $path }}"
                              class="w-40 h-40 sm:w-48 sm:h-48 object-cover rounded-lg mt-3 border shadow">
                     @endif
 
-                    @if($isWord)
+                    @if(in_array($ext, ['doc','docx']))
                         <div class="mt-3 flex items-center gap-3">
                             <img src="https://cdn-icons-png.flaticon.com/512/281/281760.png" width="40">
                             <a href="{{ $path }}" target="_blank"
@@ -170,6 +166,7 @@
                 @endif
             </div>
 
+            {{-- =============== ALUMNOS =============== --}}
             <h2 class="text-lg sm:text-xl font-semibold mb-3 text-gray-800">Resumen de alumnos</h2>
 
             <div class="flex flex-wrap gap-6 mb-6 text-sm sm:text-base">
@@ -206,6 +203,7 @@
                 </table>
             </div>
 
+            {{-- =============== REPORTES =============== --}}
             <h2 class="text-lg sm:text-xl font-semibold mt-8 mb-4 text-gray-800">Reportes del Maestro</h2>
 
             @if($reports->isEmpty())
@@ -256,12 +254,12 @@
 
         </div>
 
-
     </main>
 
     <x-basic-sciences-footer />
 
 </body>
 </html>
+
 
 
