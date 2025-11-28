@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('subjects', function (Blueprint $table) {
             $table->id('subject_id');
             $table->string('name', 50); # Nombre de la materia
-            $table->unsignedBigInteger('career_id');
-            $table->string('period', 10)->nullable();
+            $table->string('type', 50)->nullable(); # Tipo de materia (obligatoria, optativa, etc.)
+            $table->unsignedBigInteger('career_id')->nullable(); # Carrera a la que pertenece
+            $table->string('period', 50)->nullable();
 
             $table->foreign('career_id')->references('career_id')->on('careers')->onDelete('cascade');
             $table->timestamps();

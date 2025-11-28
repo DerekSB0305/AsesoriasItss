@@ -11,7 +11,7 @@ class Subject extends Model
     use HasFactory;
 
     protected $primaryKey = 'subject_id';
-    protected $fillable = ['name', 'career_id', 'period'];
+    protected $fillable = ['name', 'type', 'career_id', 'period'];
 
     // Pertenece a una carrera
     public function career()
