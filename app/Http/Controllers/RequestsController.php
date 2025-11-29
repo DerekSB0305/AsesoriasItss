@@ -11,36 +11,37 @@ use Illuminate\Support\Facades\Storage;
 
 class RequestsController extends Controller
 {
+    // Index ciencias basicas 
     public function index(Request $request)
     {
         $query = Requests::with(['student.career', 'subject', 'teacher']);
 
-        // Si hay búsqueda
-        if ($request->filled('buscar')) {
-
-            $buscar = $request->buscar;
-
-            $query->whereHas('student', function ($q) use ($buscar) {
-                $q->where('enrollment', 'like', "%$buscar%")
-                    ->orWhere('name', 'like', "%$buscar%")
-                    ->orWhere('last_name_f', 'like', "%$buscar%");
-            });
-
-            // Buscar por materia
-            $query->orWhereHas('subject', function ($q) use ($buscar) {
-                $q->where('name', 'like', "%$buscar%");
-            });
-
-            // Buscar por carrera
-            $query->orWhereHas('student.career', function ($q) use ($buscar) {
-                $q->where('name', 'like', "%$buscar%");
+        if ($request->filled('matricula')) {
+            $query->whereHas('student', function ($q) use ($request) {
+                $q->where('enrollment', 'like', "%{$request->matricula}%");
             });
         }
 
-        $requests = $query->get();
+        if ($request->filled('materia')) {
+            $query->whereHas('subject', function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->materia}%");
+            });
+        }
+
+        if ($request->filled('carrera')) {
+            $query->whereHas('student.career', function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->carrera}%");
+            });
+        }
+
+        $requests = $query->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
 
         return view('basic_sciences.requests.index', compact('requests'));
     }
+
+
 
     public function indexTeacher()
     {

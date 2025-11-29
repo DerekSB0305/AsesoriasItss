@@ -1,34 +1,28 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio Ciencias Básicas</title>
     @vite('resources/css/app.css')
-
-    <!-- Material Icons (Google) -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
-    {{-- NAVBAR --}}
     <x-basic-sciences-navbar />
 
-    
-     {{-- CONTENIDO PRINCIPAL --}}
-
-    <div class="py-8 px-4">
+    <div class="py-8 px-4 flex-grow">
         <div class="max-w-6xl mx-auto">
 
             <h1 class="text-3xl font-extrabold text-gray-800 mb-6 text-center">
                 Bienvenido al Panel de Ciencias Básicas
             </h1>
 
-            {{-- GRID DE CARDS --}}
+            <!-- GRID -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
-                {{-- ADMINISTRATIVOS --}}
                 <a href="{{ route('basic_sciences.administratives.index') }}"
                    class="bg-white shadow-md rounded-xl p-4 hover:shadow-xl transition transform hover:-translate-y-0.5 flex flex-col items-center gap-2">
 
@@ -39,7 +33,6 @@
                     </h2>
                 </a>
 
-                {{-- MAESTROS --}}
                 <a href="{{ route('basic_sciences.teachers.index') }}"
                    class="bg-white shadow-md rounded-xl p-4 hover:shadow-xl transition transform hover:-translate-y-0.5 flex flex-col items-center gap-2">
 
@@ -50,7 +43,6 @@
                     </h2>
                 </a>
 
-                {{-- ASIGNAR MATERIAS --}}
                 <a href="{{ route('basic_sciences.teacher_subjects.index') }}"
                    class="bg-white shadow-md rounded-xl p-4 hover:shadow-xl transition transform hover:-translate-y-0.5 flex flex-col items-center gap-2">
 
@@ -61,7 +53,6 @@
                     </h2>
                 </a>
 
-                {{-- ESTUDIANTES --}}
                 <a href="{{ route('basic_sciences.students.index') }}"
                    class="bg-white shadow-md rounded-xl p-4 hover:shadow-xl transition transform hover:-translate-y-0.5 flex flex-col items-center gap-2">
 
@@ -72,7 +63,6 @@
                     </h2>
                 </a>
 
-                {{-- SOLICITUDES --}}
                 <a href="{{ route('basic_sciences.requests.index') }}"
                    class="bg-white shadow-md rounded-xl p-4 hover:shadow-xl transition transform hover:-translate-y-0.5 flex flex-col items-center gap-2">
 
@@ -83,7 +73,6 @@
                     </h2>
                 </a>
 
-                {{-- ASESORÍAS --}}
                 <a href="{{ route('basic_sciences.advisories.index') }}"
                    class="bg-white shadow-md rounded-xl p-4 hover:shadow-xl transition transform hover:-translate-y-0.5 flex flex-col items-center gap-2">
 
@@ -94,7 +83,6 @@
                     </h2>
                 </a>
 
-                {{-- USUARIOS --}}
                 <a href="{{ route('basic_sciences.users.index') }}"
                    class="bg-white shadow-md rounded-xl p-4 hover:shadow-xl transition transform hover:-translate-y-0.5 flex flex-col items-center gap-2">
 
@@ -105,7 +93,6 @@
                     </h2>
                 </a>
 
-                {{-- MANUALES --}}
                 <a href="{{ route('basic_sciences.manuals.index') }}"
                    class="bg-white shadow-md rounded-xl p-4 hover:shadow-xl transition transform hover:-translate-y-0.5 flex flex-col items-center gap-2">
 
@@ -126,12 +113,21 @@
                     </h2>
                 </a>
 
-            </div>
+                <a href="{{ route('basic_sciences.subjects.index') }}"
+                   class="bg-white shadow-md rounded-xl p-4 hover:shadow-xl transition transform hover:-translate-y-0.5 flex flex-col items-center gap-2">
+
+                    <span class="material-icons text-orange-700" style="font-size:64px;">book</span>
+
+                    <h2 class="text-center font-bold text-base text-gray-700">
+                        📚 Gestionar Materias
+                    </h2>
+                </a>
+
+            </div> 
 
         </div>
     </div>
 
-    {{-- FOOTER --}}
     <x-basic-sciences-footer />
 
 </body>

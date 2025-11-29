@@ -13,11 +13,20 @@ class DocumentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $documents =Document::all();
-        return view('basic_sciences.documents.index', compact('documents'));
-    }
+    public function index(Request $request)
+{
+    $search = $request->buscar;
+
+    $documents = Document::when($search, function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%");
+        })
+        ->orderBy('created_at', 'desc')
+        ->paginate(10)              
+        ->withQueryString();        
+
+    return view('basic_sciences.documents.index', compact('documents'));
+}
+
 
     public function teachersIndex()
 {

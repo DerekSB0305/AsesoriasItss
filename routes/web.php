@@ -7,6 +7,7 @@ use App\Http\Controllers\{
     AdvisoryDetailsController,
     Auth\AuthenticatedSessionController,
     DocumentController,
+    EvaluationController,
     ManualController,
     ProfileController,
     StudentController,
@@ -55,21 +56,12 @@ Route::prefix('basic_sciences')
         Route::resource('teacher_subjects', \App\Http\Controllers\TeacherSubjectController::class);
         Route::resource('advisory_details', AdvisoryDetailsController::class);
         Route::resource('advisories', AdvisoriesController::class);
-        Route::get(
-            '/advisory_details/students/{subject_id}',
-            [AdvisoryDetailsController::class, 'getStudentsBySubject']
-        )
-            ->name('advisory_details.getStudents');
-        Route::get(
-            'advisories/{id}/details',
-            [AdvisoriesController::class, 'details']
-        )
-            ->name('advisories.details');
-        Route::get('manuals/index', [ManualController::class, 'listManuals'])
-            ->name('manuals.index');
+        Route::get('/advisory_details/students/{id}', [AdvisoryDetailsController::class, 'getStudents'])->name('advisory_details.getStudents');
+        Route::get('advisories/{id}/details', [AdvisoriesController::class, 'details'])->name('advisories.details');
+        Route::get('manuals/index', [ManualController::class, 'listManuals'])->name('manuals.index');
         Route::resource('documents', DocumentController::class);
-        Route::get('evaluation/{advisory_id}', [\App\Http\Controllers\EvaluationController::class, 'show'])
-            ->name('evaluation');
+        Route::get('evaluation/{advisory_id}', [EvaluationController::class, 'show'])->name('evaluation');
+        Route::resource('subjects', \App\Http\Controllers\SubjectController::class);
     });
 
 // Jefes de carrera
@@ -200,18 +192,16 @@ Route::prefix('teachers')
         Route::get('documents', [DocumentController::class, 'teachersIndex'])
             ->name('documents.index');
 
-            Route::get('/notifications', function () {
+        Route::get('/notifications', function () {
             return view('teachers.notifications.index', [
                 'notifications' => Auth::user()->notifications
             ]);
         })->name('notifications');
         Route::post('/notifications/{id}/mark', function ($id) {
-        $n = Auth::user()->notifications()->findOrFail($id);
-        $n->markAsRead();
+            $n = Auth::user()->notifications()->findOrFail($id);
+            $n->markAsRead();
             return back();
         })->name('notifications.mark');
-
-
     });
 
 //Cambiar contraseña

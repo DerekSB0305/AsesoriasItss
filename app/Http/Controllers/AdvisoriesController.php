@@ -16,10 +16,8 @@ class AdvisoriesController extends Controller
 {
     public function index(Request $request)
     {
-        // Día actual
         $hoy = now()->toDateString();
 
-        // Actualizar asesorías vencidas
         $asesoriasVencidas = Advisories::where('end_date', '<', $hoy)
             ->whereHas('advisoryDetail', fn($q) => $q->where('status', 'Aprobado'))
             ->get();
@@ -28,32 +26,40 @@ class AdvisoriesController extends Controller
             $item->advisoryDetail->update(['status' => 'Finalizado']);
         }
 
-        // Consultar todas las asesorías con la materia solicitada
         $query = Advisories::with([
             'teacherSubject.teacher',
-            'teacherSubject.subject', // materia del maestro
+            'teacherSubject.subject',
             'advisoryDetail',
-            'advisoryDetail.requests.subject', // materia SOLICITADA
+            'advisoryDetail.requests.subject',
         ]);
 
-        // Buscador
-        if ($request->q) {
-            $q = $request->q;
-
-            $query->where(function ($sub) use ($q) {
-                $sub->whereHas('teacherSubject.teacher', fn($t) =>
-                $t->where('name', 'LIKE', "%$q%"))
-                    ->orWhereHas('teacherSubject.subject', fn($s) =>
-                    $s->where('name', 'LIKE', "%$q%"))
-                    ->orWhereHas('advisoryDetail.requests.subject', fn($s2) =>
-                    $s2->where('name', 'LIKE', "%$q%"));
+        if ($request->teacher) {
+            $query->whereHas('teacherSubject.teacher', function ($q) use ($request) {
+                $q->where('name', 'LIKE', "%{$request->teacher}%");
             });
         }
 
-        $advisories = $query->get();
+        if ($request->subject) {
+            $query->whereHas('advisoryDetail.requests.subject', function ($q) use ($request) {
+                $q->where('name', 'LIKE', "%{$request->subject}%");
+            });
+        }
+
+        if ($request->status) {
+            $query->whereHas('advisoryDetail', function ($q) use ($request) {
+                $q->where('status', $request->status);
+            });
+        }
+
+        // Ordenar y paginar
+        $advisories = $query->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
 
         return view('basic_sciences.advisories.index', compact('advisories'));
     }
+
+
 
 
     public function create(Request $request)
@@ -96,14 +102,12 @@ class AdvisoriesController extends Controller
             'assignment_file'    => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:4096',
         ]);
 
-        // Validación horario
         if ($request->start_time < "07:00" || $request->end_time > "16:00") {
             return back()->withErrors([
                 'start_time' => 'Las asesorías solo pueden ser entre 7:00 AM y 4:00 PM.'
             ]);
         }
 
-        // Conflicto maestro
         $conflictoMaestro = Advisories::where('teacher_subject_id', $request->teacher_subject_id)
             ->where('day_of_week', $request->day_of_week)
             ->where(function ($q) use ($request) {
@@ -118,7 +122,6 @@ class AdvisoriesController extends Controller
             ]);
         }
 
-        // Conflicto aula
         if ($request->classroom) {
             $conflictoAula = Advisories::where('classroom', $request->classroom)
                 ->where('day_of_week', $request->day_of_week)
@@ -133,7 +136,6 @@ class AdvisoriesController extends Controller
             }
         }
 
-        // Validación alumno → solo 1 asesoría activa
         $detail = Advisory_details::with(['students'])->find($request->advisory_detail_id);
 
         foreach ($detail->students as $student) {
@@ -150,14 +152,12 @@ class AdvisoriesController extends Controller
             }
         }
 
-        // Archivo
         $path = null;
         if ($request->hasFile('assignment_file')) {
             $file = $request->file('assignment_file');
             $path = $file->storeAs('assignments', $file->getClientOriginalName(), 'public');
         }
 
-        // Crear asesoría
         $advisory = Advisories::create([
             'advisory_detail_id' => $request->advisory_detail_id,
             'teacher_subject_id' => $request->teacher_subject_id,
@@ -171,10 +171,8 @@ class AdvisoriesController extends Controller
             'assignment_file'    => $path,
         ]);
 
-        // Cambiar estado
         $detail->update(['status' => 'Aprobado']);
 
-        // Notificar
         $user = $advisory->teacherSubject->teacher->userRelation;
         $user->notify(new AdvisoryCreated($advisory));
 
@@ -316,10 +314,9 @@ class AdvisoriesController extends Controller
             'advisoryDetail.requests.subject.career',
         ])
             ->whereHas('teacherSubject.teacher', function ($q) use ($careerId) {
-                $q->where('career_id', $careerId);   // Solo maestros de mi carrera
+                $q->where('career_id', $careerId);
             });
 
-        // Filtro por maestro
         if (request('maestro')) {
             $search = request('maestro');
             $query->whereHas('teacherSubject.teacher', function ($q) use ($search) {
@@ -328,14 +325,16 @@ class AdvisoriesController extends Controller
             });
         }
 
-        // Filtro por estado
         if (request('estado')) {
             $query->whereHas('advisoryDetail', function ($q) {
                 $q->where('status', request('estado'));
             });
         }
 
-        $advisories = $query->orderBy('start_date')->get();
+        $advisories = $query
+            ->orderBy('start_date', 'desc')
+            ->paginate(10)
+            ->withQueryString();
 
         return view('career_head.advisories.index', compact('advisories'));
     }
@@ -347,23 +346,50 @@ class AdvisoriesController extends Controller
             'teacherSubject.subject',
             'advisoryDetail.students',
             'advisoryDetail.requests.subject.career',
-            'reports'
+            'reports',
+            'evaluations'
         ])->findOrFail($id);
 
-        // Obtener materia real solicitada
         $solicitud = $advisory->advisoryDetail->requests->first();
         $materiaSolicitada = $solicitud?->subject?->name ?? 'N/A';
         $carreraSolicitada = $solicitud?->subject?->career?->name ?? 'Materia común';
 
+        $evaluaciones = $advisory->evaluations;
+        $totalEvaluaciones = $evaluaciones->count();
+
+        if ($totalEvaluaciones > 0) {
+
+            $sumaGeneral = $evaluaciones->sum(function ($item) {
+                return $item->q1 + $item->q2 + $item->q3 + $item->q4 + $item->q5 +
+                    $item->q6 + $item->q7 + $item->q8 + $item->q9 + $item->q10 + $item->q11;
+            });
+
+            // 11 preguntas por evaluación
+            $general = round($sumaGeneral / ($totalEvaluaciones * 11), 2);
+        } else {
+            $general = null;
+        }
+
+        $students = $advisory->advisoryDetail->students;
+
+        $evaluatedIds = $evaluaciones->pluck('enrollment');
+
+        $evaluatedStudents = $students->whereIn('enrollment', $evaluatedIds);
+        $notEvaluatedStudents = $students->whereNotIn('enrollment', $evaluatedIds);
+
         return view('career_head.advisories.individual_details', [
-            'advisory'           => $advisory,
-            'students'           => $advisory->advisoryDetail->students,
-            'materiaSolicitada'  => $materiaSolicitada,
-            'carreraSolicitada'  => $carreraSolicitada,
-            'total'              => $advisory->advisoryDetail->students->count(),
-            'hombres'            => $advisory->advisoryDetail->students->where('gender', 'Masculino')->count(),
-            'mujeres'            => $advisory->advisoryDetail->students->where('gender', 'Femenino')->count(),
-            'reports'            => $advisory->reports
+            'advisory'             => $advisory,
+            'materiaSolicitada'    => $materiaSolicitada,
+            'carreraSolicitada'    => $carreraSolicitada,
+            'students'             => $students,
+            'total'                => $students->count(),
+            'hombres'              => $students->where('gender', 'Masculino')->count(),
+            'mujeres'              => $students->where('gender', 'Femenino')->count(),
+            'reports'              => $advisory->reports,
+            'general'              => $general,
+            'totalEvaluaciones'    => $totalEvaluaciones,
+            'evaluatedStudents'    => $evaluatedStudents,
+            'notEvaluatedStudents' => $notEvaluatedStudents,
         ]);
     }
 }

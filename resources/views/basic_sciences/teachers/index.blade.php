@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Maestros</title>
     @vite('resources/css/app.css')
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -164,6 +165,11 @@
         </table>
 
     </div>
+
+    <div class="mt-6 flex justify-center">
+    {{ $teachers->links('vendor.pagination.tailwind') }}
+</div>
+
 </div>
 
 

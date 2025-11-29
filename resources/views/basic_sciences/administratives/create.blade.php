@@ -13,16 +13,13 @@
 
 <main class="flex-grow">
 
-    {{-- CONTENEDOR RESPONSIVE --}}
     <div class="w-full mx-auto bg-white shadow-lg rounded-lg p-6 sm:p-8 mt-6 
                 max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl">
 
-        {{-- TÍTULO --}}
         <h1 class="text-2xl sm:text-3xl font-bold text-[#0B3D7E] mb-6 flex items-center gap-2">
             ➕ Nuevo Administrativo
         </h1>
 
-        {{-- ERRORES --}}
         @if ($errors->any())
             <div class="mb-6 bg-red-100 border border-red-300 text-red-700 p-4 rounded-lg text-sm">
                 <p class="font-semibold mb-2">Se encontraron los siguientes errores:</p>
@@ -34,7 +31,6 @@
             </div>
         @endif
 
-        {{-- FORMULARIO RESPONSIVE (1 → 2 columnas) --}}
         <form action="{{ route('basic_sciences.administratives.store') }}"
               method="POST"
               class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
@@ -90,7 +86,6 @@
                 </select>
             </div>
 
-            {{-- BOTONES RESPONSIVE --}}
             <div class="col-span-1 md:col-span-2 flex flex-col sm:flex-row justify-between mt-6 gap-3">
 
                 <a href="{{ route('basic_sciences.administratives.index') }}"

@@ -18,27 +18,31 @@ class StudentController extends Controller
     {
         $query = Student::with(['career', 'teacher']);
 
-        // Si el usuario escribe algo
-        if ($request->filled('buscar')) {
+        if ($request->filled('matricula')) {
+            $query->where('enrollment', 'like', "%{$request->matricula}%");
+        }
 
-            $buscar = $request->buscar;
-
-            $query->where(function ($q) use ($buscar) {
-
-                // Buscar por matrícula
-                $q->where('enrollment', 'like', "%$buscar%")
-
-                    // Buscar por nombre de carrera
-                    ->orWhereHas('career', function ($c) use ($buscar) {
-                        $c->where('name', 'like', "%$buscar%");
-                    });
+        if ($request->filled('nombre')) {
+            $nombre = $request->nombre;
+            $query->where(function ($q) use ($nombre) {
+                $q->where('name', 'like', "%$nombre%")
+                    ->orWhere('last_name_f', 'like', "%$nombre%")
+                    ->orWhere('last_name_m', 'like', "%$nombre%");
             });
         }
 
-        $students = $query->get();
+        if ($request->filled('carrera')) {
+            $carrera = $request->carrera;
+            $query->whereHas('career', function ($q) use ($carrera) {
+                $q->where('name', 'like', "%$carrera%");
+            });
+        }
+
+        $students = $query->paginate(15)->appends($request->query());
 
         return view('basic_sciences.students.index', compact('students'));
     }
+
 
     public function indexTeacher()
     {
@@ -223,12 +227,19 @@ class StudentController extends Controller
                 'advisoryDetails.advisories.teacherSubject.subject',
             ]);
 
-        // FILTRO DE BÚSQUEDA
         if ($request->matricula) {
             $query->where('enrollment', 'LIKE', '%' . $request->matricula . '%');
         }
 
-        $students = $query->get();
+        if ($request->semestre) {
+            $query->where('semester', $request->semestre);
+        }
+
+        if ($request->grupo) {
+            $query->where('group', 'LIKE', '%' . $request->grupo . '%');
+        }
+
+        $students = $query->paginate(10)->withQueryString();
 
         return view('career_head.students.index', compact('students'));
     }

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Evaluation;
+
 
 class Advisories extends Model
 {
@@ -92,4 +94,10 @@ class Advisories extends Model
     {
         return $this->hasMany(Requests::class, 'enrollment', 'enrollment');
     }
+
+    public function evaluations()
+{
+    return $this->hasMany(Evaluation::class, 'advisory_id', 'advisory_id');
+}
+
 }

@@ -2,86 +2,107 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Career;
 use App\Models\Subject;
+use App\Models\Career;
 use Illuminate\Http\Request;
 
 class SubjectController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        $subjects = Subject::with('career')->get();
-        return view('subjects.index', compact('subjects'));
+        $search = $request->search;
+        $career = $request->career;
+
+        $query = Subject::with('career');
+
+
+        if ($search) {
+            $query->where('name', 'LIKE', "%$search%");
+        }
+
+
+        if ($career === 'comun') {
+            $query->whereNull('career_id');
+        } elseif ($career) {
+            $query->where('career_id', $career);
+        }
+
+        // Obtener materias paginadas
+        $subjects = $query->orderBy('name')->paginate(15);
+
+
+        $careers = Career::orderBy('name')->get();
+
+        return view('basic_sciences.subjects.index', compact(
+            'subjects',
+            'careers',
+            'search',
+            'career'
+        ));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
-        $careers = Career::all();
-        return view('subjects.create', compact('careers'));
+        $careers = Career::orderBy('name')->get();
+        return view('basic_sciences.subjects.create', compact('careers'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:100',
-            'credits' => 'required|integer|min:1|max:10',
-            'career_id' => 'required|exists:careers,id',
+            'name'      => 'required|string|max:100|unique:subjects,name',
+            'type'      => 'nullable|string|max:50',
+            'career_id' => 'nullable|exists:careers,career_id',
+            'period'    => 'nullable|string|max:50',
         ]);
 
-        Subject::create($request->all());
-        return redirect()->route('subjects.index')
-                         ->with('success', 'Materia registrada correctamente.');
+        Subject::create([
+            'name'      => $request->name,
+            'type'      => $request->type,
+            'career_id' => $request->career_id,
+            'period'    => $request->period,
+        ]);
+
+        return redirect()->route('basic_sciences.subjects.index')
+            ->with('success', 'Materia registrada correctamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Subject $subject)
+    public function edit($id)
     {
-        //
+        $subject = Subject::findOrFail($id);
+        $careers = Career::orderBy('name')->get();
+
+        return view('basic_sciences.subjects.edit', compact('subject', 'careers'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Subject $subject)
+    public function update(Request $request, $id)
     {
-        $careers = Career::all();
-        return view('subjects.edit', compact('subject', 'careers'));
-    }
+        $subject = Subject::findOrFail($id);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Subject $subject)
-    {
         $request->validate([
-            'name' => 'required|string|max:100',
-            'credits' => 'required|integer|min:1|max:10',
-            'career_id' => 'required|exists:careers,id',
+            'name'      => 'required|string|max:100|unique:subjects,name,' . $subject->subject_id . ',subject_id',
+            'type'      => 'nullable|string|max:50',
+            'period'    => 'nullable|string|max:50',
+            'career_id' => 'nullable|exists:careers,career_id',
         ]);
 
-        $subject->update($request->all());
-        return redirect()->route('subjects.index')
-                         ->with('success', 'Materia actualizada correctamente.');
-    }
+        $subject->update([
+            'name'      => $request->name,
+            'type'      => $request->type,
+            'period'    => $request->period,
+            'career_id' => $request->career_id,
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Subject $subject)
+        return redirect()->route('basic_sciences.subjects.index')
+            ->with('success', 'Materia actualizada correctamente.');
+    }
+    public function destroy($id)
     {
+        $subject = Subject::findOrFail($id);
         $subject->delete();
-        return redirect()->route('subjects.index')
-                         ->with('success', 'Materia eliminada correctamente.');
+
+        return redirect()->route('basic_sciences.subjects.index')
+            ->with('success', 'Materia eliminada correctamente.');
     }
 }

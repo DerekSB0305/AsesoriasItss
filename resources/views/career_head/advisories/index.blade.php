@@ -71,15 +71,12 @@
                 @foreach ($advisories as $a)
 
                     @php
-                        // Maestro
                         $teacher = $a->teacherSubject->teacher;
 
-                        // Solicitud (materia y carrera REAL solicitada)
                         $solicitud = $a->advisoryDetail->requests->first();
                         $materiaSolicitada = $solicitud?->subject?->name ?? 'N/A';
                         $carreraSolicitada = $solicitud?->subject?->career?->name ?? 'Materia común';
 
-                        // Fechas y horas
                         $startDate = \Carbon\Carbon::parse($a->start_date)->format('d/m/Y');
                         $endDate   = \Carbon\Carbon::parse($a->end_date)->format('d/m/Y');
                         $startTime = \Carbon\Carbon::parse($a->start_time)->format('H:i');
@@ -90,61 +87,51 @@
 
                     <tr class="border-b hover:bg-gray-50 transition">
 
-                        {{-- Maestro --}}
                         <td class="px-4 py-3 font-semibold whitespace-nowrap">
                             {{ $teacher->name }} {{ $teacher->last_name_f }}
                         </td>
 
-                        {{-- Carrera solicitada --}}
                         <td class="px-4 py-3 whitespace-nowrap">
                             {{ $carreraSolicitada }}
                         </td>
 
-                        {{-- Materia solicitada --}}
                         <td class="px-4 py-3 whitespace-nowrap">
                             {{ $materiaSolicitada }}
                         </td>
 
-                        {{-- Fechas --}}
                         <td class="px-4 py-3 whitespace-nowrap">
                             {{ $startDate }} <br>
                             <span class="text-gray-500">a</span> <br>
                             {{ $endDate }}
                         </td>
 
-                        {{-- Día y horario --}}
                         <td class="px-4 py-3 whitespace-nowrap">
                             {{ ucfirst($a->day_of_week) }}<br>
                             {{ $startTime }} - {{ $endTime }}
                         </td>
 
-                        {{-- Aula --}}
                         <td class="px-4 py-3 whitespace-nowrap">
                             {{ $a->classroom ?? 'N/A' }}
                         </td>
 
-                        {{-- Edificio --}}
                         <td class="px-4 py-3 whitespace-nowrap">
                             {{ $a->building ?? 'N/A' }}
                         </td>
 
-                        {{-- Alumnos --}}
                         <td class="px-4 py-3 text-center font-bold whitespace-nowrap">
                             {{ $detail->students->count() }}
                         </td>
 
-                        {{-- Estado --}}
                         <td class="px-4 py-3 font-semibold whitespace-nowrap">
                             @if($detail->status == 'Pendiente')
                                 <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded">Pendiente</span>
                             @elseif($detail->status == 'Aprobado')
                                 <span class="px-2 py-1 bg-green-100 text-green-700 rounded">Aprobado</span>
                             @else
-                                <span class="px-2 py-1 bg-red-600 text-white  rounded">Finalizado</span>
+                                <span class="px-2 py-1 bg-red-600 text-white rounded">Finalizado</span>
                             @endif
                         </td>
 
-                        {{-- Detalles --}}
                         <td class="px-4 py-3 text-center whitespace-nowrap">
                            <a href="{{ route('career_head.advisories.details', $a->advisory_id) }}"
                                class="text-indigo-600 hover:text-indigo-800 font-semibold">
@@ -162,6 +149,10 @@
 
     </div>
 
+    <div class="mt-6 flex justify-center">
+        {{ $advisories->links('vendor.pagination.tailwind') }}
+    </div>
+
 </div>
 
 </main>
@@ -170,3 +161,4 @@
 
 </body>
 </html>
+

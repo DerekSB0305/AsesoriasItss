@@ -26,7 +26,6 @@
         </a>
     </div>
 
-    <!-- BUSCADOR -->
     <form method="GET"
         class="bg-gray-50 p-4 rounded-lg shadow mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
@@ -65,7 +64,6 @@
 
     </form>
 
-    <!-- TABLA -->
     <div class="overflow-x-auto">
 
         <table class="w-full border-collapse shadow text-sm sm:text-base">
@@ -129,6 +127,10 @@
 
     </div>
 
+    <div class="mt-6 flex justify-center">
+        {{ $teachers->links('vendor.pagination.tailwind') }}
+    </div>
+
 </div>
 
 </main>
@@ -137,5 +139,5 @@
 
 </body>
 </html>
->
+
 

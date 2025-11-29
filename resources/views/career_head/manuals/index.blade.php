@@ -9,9 +9,8 @@
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-    {{-- NAVBAR --}}
     <div class="fixed top-0 left-0 w-full z-50">
-        <x-career-head-navbar />
+        <x-career-head-navbar/>
     </div>
 
 <main class="flex-1 mt-28 mb-12 px-4">
@@ -29,7 +28,31 @@
             </a>
         </div>
 
-        <!-- TABLA RESPONSIVA -->
+        <form method="GET"
+              class="bg-gray-50 p-4 rounded-lg shadow mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+            <div>
+                <label class="text-sm font-semibold">Maestro</label>
+                <input type="text" name="maestro" value="{{ request('maestro') }}"
+                    placeholder="Nombre o apellido"
+                    class="w-full px-3 py-2 border rounded-lg focus:ring-[#0B3D7E]">
+            </div>
+
+            <div>
+                <label class="text-sm font-semibold">Materia</label>
+                <input type="text" name="materia" value="{{ request('materia') }}"
+                    placeholder="Ej. Cálculo, Física"
+                    class="w-full px-3 py-2 border rounded-lg focus:ring-[#0B3D7E]">
+            </div>
+
+            <div class="flex items-end">
+                <button class="w-full px-4 py-2 bg-[#1ABC9C] text-white rounded-lg shadow hover:bg-[#159a82]">
+                    🔍 Buscar
+                </button>
+            </div>
+
+        </form>
+
         <div class="overflow-x-auto rounded-xl border shadow">
 
             <table class="min-w-max w-full text-sm sm:text-base border-collapse">
@@ -48,24 +71,20 @@
                     @foreach ($manuals as $m)
                     <tr class="border-b hover:bg-gray-50 transition">
 
-                        <!-- Título -->
                         <td class="px-4 py-3 font-semibold">
                             {{ $m->title }}
                         </td>
 
-                        <!-- Maestro -->
                         <td class="px-4 py-3 whitespace-nowrap">
                             {{ $m->teacherSubject->teacher->name }}
                             {{ $m->teacherSubject->teacher->last_name_f }}
                             {{ $m->teacherSubject->teacher->last_name_m }}
                         </td>
 
-                        <!-- Materia -->
                         <td class="px-4 py-3 whitespace-nowrap">
                             {{ $m->teacherSubject->subject->name }}
                         </td>
 
-                        <!-- Archivo -->
                         <td class="px-4 py-3 text-center">
                             <a href="{{ asset('storage/'.$m->file_path) }}"
                                target="_blank"
@@ -82,6 +101,11 @@
             </table>
 
         </div>
+
+        <div class="mt-6 flex justify-center">
+            {{ $manuals->links('vendor.pagination.tailwind') }}
+        </div>
+
     </div>
 
 </main>
@@ -90,4 +114,5 @@
 
 </body>
 </html>
+
 

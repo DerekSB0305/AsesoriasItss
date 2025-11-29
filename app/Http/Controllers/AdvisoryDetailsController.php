@@ -65,14 +65,14 @@ class AdvisoryDetailsController extends Controller
         ]);
     }
 
-    public function getStudentsBySubject(int $subject_id)
+    public function getStudents($subject_id)
     {
         //  Solicitudes hechas para esta materia
         $requests = Requests::where('subject_id', $subject_id)
             ->with('student')
             ->get();
 
-        // Alumnos con asesoría activa (Aprobado)
+        //  Alumnos con asesoría activa (Aprobado)
         $alumnosActivos = Advisories::whereHas('advisoryDetail', function ($q) {
             $q->where('status', 'Aprobado');
         })
@@ -82,7 +82,7 @@ class AdvisoryDetailsController extends Controller
             ->unique()
             ->toArray();
 
-        // Alumnos con asesoría pendiente
+        //  Alumnos con asesoría pendiente
         $alumnosPendientes = Advisories::whereHas('advisoryDetail', function ($q) {
             $q->where('status', 'Pendiente');
         })
@@ -92,12 +92,12 @@ class AdvisoryDetailsController extends Controller
             ->unique()
             ->toArray();
 
-        // Alumnos que YA llevaron esta materia (Finalizados)
-        $alumnosRepetidores = Advisories::whereHas('teacherSubject', function ($q) use ($subject_id) {
-            $q->where('subject_id', $subject_id);
+        //  Alumnos que ya llevaron esta materia (Finalizados)
+        $alumnosRepetidores = Advisories::whereHas('advisoryDetail', function ($q) {
+            $q->where('status', 'Finalizado');
         })
-            ->whereHas('advisoryDetail', function ($q) {
-                $q->where('status', 'Finalizado');
+            ->whereHas('advisoryDetail.requests', function ($q) use ($subject_id) {
+                $q->where('subject_id', $subject_id);
             })
             ->with('advisoryDetail.students')
             ->get()
@@ -105,15 +105,14 @@ class AdvisoryDetailsController extends Controller
             ->keyBy('enrollment');
 
 
-        //  Unir alumnos que NO pueden ser seleccionados
+        //  Unir alumnos bloqueados (activos + pendientes)
         $bloqueados = array_unique(array_merge($alumnosActivos, $alumnosPendientes));
 
-        // Filtrar los alumnos DISPONIBLES
+        //  Filtrar alumnos disponibles
         $alumnosDisponibles = $requests->filter(function ($req) use ($bloqueados) {
             return !in_array($req->student->enrollment, $bloqueados);
         });
 
-        // disponibles y repetidores por separado
         return response()->json([
             'disponibles' => $alumnosDisponibles->map(function ($req) {
                 return [
@@ -135,6 +134,7 @@ class AdvisoryDetailsController extends Controller
             })->values(),
         ]);
     }
+
     /**
      * Crea uno o varios advisory_details a partir de los request_id seleccionados.
      * Tras crear, redirige a crear la Asesoría usando el primer detalle.
@@ -214,4 +214,8 @@ class AdvisoryDetailsController extends Controller
         return redirect()->route('basic_sciences.advisory_details.index')
             ->with('success', 'Detalle eliminado correctamente.');
     }
+
+  
+
+
 }

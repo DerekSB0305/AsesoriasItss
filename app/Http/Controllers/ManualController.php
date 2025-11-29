@@ -177,16 +177,18 @@ class ManualController extends Controller
                 });
             })
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10)                          // ⬅⬅⬅ AQUÍ EL CAMBIO OBLIGATORIO
+            ->withQueryString();                   // mantiene la búsqueda al paginar
 
         return view('basic_sciences.manuals.index', compact('manuals'));
     }
 
 
+
     /**
      * Vista para Jefes de Carrera
      */
-    public function indexCareerHead()
+    public function indexCareerHead(Request $request)
     {
         $admin = Auth::user()->administrative;
 
@@ -196,11 +198,27 @@ class ManualController extends Controller
 
         $careerId = $admin->career_id;
 
+        $maestro = $request->maestro;
+        $materia = $request->materia;
+
         $manuals = Manual::with(['teacherSubject.teacher', 'teacherSubject.subject'])
             ->whereHas('teacherSubject.teacher', function ($q) use ($careerId) {
-                $q->where('career_id', $careerId);  // 🔥 Maestro pertenece a mi carrera
+                $q->where('career_id', $careerId); // Solo maestros de mi carrera
             })
-            ->get();
+            ->when($maestro, function ($q) use ($maestro) {
+                $q->whereHas('teacherSubject.teacher', function ($t) use ($maestro) {
+                    $t->where('name', 'LIKE', "%$maestro%")
+                        ->orWhere('last_name_f', 'LIKE', "%$maestro%")
+                        ->orWhere('last_name_m', 'LIKE', "%$maestro%");
+                });
+            })
+            ->when($materia, function ($q) use ($materia) {
+                $q->whereHas('teacherSubject.subject', function ($s) use ($materia) {
+                    $s->where('name', 'LIKE', "%$materia%");
+                });
+            })
+            ->paginate(10)
+            ->withQueryString();
 
         return view('career_head.manuals.index', compact('manuals'));
     }

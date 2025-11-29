@@ -17,7 +17,7 @@ class AdministrativeController extends Controller
      */
     public function index()
     {
-        $administratives = Administrative::with('career')->get();
+        $administratives = Administrative::with('career')->paginate(10);
         return view('basic_sciences.administratives.index', compact('administratives'));
     }
 

@@ -27,15 +27,34 @@
         </a>
     </div>
 
-    <!-- BUSCADOR RESPONSIVO -->
     <form method="GET"
         class="bg-gray-50 p-4 rounded-lg shadow mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-        <div class="lg:col-span-3">
-            <label class="text-sm font-semibold">Buscar por matrícula</label>
+        <div>
+            <label class="text-sm font-semibold">Matrícula</label>
             <input type="text" name="matricula" value="{{ request('matricula') }}"
                 class="w-full px-3 py-2 border rounded-lg focus:ring-[#0B3D7E]"
                 placeholder="Ej. 22451234">
+        </div>
+
+        <div>
+            <label class="text-sm font-semibold">Semestre</label>
+            <select name="semestre"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-[#0B3D7E]">
+                <option value="">Todos</option>
+                @for($i=1; $i<=12; $i++)
+                    <option value="{{ $i }}" {{ request('semestre') == $i ? 'selected' : '' }}>
+                        {{ $i }}
+                    </option>
+                @endfor
+            </select>
+        </div>
+
+        <div>
+            <label class="text-sm font-semibold">Grupo</label>
+            <input type="text" name="grupo" value="{{ request('grupo') }}"
+                class="w-full px-3 py-2 border rounded-lg focus:ring-[#0B3D7E]"
+                placeholder="Ej. A, B, C">
         </div>
 
         <div class="flex items-end">
@@ -46,7 +65,6 @@
 
     </form>
 
-    <!-- TABLA RESPONSIVA COMO LA DE MAESTROS -->
     <div class="overflow-x-auto">
 
         <table class="min-w-max w-full border-collapse shadow text-sm sm:text-base">
@@ -94,7 +112,6 @@
                         <td class="px-3 py-2 text-center">{{ $s->gender }}</td>
                         <td class="px-3 py-2 text-center">{{ $s->age ?? 'N/D' }}</td>
 
-                        <!-- Tutor -->
                         <td class="px-3 py-2 whitespace-nowrap">
                             @if($s->teacher)
                                 {{ $s->teacher->name }} {{ $s->teacher->last_name_f }}
@@ -103,7 +120,6 @@
                             @endif
                         </td>
 
-                        <!-- Horario Escolar -->
                         <td class="px-3 py-2 text-center">
                             @if ($s->schedule_file)
                                 <a href="{{ asset('storage/'.$s->schedule_file) }}" 
@@ -116,7 +132,6 @@
                             @endif
                         </td>
 
-                        <!-- Periodo asesoría -->
                         <td class="px-3 py-2 text-center whitespace-nowrap">
                             @if($advisory)
                                 {{ \Carbon\Carbon::parse($advisory->start_date)->format('d/m/Y') }}
@@ -127,20 +142,18 @@
                             @endif
                         </td>
 
-                        <!-- Horario asesoría -->
                         <td class="px-3 py-2 text-center whitespace-nowrap">
                             @if($advisory)
                                 {{ ucfirst($advisory->day_of_week) }}
                                 <br>
                                 {{ \Carbon\Carbon::parse($advisory->start_time)->format('H:i') }}
-                                – 
+                                –
                                 {{ \Carbon\Carbon::parse($advisory->end_time)->format('H:i') }}
                             @else
                                 —
                             @endif
                         </td>
 
-                        <!-- Maestro asesor -->
                         <td class="px-3 py-2 whitespace-nowrap">
                             @if($advisory)
                                 {{ $advisory->teacherSubject->teacher->name }}
@@ -150,7 +163,6 @@
                             @endif
                         </td>
 
-                        <!-- Materia asesoría -->
                         <td class="px-3 py-2 whitespace-nowrap">
                             @if($advisory)
                                 {{ $advisory->teacherSubject->subject->name }}
@@ -166,6 +178,10 @@
 
         </table>
 
+    </div>
+
+    <div class="mt-6 flex justify-center">
+        {{ $students->links('vendor.pagination.tailwind') }}
     </div>
 
 </div>

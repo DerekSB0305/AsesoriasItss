@@ -24,9 +24,12 @@ class UserController extends Controller
             ->when($role, function ($q) use ($role) {
                 $q->where('role_id', $role);
             })
-            ->get();
+            ->orderBy('created_at', 'desc') 
+            ->paginate(10)                  
+            ->withQueryString();            
 
         $roles = Role::all();
+
         return view('basic_sciences.users.index', compact('users', 'roles', 'role', 'search'));
     }
 

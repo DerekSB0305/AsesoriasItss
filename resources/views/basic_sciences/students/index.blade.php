@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Estudiantes</title>
     @vite('resources/css/app.css')
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -18,7 +19,6 @@
     <div class="w-full max-w-6xl mx-auto bg-white shadow-xl rounded-xl p-6 sm:p-8">
 
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-
             <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
                 📚 Lista de Estudiantes
             </h1>
@@ -29,26 +29,51 @@
             </a>
         </div>
 
-        <form method="GET" class="flex flex-col md:flex-row gap-3 mb-6">
+        <form method="GET"
+              class="bg-gray-50 p-4 rounded-xl shadow-sm border
+                     grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 
-            <input type="text"
-                   name="buscar"
-                   value="{{ request('buscar') }}"
-                   placeholder="Buscar por matrícula o carrera..."
-                   class="px-4 py-2 border rounded-lg w-full md:w-80 
-                          focus:ring-2 focus:ring-[#0B3D7E]">
+            <div>
+                <label class="text-sm font-semibold">Buscar por matrícula</label>
+                <input type="text"
+                       name="matricula"
+                       value="{{ request('matricula') }}"
+                       class="w-full px-3 py-2 mt-1 border rounded-lg focus:ring-[#0B3D7E]"
+                       placeholder="Ej. 21330899">
+            </div>
 
-            <button class="px-4 py-2 bg-[#159a82] text-white rounded-lg shadow hover:bg-[#0f7a62]">
-                🔍 Buscar
-            </button>
+            <div>
+                <label class="text-sm font-semibold">Buscar por nombre</label>
+                <input type="text"
+                       name="nombre"
+                       value="{{ request('nombre') }}"
+                       class="w-full px-3 py-2 mt-1 border rounded-lg focus:ring-[#0B3D7E]"
+                       placeholder="Ej. Juan, María">
+            </div>
+
+            <div>
+                <label class="text-sm font-semibold">Buscar por carrera</label>
+                <input type="text"
+                       name="carrera"
+                       value="{{ request('carrera') }}"
+                       class="w-full px-3 py-2 mt-1 border rounded-lg focus:ring-[#0B3D7E]"
+                       placeholder="Ej. Informática, Industrial">
+            </div>
+
+            <div class="flex items-end">
+                <button class="px-4 py-2 w-full bg-[#1ABC9C] hover:bg-[#159a82]
+                               text-white rounded-lg shadow font-semibold flex items-center gap-2 justify-center">
+                    🔍 Buscar
+                </button>
+            </div>
 
         </form>
 
         <div class="overflow-x-auto rounded-lg shadow border border-gray-200">
 
-            <table class="w-full table-auto text-sm">
+            <table class="w-full text-sm">
 
-                <thead class="bg-[#0B3D7E] text-white text-xs sm:text-sm">
+                <thead class="bg-[#0B3D7E] text-white text-xs sm:text-sm uppercase font-semibold">
                     <tr>
                         <th class="px-3 py-3">Matrícula</th>
                         <th class="px-3 py-3">Nombre</th>
@@ -129,13 +154,17 @@
             </table>
         </div>
 
+        <div class="mt-6 flex justify-center">
+            {{ $students->links('vendor.pagination.tailwind') }}
+        </div>
+
     </div>
 
 </main>
 
-<div class="fixed bottom-0 left-0 w-full z-40 shadow">
-    <x-basic-sciences-footer />
-</div>
+<div class="w-full mt-10">
+        <x-basic-sciences-footer />
+    </div>
 
 </body>
 </html>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administrativos</title>
     @vite('resources/css/app.css')
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -19,7 +20,6 @@
                 📋 Lista de Administrativos
             </h1>
 
-            {{-- BOTONES SUPERIORES --}}
             <div class="flex flex-col md:flex-row justify-between gap-3 mb-6">
 
                 <a href="{{ route('basic_sciences.administratives.create') }}"
@@ -34,7 +34,6 @@
                 </a>
             </div>
 
-            {{-- MENSAJE DE ÉXITO --}}
             @if (session('success'))
                 <div class="bg-green-100 border border-green-300 text-green-700 p-3 rounded mb-4">
                     ✔ {{ session('success') }}
@@ -94,6 +93,11 @@
 
                 </table>
             </div>
+
+            <div class="mt-6 flex justify-center">
+                {{ $administratives->links('vendor.pagination.tailwind') }}
+            </div>
+
         </div>
 
     </main>
@@ -111,8 +115,8 @@
             </h2>
 
             <p class="text-gray-700 mb-6 text-sm md:text-base">
-                ¿Eliminar al administrativo  
-                <strong id="adminName" class="text-red-600"></strong>?  
+                ¿Eliminar al administrativo
+                <strong id="adminName" class="text-red-600"></strong>?
                 <br><br>
                 Esta acción no se puede deshacer.
             </p>
@@ -156,8 +160,4 @@
 
 </body>
 </html>
-
-
-
-
 

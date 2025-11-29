@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitudes</title>
     @vite('resources/css/app.css')
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -17,6 +18,7 @@
 
     <div class="max-w-7xl mx-auto bg-white shadow-xl rounded-xl p-6 sm:p-8">
 
+        {{-- HEADER --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
             <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">📄 Lista de Solicitudes</h1>
 
@@ -26,18 +28,48 @@
             </a>
         </div>
 
-        <form method="GET" class="flex flex-col md:flex-row gap-3 mb-6">
-            <input type="text"
-                   name="buscar"
-                   value="{{ request('buscar') }}"
-                   placeholder="Buscar por matrícula, materia o carrera..."
-                   class="px-4 py-2 border rounded-lg w-full md:w-96 focus:ring-2 focus:ring-[#0B3D7E]">
+        {{-- 🔎 BUSCADOR PROFESIONAL --}}
+        <form method="GET"
+        class="bg-gray-50 p-4 rounded-xl shadow-sm border
+        grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+           
+             <div>
+                <label class="text-sm font-semibold">Buscar por matrícula</label>
+                <input type="text"
+                name="matricula"
+                value="{{ request('matricula') }}"
+                class="w-full px-3 py-2 mt-1 border rounded-lg focus:ring-[#0B3D7E]"
+                placeholder="Ej. 21330899">
+            </div>
 
-            <button class="px-4 py-2 bg-[#159a82] text-white rounded-lg shadow hover:bg-[#107a68]">
-                🔍 Buscar
-            </button>
+            <div>
+                <label class="text-sm font-semibold">Buscar por materia</label>
+                <input type="text"
+               name="materia"
+               value="{{ request('materia') }}"
+               class="w-full px-3 py-2 mt-1 border rounded-lg focus:ring-[#0B3D7E]"
+               placeholder="Ej. Cálculo, Física">
+            </div>
+
+            <div>
+                <label class="text-sm font-semibold">Buscar por carrera</label>
+                 <input type="text"
+                name="carrera"
+                value="{{ request('carrera') }}"
+                class="w-full px-3 py-2 mt-1 border rounded-lg focus:ring-[#0B3D7E]"
+                placeholder="Ej. Informática, Industrial">
+            </div>
+
+            <div class="flex items-end">
+                <button class="px-4 py-2 w-full bg-[#1ABC9C] hover:bg-[#159a82]
+                text-white rounded-lg shadow font-semibold flex items-center gap-2 justify-center">
+                    🔍 Buscar
+                </button>
+             </div>
+
         </form>
 
+        {{-- TABLA --}}
         <div class="overflow-x-auto rounded-lg shadow border border-gray-200">
 
             <table class="w-full table-auto text-sm">
@@ -92,7 +124,7 @@
                                 <a href="{{ asset('storage/' . $request->canalization_file) }}"
                                    class="text-blue-600 hover:underline"
                                    target="_blank">
-                                    Ver Hoja
+                                   Ver Hoja
                                 </a>
                             @else
                                 <span class="text-gray-500">No disponible</span>
@@ -101,8 +133,8 @@
 
                         <td class="px-3 py-3 text-center">
                             <a href="{{ route('basic_sciences.advisory_details.create', ['subject_id' => $request->subject_id]) }}"
-                                class="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold shadow-md text-xs sm:text-sm
-                                hover:from-green-600 hover:to-emerald-700 hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">
+                               class="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold shadow-md text-xs sm:text-sm
+                                      hover:from-green-600 hover:to-emerald-700 hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">
                                 ➕ Crear asesoría
                             </a>
                         </td>
@@ -113,18 +145,20 @@
                 </tbody>
 
             </table>
+        </div>
 
+        {{-- PAGINACIÓN --}}
+        <div class="mt-6 flex justify-center">
+            {{ $requests->links('vendor.pagination.tailwind') }}
         </div>
 
     </div>
 
 </main>
 
- <div class="w-full mt-10">
+<div class="w-full mt-10">
     <x-basic-sciences-footer />
 </div>
 
 </body>
 </html>
-
-

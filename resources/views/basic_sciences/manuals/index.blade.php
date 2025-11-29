@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manuales de Maestros</title>
     @vite('resources/css/app.css')
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -21,7 +22,11 @@
                 📘 Manuales Subidos por Maestros
             </h1>
             
-            <form method="GET" class="bg-gray-50 p-4 rounded-lg shadow mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- BUSCADOR -->
+            <form method="GET" 
+                  class="bg-gray-50 p-4 rounded-lg shadow mb-6 
+                         grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
                 <div>
                     <label class="text-sm font-semibold">Buscar por maestro</label>
                     <input type="text"
@@ -45,6 +50,7 @@
                         🔍 Buscar
                     </button>
                 </div>
+
             </form>
 
             <a href="{{ route('basic_sciences.index') }}"
@@ -52,6 +58,8 @@
                 ← Volver al inicio
             </a>
 
+
+            <!-- TABLA -->
             <div class="overflow-x-auto mt-6 rounded-xl border border-gray-200 shadow">
 
                 <table class="min-w-full text-xs sm:text-sm">
@@ -68,7 +76,6 @@
                     </thead>
 
                     <tbody class="text-gray-800">
-
                         @foreach($manuals as $m)
                             <tr class="border-b hover:bg-gray-50 transition">
 
@@ -87,7 +94,7 @@
                                 </td>
 
                                 <td class="px-4 py-3">
-                                    {{ $m->teacherSubject->subject->career->name  ?? 'Materia común' }}
+                                    {{ $m->teacherSubject->subject->career->name ?? 'Materia común' }}
                                 </td>
 
                                 <td class="px-4 py-3 whitespace-nowrap">
@@ -112,11 +119,16 @@
 
                             </tr>
                         @endforeach
-
                     </tbody>
 
                 </table>
 
+            </div>
+
+
+            <!-- PAGINACIÓN -->
+            <div class="mt-6 flex justify-center">
+                {{ $manuals->links('vendor.pagination.tailwind') }}
             </div>
 
         </div>
@@ -127,4 +139,5 @@
 
 </body>
 </html>
+
 

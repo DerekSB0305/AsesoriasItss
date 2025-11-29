@@ -19,10 +19,10 @@ class TeacherController extends Controller
      */
     public function index(Request $request)
     {
-        $search = $request->search;
-        $tutor = $request->tutor;
+        $search  = $request->search;
+        $tutor   = $request->tutor;
         $science = $request->science;
-        $degree = $request->degree;
+        $degree  = $request->degree;
 
         $teachers = Teacher::with('career')
             ->when($search, function ($q) use ($search) {
@@ -41,11 +41,18 @@ class TeacherController extends Controller
             ->when($degree, function ($q) use ($degree) {
                 $q->where('degree', 'like', "%$degree%");
             })
-            ->get();
+            ->orderBy('name', 'ASC')
+            ->paginate(10)
+            ->appends($request->query());
 
-        return view('basic_sciences.teachers.index', compact('teachers'));
+        return view('basic_sciences.teachers.index', compact(
+            'teachers',
+            'search',
+            'tutor',
+            'science',
+            'degree'
+        ));
     }
-
 
     public function create()
     {
@@ -228,11 +235,10 @@ class TeacherController extends Controller
         $query = Teacher::with([
             'career',
             'manuals',
-            'advisories.advisoryDetail' // necesario para filtrar activas
+            'advisories.advisoryDetail'
         ])
             ->where('career_id', $careerId);
 
-        // FILTRO POR NOMBRE
         if (request('nombre')) {
             $search = request('nombre');
             $query->where(function ($q) use ($search) {
@@ -242,28 +248,23 @@ class TeacherController extends Controller
             });
         }
 
-        // FILTRO TUTOR
         if (request('tutor') !== null && request('tutor') !== '') {
             $query->where('tutor', request('tutor'));
         }
 
-        // FILTRO CB
         if (request('cb') !== null && request('cb') !== '') {
             $query->where('science_department', request('cb'));
         }
 
-        $teachers = $query->get();
+        $teachers = $query->paginate(10)->withQueryString();
 
         foreach ($teachers as $t) {
-
-            // SOLO asesorías activas (Pendiente o Aprobado)
             $t->total_advisories = $t->advisories
                 ->filter(function ($adv) {
                     return in_array($adv->advisoryDetail->status, ['Pendiente', 'Aprobado']);
                 })
                 ->count();
 
-            // CANTIDAD DE MANUALES
             $t->manuals_count = $t->manuals->count();
         }
 
