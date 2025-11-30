@@ -2,148 +2,174 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Asesorías</title>
     @vite('resources/css/app.css')
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-<x-teachers-navbar/>
+    {{-- NAVBAR --}}
+    <div class="fixed top-0 left-0 w-full z-50 shadow">
+        <x-teachers-navbar />
+    </div>
 
-<div class="flex-grow p-6">
+<main class="flex-1 mt-28 mb-20 px-4">
 
-<div class="max-w-6xl mx-auto bg-white shadow-xl rounded-2xl p-8">
+<div class="max-w-7xl mx-auto bg-white shadow-xl rounded-xl p-6 sm:p-8">
 
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-3">
-        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">📅 Mis Asesorías Programadas</h1>
+    {{-- HEADER --}}
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-[#0B3D7E]">
+            📅 Mis Asesorías Programadas
+        </h1>
 
         <a href="{{ route('teachers.index') }}"
-           class="text-green-600 hover:text-green-800 font-semibold">
+           class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg font-semibold">
             ← Volver al panel
         </a>
     </div>
 
+    {{-- SIN ASESORÍAS --}}
     @if ($advisories->count() == 0)
-
-        <p class="text-center text-gray-600 py-6 text-lg">
+        <p class="text-center text-gray-600 text-lg py-8">
             No tienes asesorías asignadas.
         </p>
-
     @else
 
-        <div class="overflow-x-auto">
+    {{-- TABLA --}}
+    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow">
 
-            <table class="min-w-full border-collapse rounded-lg overflow-hidden shadow">
+        <table class="min-w-full text-xs sm:text-sm">
 
-                <thead class="text-white uppercase text-xs font-semibold" style="background-color:#0B3D7E;">
-                    <tr>
-                        <th class="px-4 py-3">Fecha</th>
-                        <th class="px-4 py-3">Hora</th>
-                        <th class="px-4 py-3">Materia</th>
-                        <th class="px-4 py-3">Carrera</th>
-                        <th class="px-4 py-3 text-center">Alumnos</th>
-                        <th class="px-4 py-3">Aula</th>
-                        <th class="px-4 py-3">Edificio</th>
-                        <th class="px-4 py-3">Estado</th>
-                        <th class="px-4 py-3 text-center">Ficha</th>
-                        <th class="px-4 py-3 text-center">Acciones</th>
-                    </tr>
-                </thead>
+            <thead class="text-white uppercase font-semibold"
+                   style="background-color:#0B3D7E;">
+                <tr>
+                    <th class="px-4 py-3 whitespace-nowrap">Fecha</th>
+                    <th class="px-4 py-3 whitespace-nowrap">Horario</th>
+                    <th class="px-4 py-3 whitespace-nowrap">Materia</th>
+                    <th class="px-4 py-3 whitespace-nowrap">Carrera</th>
+                    <th class="px-4 py-3 whitespace-nowrap text-center">Alumnos</th>
+                    <th class="px-4 py-3 whitespace-nowrap">Aula</th>
+                    <th class="px-4 py-3 whitespace-nowrap">Edificio</th>
+                    <th class="px-4 py-3 whitespace-nowrap">Estado</th>
+                    <th class="px-4 py-3 whitespace-nowrap text-center">Ficha</th>
+                    <th class="px-4 py-3 whitespace-nowrap text-center">Acciones</th>
+                </tr>
+            </thead>
 
-                <tbody class="text-gray-700">
+            <tbody class="text-gray-800">
 
-                    @foreach ($advisories as $adv)
+                @foreach ($advisories as $adv)
 
-                        @php
-                            $startDate = \Carbon\Carbon::parse($adv->start_date)->format('d/m/Y');
-                            $endDate   = \Carbon\Carbon::parse($adv->end_date)->format('d/m/Y');
+                    @php
+                        $startDate = \Carbon\Carbon::parse($adv->start_date)->format('d/m/Y');
+                        $endDate   = \Carbon\Carbon::parse($adv->end_date)->format('d/m/Y');
+                        $startTime = \Carbon\Carbon::parse($adv->start_time)->format('H:i');
+                        $endTime   = \Carbon\Carbon::parse($adv->end_time)->format('H:i');
+                        $day = ucfirst($adv->day_of_week);
+                    @endphp
 
-                            $startTime = \Carbon\Carbon::parse($adv->start_time)->format('H:i');
-                            $endTime   = \Carbon\Carbon::parse($adv->end_time)->format('H:i');
+                    <tr class="border-b hover:bg-gray-100 transition">
 
-                            $day = ucfirst($adv->day_of_week);
-                        @endphp
+                        {{-- Fecha --}}
+                        <td class="px-4 py-3 font-semibold whitespace-nowrap">
+                            📅 {{ $startDate }} – {{ $endDate }}
+                        </td>
 
-                        <tr class="border-b hover:bg-gray-50 transition">
+                        {{-- Horario --}}
+                        <td class="px-4 py-3 font-semibold whitespace-nowrap">
+                            🕒 {{ $day }} {{ $startTime }} – {{ $endTime }}
+                        </td>
 
-                            <td class="px-4 py-3 font-semibold">
-                                📅 Del {{ $startDate }} al {{ $endDate }}
-                            </td>
+                        {{-- Materia --}}
+                        <td class="px-4 py-3 font-semibold whitespace-nowrap">
+                            {{ $adv->materiaSolicitada }}
+                        </td>
 
-                            <td class="px-4 py-3 font-semibold">
-                                🕒 {{ $day }} {{ $startTime }} - {{ $endTime }}
-                            </td>
+                        {{-- Carrera --}}
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            {{ $adv->carreraSolicitada }}
+                        </td>
 
-                            {{-- ✔ MATERIA SOLICITADA --}}
-                            <td class="px-4 py-3 font-semibold">
-                                {{ $adv->materiaSolicitada }}
-                            </td>
+                        {{-- Alumnos --}}
+                        <td class="px-4 py-3 text-center font-bold whitespace-nowrap">
+                            {{ $adv->advisoryDetail->students->count() }}
+                        </td>
 
-                            {{-- ✔ CARRERA SOLICITADA --}}
-                            <td class="px-4 py-3">
-                                {{ $adv->carreraSolicitada }}
-                            </td>
+                        {{-- Aula --}}
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            {{ $adv->classroom ?? '---' }}
+                        </td>
 
-                            <td class="px-4 py-3 text-center font-bold">
-                                {{ optional($adv->advisoryDetail->students)->count() ?? 0 }}
-                            </td>
+                        {{-- Edificio --}}
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            {{ $adv->building ?? '---' }}
+                        </td>
 
-                            <td class="px-4 py-3">{{ $adv->classroom ?? '---' }}</td>
-                            <td class="px-4 py-3">{{ $adv->building ?? '---' }}</td>
+                        {{-- Estado --}}
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <span class="px-3 py-1 rounded-full text-white text-xs font-semibold
+                                @if($adv->advisoryDetail->status == 'Pendiente') bg-yellow-600
+                                @elseif($adv->advisoryDetail->status == 'Aprobado') bg-green-600
+                                @else bg-red-600 @endif">
+                                {{ $adv->advisoryDetail->status }}
+                            </span>
+                        </td>
 
-                            <td class="px-4 py-3">
-                                <span class="px-3 py-1 rounded-full text-white text-xs font-semibold
-                                    @if($adv->advisoryDetail->status == 'Pending') bg-yellow-600
-                                    @elseif($adv->advisoryDetail->status == 'Aprobado') bg-green-600
-                                    @else bg-red-600 @endif">
-                                    {{ $adv->advisoryDetail->status }}
-                                </span>
-                            </td>
+                        {{-- Archivo --}}
+                        <td class="px-4 py-3 text-center whitespace-nowrap">
+                            @if ($adv->assignment_file)
+                                <a href="{{ asset('storage/'.$adv->assignment_file) }}"
+                                   target="_blank"
+                                   class="text-blue-600 hover:underline font-medium">
+                                    📄 Ver archivo
+                                </a>
+                            @else
+                                <span class="text-gray-500">---</span>
+                            @endif
+                        </td>
 
-                            <td class="px-4 py-3 text-center">
-                                @if ($adv->assignment_file)
-                                    <a href="{{ asset('storage/'.$adv->assignment_file) }}"
-                                       target="_blank"
-                                       class="text-blue-600 hover:underline font-medium">
-                                        Ver archivo
-                                    </a>
-                                @else
-                                    <span class="text-gray-500">---</span>
-                                @endif
-                            </td>
+                        {{-- Acciones --}}
+                        <td class="px-4 py-3 text-center whitespace-nowrap">
+                            <div class="flex flex-col sm:flex-row gap-2 justify-center">
 
-                            <td class="px-4 py-3 text-center space-y-2">
                                 <a href="{{ route('teachers.advisories.reports.by_advisory', $adv->advisory_id) }}"
-                                   class="inline-flex items-center justify-center w-full sm:w-auto 
-                                          bg-blue-600 text-white px-4 py-2 rounded-lg font-medium
-                                          shadow hover:bg-blue-700 transition">
-                                    📄 Ver reportes
+                                   class="px-3 py-1 bg-blue-600 text-white rounded-lg shadow font-semibold hover:bg-blue-700">
+                                    📄 Reportes
                                 </a>
 
                                 <a href="{{ route('teachers.advisories.reports.create', $adv->advisory_id) }}"
-                                   class="inline-flex items-center justify-center w-full sm:w-auto
-                                          bg-green-600 text-white px-4 py-2 rounded-lg font-medium
-                                          shadow hover:bg-green-700 transition">
-                                    ⬆️ Subir reporte
+                                   class="px-3 py-1 bg-green-600 text-white rounded-lg shadow font-semibold hover:bg-green-700">
+                                    ⬆️ Subir
                                 </a>
-                            </td>
 
-                        </tr>
+                            </div>
+                        </td>
 
-                    @endforeach
+                    </tr>
 
-                </tbody>
+                @endforeach
 
-            </table>
+            </tbody>
 
-        </div>
+        </table>
+
+    </div>
+
+    {{-- PAGINACIÓN --}}
+    <div class="mt-6 flex justify-center">
+        {{ $advisories->links('vendor.pagination.tailwind') }}
+    </div>
 
     @endif
 
 </div>
-</div>
 
-<x-basic-sciences-footer/>
+</main>
+
+<x-basic-sciences-footer />
 
 </body>
 </html>

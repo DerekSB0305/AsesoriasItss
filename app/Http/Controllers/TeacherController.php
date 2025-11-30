@@ -184,22 +184,25 @@ class TeacherController extends Controller
             'teacherSubject.teacher',
             'teacherSubject.subject.career',
             'advisoryDetail.students',
-            'advisoryDetail.requests.subject' // << NECESARIO PARA saber la materia solicitada
+            'advisoryDetail.requests.subject'
         ])
             ->whereHas('teacherSubject', fn($q) => $q->where('teacher_user', $teacherUser))
             ->orderBy('start_date', 'ASC')
             ->orderBy('start_time', 'ASC')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
-        // 🔥 AGREGAR MATERIA SOLICITADA (si existe)
+        // 🔥 Agregar datos útiles a cada registro
         foreach ($advisories as $adv) {
             $solicitud = optional($adv->advisoryDetail->requests)->first();
+
             $adv->materiaSolicitada = $solicitud?->subject?->name ?? 'Materia común';
             $adv->carreraSolicitada = $solicitud?->subject?->career->name ?? 'Materia común';
         }
 
         return view('teachers.advisories.index', compact('advisories'));
     }
+
 
 
     public function showChangePasswordForm()

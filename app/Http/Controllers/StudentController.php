@@ -47,7 +47,9 @@ class StudentController extends Controller
     public function indexTeacher()
     {
         $teacher_user = Auth::user()->user;
-        $students = Student::where('teacher_user', $teacher_user)->get();
+        $students = Student::where('teacher_user', $teacher_user)
+            ->with(['career', 'teacher'])
+            ->paginate(10);
         return view('teachers.students.index', compact('students'));
     }
 

@@ -49,10 +49,13 @@ class RequestsController extends Controller
 
         $requests = Requests::where('teacher_user', $teacher_user)
             ->with(['student', 'subject'])
-            ->get();
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
 
         return view('teachers.requests.index', compact('requests'));
     }
+
 
     public function create()
     {

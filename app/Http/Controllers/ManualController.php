@@ -17,13 +17,16 @@ class ManualController extends Controller
     {
         $teacherUser = Auth::user()->teacher->teacher_user;
 
-        // Solo manuales de materias del maestro
         $manuals = Manual::whereHas('teacherSubject', function ($q) use ($teacherUser) {
             $q->where('teacher_user', $teacherUser);
-        })->get();
+        })
+            ->with(['teacherSubject.subject'])
+            ->paginate(10)
+            ->withQueryString();
 
         return view('teachers.manuals.index', compact('manuals'));
     }
+
 
     /**
      * Seleccionar materia para subir manual
