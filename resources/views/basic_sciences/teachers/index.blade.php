@@ -69,7 +69,7 @@
         <a href="{{ route('basic_sciences.teachers.create') }}"
            class="px-4 py-2 rounded text-white font-semibold shadow text-center"
            style="background-color:#28A745;">
-            ➕ Agregar Maestro
+            ➕ Crear Maestro
         </a>
 
         <a href="{{ route('basic_sciences.index') }}"
@@ -99,7 +99,6 @@
                     <th class="px-2 py-2 text-left">Ciencias Básicas</th>
                     <th class="px-2 py-2 text-left">Carrera</th>
                     <th class="px-2 py-2 text-center">Horario</th>
-                    <th class="px-2 py-2 text-center">Asesoría</th>
                     <th class="px-2 py-2 text-center">Acciones</th>
                 </tr>
             </thead>
@@ -128,16 +127,6 @@
                             @endif
                         </td>
 
-                        <td class="px-2 py-2 text-center">
-                            @if($t->advisory)
-                                <a href="{{ route('basic_sciences.advisories.show', $t->advisory) }}"
-                                   class="text-blue-600 hover:underline">
-                                    Ver
-                                </a>
-                            @else
-                                <span class="text-gray-500">Sin asignar</span>
-                            @endif
-                        </td>
 
                         <td class="px-2 py-2 text-center">
                             <div class="flex flex-col sm:flex-row justify-center gap-2">

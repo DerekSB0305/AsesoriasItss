@@ -111,6 +111,7 @@
                         <input type="time" name="end_time"
                                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-600"
                                required>
+                         <p class="text-xs text-gray-500 mt-1">Permitido: 07:00 – 16:00</p>
                     </div>
                 </div>
 

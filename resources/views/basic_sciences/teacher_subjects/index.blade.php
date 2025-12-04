@@ -27,7 +27,7 @@
             <a href="{{ route('basic_sciences.teacher_subjects.create') }}"
                class="px-4 py-2 rounded text-center text-white font-semibold shadow hover:opacity-90"
                style="background-color:#28A745;">
-                ➕ Nueva asignación
+                ➕  Asignación de materias a maestro
             </a>
 
             <a href="{{ route('basic_sciences.index') }}"

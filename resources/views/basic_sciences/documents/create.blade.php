@@ -54,6 +54,7 @@
                            name="file"
                            class="mt-1 w-full px-3 py-2 border rounded-lg text-sm focus:ring-[#0B3D7E] focus:border-[#0B3D7E]"
                            required>
+                        <label>archivos permitidos: pdf,doc,docx,png,jpg,jpeg,xsl</label>
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-4">

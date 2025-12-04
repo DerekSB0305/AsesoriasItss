@@ -263,7 +263,7 @@ class AdvisoriesController extends Controller
             'reports'
         ])->findOrFail($id);
 
-        // Materia solicitada real
+        // Materia solicitada 
         $solicitud = $advisory->advisoryDetail->requests->first();
         $materiaSolicitada = $solicitud?->subject?->name ?? 'N/A';
 

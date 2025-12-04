@@ -80,7 +80,7 @@
                         <th class="px-3 py-3">A. Paterno</th>
                         <th class="px-3 py-3">A. Materno</th>
                         <th class="px-3 py-3">Carrera</th>
-                        <th class="px-3 py-3">Sem.</th>
+                        <th class="px-3 py-3">Semestre</th>
                         <th class="px-3 py-3">Grupo</th>
                         <th class="px-3 py-3">Materia</th>
                         <th class="px-3 py-3">Género</th>
@@ -89,8 +89,6 @@
                         <th class="px-3 py-3 whitespace-nowrap">Horario</th>
                         <th class="px-3 py-3 whitespace-nowrap">Asesoría</th>
                         <th class="px-3 py-3">Asesor</th>
-                        <th class="px-3 py-3">Evaluación</th>
-                        <th class="px-3 py-3 text-center">Acciones</th>
                     </tr>
                 </thead>
 
@@ -123,8 +121,14 @@
                             {{ $student->teacher->name ?? 'N/A' }}
                         </td>
 
-                        <td class="px-3 py-3 whitespace-nowrap">
-                            {{ $student->schedule ?? 'N/A' }}
+                        <td class="px-2 py-2 text-center">
+                            @if($student->schedule_file)
+                                <a href="{{ asset('storage/'.$student->schedule_file) }}"
+                                   class="text-blue-600 hover:text-blue-800"
+                                   target="_blank">📄 Ver</a>
+                            @else
+                                <span class="text-gray-500">No disponible</span>
+                            @endif
                         </td>
 
                         <td class="px-3 py-3 whitespace-nowrap">
@@ -133,17 +137,6 @@
 
                         <td class="px-3 py-3">
                             {{ $student->advisor ?? 'N/A' }}
-                        </td>
-
-                        <td class="px-3 py-3">
-                            {{ $student->evaluation ?? 'N/A' }}
-                        </td>
-
-                        <td class="px-3 py-3 text-center">
-                            <a href="#"
-                               class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-xs sm:text-sm">
-                               Ver
-                            </a>
                         </td>
 
                     </tr>

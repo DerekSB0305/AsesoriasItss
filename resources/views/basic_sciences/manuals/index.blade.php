@@ -106,13 +106,13 @@
                                     <a href="{{ asset('storage/' . $m->file_path) }}"
                                        target="_blank"
                                        class="px-4 py-1 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition">
-                                        👁 Ver
+                                         Ver
                                     </a>
 
                                     <a href="{{ asset('storage/' . $m->file_path) }}"
                                        download
                                        class="px-4 py-1 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition">
-                                        ⬇ Descargar
+                                         Descargar
                                     </a>
 
                                 </td>
