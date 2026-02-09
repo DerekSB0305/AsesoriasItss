@@ -33,7 +33,7 @@
 
                 <p class="mb-2 text-gray-700">
                     <strong class="text-gray-900">Materia:</strong>
-                    {{ $advisory->teacherSubject->subject->name }}
+                    {{ $advisory->materiaSolicitada }}
                 </p>
 
                 <p class="text-gray-700">

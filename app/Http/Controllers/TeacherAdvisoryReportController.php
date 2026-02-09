@@ -16,7 +16,7 @@ class TeacherAdvisoryReportController extends Controller
     {
         $user = auth()->user()->user;
 
-        $reports = AdvisoryReport::whereHas('advisory.teacherSubject', function($q) use ($user) {
+        $reports = AdvisoryReport::whereHas('advisory.teacherSubject', function ($q) use ($user) {
             $q->where('teacher_user', $user);
         })->get();
 
@@ -28,11 +28,22 @@ class TeacherAdvisoryReportController extends Controller
      */
     public function create($advisory_id)
     {
-        $advisory = Advisories::with(['teacherSubject.teacher', 'advisoryDetail.students'])
-            ->findOrFail($advisory_id);
+        $advisory = Advisories::with([
+            'teacherSubject.teacher',
+            'teacherSubject.subject.career',
+            'advisoryDetail.students',
+            'advisoryDetail.requests.subject.career',
+        ])->findOrFail($advisory_id);
+
+        // 🔥 Misma lógica que en myAdvisories()
+        $solicitud = optional($advisory->advisoryDetail->requests)->first();
+
+        $advisory->materiaSolicitada = $solicitud?->subject?->name ?? 'Materia común';
+        $advisory->carreraSolicitada = $solicitud?->subject?->career->name ?? 'Materia común';
 
         return view('teachers.advisories.reports.create', compact('advisory'));
     }
+
 
     /**
      * Guardar reporte.
@@ -55,8 +66,8 @@ class TeacherAdvisoryReportController extends Controller
         $counter = 1;
         while (Storage::disk('public')->exists("$dir/$filename")) {
             $filename = pathinfo($origName, PATHINFO_FILENAME)
-                      . "_$counter."
-                      . $file->getClientOriginalExtension();
+                . "_$counter."
+                . $file->getClientOriginalExtension();
             $counter++;
         }
 
@@ -126,8 +137,8 @@ class TeacherAdvisoryReportController extends Controller
             $counter = 1;
             while (Storage::disk('public')->exists("$dir/$filename")) {
                 $filename = pathinfo($origName, PATHINFO_FILENAME)
-                          . "_$counter."
-                          . $file->getClientOriginalExtension();
+                    . "_$counter."
+                    . $file->getClientOriginalExtension();
                 $counter++;
             }
 
