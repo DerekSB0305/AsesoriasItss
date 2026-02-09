@@ -43,7 +43,7 @@ require __DIR__ . '/auth.php';
 
 Route::prefix('basic_sciences')
     ->name('basic_sciences.')
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'Ciencias_basicas'])
     ->group(function () {
 
         Route::get('/', fn() => view('basic_sciences.index'))->name('index');
